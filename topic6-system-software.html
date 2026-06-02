@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Topic 6: System Software — CS 9618</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .page-nav { background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:64px; z-index:90; overflow-x:auto; }
+    .page-nav-inner { max-width:1100px; margin:0 auto; padding:0 2rem; display:flex; gap:0; }
+    .page-nav a { display:block; padding:.75rem 1.1rem; font-size:.82rem; font-weight:600; color:var(--text-muted); text-decoration:none; white-space:nowrap; border-bottom:3px solid transparent; transition:color .2s,border-color .2s; }
+    .page-nav a:hover,.page-nav a.active { color:var(--primary); border-bottom-color:var(--primary); }
+
+    .lesson-wrap { max-width:1100px; margin:0 auto; padding:2.5rem 2rem 4rem; display:grid; grid-template-columns:1fr 280px; gap:2.5rem; align-items:start; }
+    @media(max-width:900px){ .lesson-wrap{grid-template-columns:1fr} .sidebar{display:none} }
+
+    .sidebar { position:sticky; top:120px; }
+    .sidebar-box { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; margin-bottom:1rem; box-shadow:var(--shadow); }
+    .sidebar-box h3 { font-size:.85rem; font-weight:700; margin-bottom:.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; }
+    .toc-list { list-style:none; }
+    .toc-list li { padding:.2rem 0; }
+    .toc-list a { font-size:.82rem; color:var(--text-muted); text-decoration:none; display:block; padding:.25rem .5rem; border-radius:4px; transition:background .15s,color .15s; }
+    .toc-list a:hover { background:var(--surface2); color:var(--primary); }
+    .toc-list a.active { background:var(--accent-light); color:var(--primary); font-weight:600; }
+
+    .lesson-section { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:2rem 2.25rem; margin-bottom:2rem; box-shadow:var(--shadow); scroll-margin-top:130px; }
+    .lesson-section h2 { font-size:1.5rem; font-weight:800; color:var(--primary); margin-bottom:.4rem; display:flex; align-items:center; gap:.6rem; }
+    .section-num { background:var(--primary); color:#fff; width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:.9rem; font-weight:800; flex-shrink:0; }
+    .lesson-section h3 { font-size:1.1rem; font-weight:700; margin:1.75rem 0 .75rem; padding-bottom:.4rem; border-bottom:2px solid var(--border); color:var(--text); }
+    .lesson-section h4 { font-size:.95rem; font-weight:700; margin:1.25rem 0 .5rem; color:var(--primary-light); }
+    .lesson-section p { font-size:.9rem; line-height:1.75; color:var(--text); margin-bottom:.75rem; }
+    .lesson-section ul,.lesson-section ol { padding-left:1.5rem; margin-bottom:.75rem; }
+    .lesson-section li { font-size:.9rem; line-height:1.75; color:var(--text); }
+
+    /* Worked example */
+    .worked { background:linear-gradient(135deg,#e0f2f1,#f0fafa); border:1px solid #80cbc4; border-left:5px solid #00695c; border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:1.25rem 1.5rem; margin:1rem 0; }
+    [data-theme="dark"] .worked { background:#00201d; border-color:#00695c; }
+    .worked .worked-title { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#00695c; margin-bottom:.6rem; }
+    [data-theme="dark"] .worked .worked-title { color:#80cbc4; }
+    .worked p,.worked li { font-size:.875rem; color:var(--text); }
+    .worked .step { display:flex; gap:.75rem; margin:.4rem 0; align-items:flex-start; }
+    .worked .step-num { background:#00695c; color:#fff; min-width:22px; height:22px; border-radius:50%; font-size:.72rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+    .worked .step-text { font-size:.875rem; line-height:1.6; }
+
+    /* Practice question */
+    .practice { background:var(--surface2); border:1px solid var(--border); border-left:5px solid #2e7d32; border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:1.25rem 1.5rem; margin:1rem 0; }
+    .practice .pq-title { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#2e7d32; margin-bottom:.6rem; }
+    .practice p,.practice li { font-size:.875rem; }
+    .practice .reveal-btn { background:#2e7d32; color:#fff; border:none; border-radius:6px; padding:.4rem 1rem; font-size:.8rem; font-weight:700; cursor:pointer; margin-top:.75rem; transition:background .2s; }
+    .practice .reveal-btn:hover { background:#1b5e20; }
+    .practice .answer-reveal { display:none; margin-top:.75rem; padding:.75rem 1rem; background:#e8f5e9; border-radius:var(--radius-sm); font-size:.875rem; }
+    [data-theme="dark"] .practice .answer-reveal { background:#1b2e1c; color:#c8e6c9; }
+    .practice .answer-reveal.open { display:block; }
+
+    /* Callouts */
+    .callout { background:var(--surface2); border-left:4px solid var(--accent); border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:.85rem 1.1rem; margin:.75rem 0; font-size:.875rem; color:var(--text); }
+    .callout.warn { border-color:#f59e0b; }
+    .callout.tip  { border-color:#22c55e; }
+    .callout.exam { border-color:#7c3aed; }
+
+    /* Key term */
+    .key-term { background:linear-gradient(transparent 60%,rgba(0,105,92,.15) 60%); font-weight:700; }
+
+    /* Objectives & breadcrumb */
+    .objectives-list { list-style:none; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:.5rem; }
+    .objectives-list li { font-size:.85rem; display:flex; align-items:flex-start; gap:.5rem; padding:.4rem 0; color:var(--text); }
+    .objectives-list li::before { content:'✦'; color:var(--accent); flex-shrink:0; }
+    .breadcrumb { display:flex; align-items:center; gap:.4rem; font-size:.82rem; color:var(--text-muted); margin-bottom:1.5rem; }
+    .breadcrumb a { color:var(--primary-light); text-decoration:none; }
+    .breadcrumb a:hover { text-decoration:underline; }
+
+    /* Checklist */
+    .checklist { list-style:none; padding:0; }
+    .checklist li { display:flex; align-items:flex-start; gap:.6rem; padding:.35rem 0; font-size:.875rem; color:var(--text); }
+    .checklist li::before { content:'☐'; color:var(--primary-light); font-size:1rem; flex-shrink:0; }
+
+    /* OS function cards */
+    .os-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:.75rem; margin:.75rem 0; }
+    .os-card { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:.9rem 1rem; }
+    .os-card .os-icon { font-size:1.4rem; margin-bottom:.3rem; }
+    .os-card h4 { font-size:.88rem; font-weight:800; color:var(--primary); margin:0 0 .35rem; }
+    .os-card ul { font-size:.78rem; color:var(--text-muted); padding-left:1.1rem; margin:0; line-height:1.55; }
+
+    /* Scheduling table / comparison table */
+    .plain-table { width:100%; border-collapse:collapse; font-size:.875rem; margin:.75rem 0; }
+    .plain-table th { background:var(--primary); color:#fff; padding:.45rem .8rem; text-align:left; }
+    .plain-table td { border:1px solid var(--border); padding:.4rem .8rem; color:var(--text); vertical-align:top; }
+    .plain-table tr:nth-child(even) td { background:var(--surface2); }
+
+    /* Process state diagram */
+    .state-flow { display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; margin:.75rem 0; }
+    .state-box { background:var(--surface2); border:2px solid var(--primary); border-radius:var(--radius-sm); padding:.5rem 1rem; font-size:.85rem; font-weight:700; color:var(--primary); text-align:center; }
+    .state-arrow { color:var(--text-muted); font-size:1rem; display:flex; flex-direction:column; align-items:center; gap:.1rem; font-size:.75rem; }
+    .state-arrow span { color:var(--primary); font-size:1.1rem; font-weight:700; }
+
+    /* Compiler stage pipeline */
+    .pipeline { display:flex; flex-direction:column; gap:0; margin:.75rem 0; }
+    .pipe-stage { display:flex; align-items:stretch; }
+    .pipe-box { background:var(--primary); color:#fff; padding:.6rem 1.2rem; font-weight:700; font-size:.85rem; min-width:180px; border-radius:var(--radius-sm) 0 0 var(--radius-sm); display:flex; align-items:center; }
+    .pipe-desc { background:var(--surface2); border:1px solid var(--border); border-left:none; padding:.6rem 1.1rem; flex:1; font-size:.83rem; color:var(--text); display:flex; align-items:center; border-radius:0 var(--radius-sm) var(--radius-sm) 0; }
+    .pipe-stage + .pipe-stage { margin-top:3px; }
+
+    /* Memory diagram */
+    .mem-diagram { display:flex; flex-direction:column; align-items:center; gap:3px; margin:.75rem 0; }
+    .mem-row { display:flex; width:100%; max-width:480px; border-radius:4px; overflow:hidden; }
+    .mem-cell { padding:.45rem .8rem; font-size:.8rem; font-weight:700; color:#fff; text-align:center; }
+
+    /* Paging / segmentation visual */
+    .page-visual { display:grid; grid-template-columns:repeat(auto-fill,minmax(60px,1fr)); gap:3px; margin:.75rem 0; max-width:480px; }
+    .page-block { padding:.45rem; border-radius:4px; font-size:.72rem; font-weight:700; color:#fff; text-align:center; }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="header-inner">
+    <a class="logo" href="index.html">
+      <div class="logo-icon">💻</div>
+      <div>
+        <div class="logo-text">CS 9618</div>
+        <div class="logo-sub">Cambridge AS &amp; A Level</div>
+      </div>
+    </a>
+    <div class="header-actions">
+      <button class="btn-icon" id="theme-btn" title="Toggle theme">🌙</button>
+    </div>
+  </div>
+</header>
+
+<!-- Section nav -->
+<nav class="page-nav" aria-label="Sections">
+  <div class="page-nav-inner">
+    <a href="#os-functions" class="active">1. OS Functions</a>
+    <a href="#memory-mgmt">2. Memory Management</a>
+    <a href="#process-mgmt">3. Process Management</a>
+    <a href="#file-device">4. File &amp; Device</a>
+    <a href="#translators">5. Translators</a>
+    <a href="#compiler-stages">6. Compiler Stages</a>
+    <a href="#comparison">7. Compiler vs Interpreter</a>
+    <a href="#utility">8. Utility Software</a>
+    <a href="#exam-practice">📝 Exam Practice</a>
+  </div>
+</nav>
+
+<div class="lesson-wrap">
+<main>
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="index.html">Home</a>
+    <span>›</span>
+    <a href="index.html#tab-as">Paper 1 — Theory</a>
+    <span>›</span>
+    <strong style="color:var(--text)">Topic 6: System Software</strong>
+  </div>
+
+  <!-- Hero -->
+  <div class="lesson-section" style="background:linear-gradient(135deg,#004d40,#00695c,#00897b);color:#fff;border:none">
+    <div style="display:flex;align-items:flex-start;gap:1.25rem">
+      <div style="font-size:3rem;flex-shrink:0">🗂️</div>
+      <div>
+        <div style="font-size:.75rem;font-weight:700;opacity:.7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem">Paper 1 · Topic 6</div>
+        <h1 style="font-size:1.9rem;font-weight:900;margin-bottom:.5rem;color:#fff">System Software</h1>
+        <p style="opacity:.85;font-size:.95rem;max-width:620px;margin-bottom:1rem;color:#fff">Operating system functions, memory and process management, language translators (assembler, compiler, interpreter), and utility programs.</p>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+          <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">Paper 1 · AS &amp; A Level</span>
+          <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">~12% of Paper 1 marks</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Learning objectives -->
+  <div class="lesson-section">
+    <h2><span class="section-num">✦</span> Learning Objectives</h2>
+    <p>By the end of this topic you should be able to:</p>
+    <ul class="objectives-list">
+      <li>State the main functions of an operating system</li>
+      <li>Describe paging, segmentation, and virtual memory</li>
+      <li>Explain process scheduling algorithms: round-robin, shortest job first, priority</li>
+      <li>Describe the three process states: ready, running, blocked</li>
+      <li>Explain file management and device management including device drivers</li>
+      <li>Distinguish between GUI and CLI user interfaces</li>
+      <li>Describe the role of an assembler, compiler, and interpreter</li>
+      <li>List and explain all stages of compilation</li>
+      <li>Compare compilers and interpreters — advantages and disadvantages of each</li>
+      <li>Describe common utility programs and their purpose</li>
+    </ul>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 1: OS FUNCTIONS               -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="os-functions">
+    <h2><span class="section-num">1</span> Operating System Functions</h2>
+
+    <p>An <span class="key-term">operating system (OS)</span> is system software that manages hardware resources and provides services to application programs and users. Without it, each application would need to control the hardware directly — impossible to manage at scale.</p>
+
+    <div class="os-grid">
+      <div class="os-card">
+        <div class="os-icon">🧠</div>
+        <h4>Memory Management</h4>
+        <ul>
+          <li>Allocates RAM to processes</li>
+          <li>Paging and segmentation</li>
+          <li>Virtual memory (disk as RAM)</li>
+          <li>Prevents processes accessing each other's memory</li>
+        </ul>
+      </div>
+      <div class="os-card">
+        <div class="os-icon">⚙️</div>
+        <h4>Process Management</h4>
+        <ul>
+          <li>Scheduling CPU time between processes</li>
+          <li>Creating, pausing, resuming, killing processes</li>
+          <li>Handling interrupts</li>
+          <li>Multi-tasking / multi-programming</li>
+        </ul>
+      </div>
+      <div class="os-card">
+        <div class="os-icon">📁</div>
+        <h4>File Management</h4>
+        <ul>
+          <li>Hierarchical directory structure</li>
+          <li>File permissions (read/write/execute)</li>
+          <li>File allocation on disk</li>
+          <li>Sequential and random access</li>
+        </ul>
+      </div>
+      <div class="os-card">
+        <div class="os-icon">🔌</div>
+        <h4>Device Management</h4>
+        <ul>
+          <li>Device drivers as hardware interface</li>
+          <li>I/O spooling (e.g. print queues)</li>
+          <li>Plug-and-play configuration</li>
+          <li>Interrupt handling for devices</li>
+        </ul>
+      </div>
+      <div class="os-card">
+        <div class="os-icon">🔒</div>
+        <h4>Security &amp; Access</h4>
+        <ul>
+          <li>User authentication (login)</li>
+          <li>Access control lists</li>
+          <li>Audit logs</li>
+          <li>Process isolation</li>
+        </ul>
+      </div>
+      <div class="os-card">
+        <div class="os-icon">🖥️</div>
+        <h4>User Interface</h4>
+        <ul>
+          <li>GUI: windows, icons, menus, pointer</li>
+          <li>CLI: text commands, scripting</li>
+          <li>Shell interprets user commands</li>
+          <li>API for applications</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>1.1 GUI vs CLI</h3>
+    <table class="plain-table">
+      <thead><tr><th>Feature</th><th>GUI (Graphical User Interface)</th><th>CLI (Command Line Interface)</th></tr></thead>
+      <tbody>
+        <tr><td>Interaction</td><td>Mouse, icons, windows, menus</td><td>Typed text commands</td></tr>
+        <tr><td>Ease of use</td><td>Intuitive for beginners</td><td>Requires knowledge of commands</td></tr>
+        <tr><td>Resources</td><td>Higher CPU/RAM overhead</td><td>Very low resource use</td></tr>
+        <tr><td>Automation</td><td>Difficult to script repetitive tasks</td><td>Easy to write scripts and batch jobs</td></tr>
+        <tr><td>Precision</td><td>Limited to provided options</td><td>Fine-grained control of every parameter</td></tr>
+        <tr><td>Examples</td><td>Windows, macOS, Android</td><td>Linux shell (bash), Windows PowerShell</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 2: MEMORY MANAGEMENT          -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="memory-mgmt">
+    <h2><span class="section-num">2</span> Memory Management</h2>
+
+    <p>The OS must share main memory (RAM) among many running processes simultaneously, while keeping each process's data isolated and safe from others.</p>
+
+    <h3>2.1 Paging</h3>
+    <p><span class="key-term">Paging</span> divides both logical memory (the process's view) and physical memory (RAM) into fixed-size blocks:</p>
+    <ul>
+      <li><strong>Page</strong> — a fixed-size block of the process's logical address space (e.g. 4 KB)</li>
+      <li><strong>Frame</strong> — a fixed-size block of physical RAM, the same size as a page</li>
+      <li>The OS maintains a <strong>page table</strong> per process mapping page numbers to frame numbers</li>
+      <li>Pages do <em>not</em> need to be contiguous in RAM — the page table handles the mapping</li>
+      <li>Eliminates <strong>external fragmentation</strong> (wasted gaps between allocations)</li>
+      <li>May cause <strong>internal fragmentation</strong> — last page of a process may not be fully used</li>
+    </ul>
+
+    <div class="page-visual">
+      <div class="page-block" style="background:#00695c">Page 0<br><small>Frame 3</small></div>
+      <div class="page-block" style="background:#00897b">Page 1<br><small>Frame 7</small></div>
+      <div class="page-block" style="background:#00695c">Page 2<br><small>Frame 1</small></div>
+      <div class="page-block" style="background:#00897b">Page 3<br><small>Frame 9</small></div>
+    </div>
+    <p style="font-size:.82rem;color:var(--text-muted)">Pages of one process mapped to non-contiguous frames in RAM — the page table keeps track.</p>
+
+    <h3>2.2 Segmentation</h3>
+    <p><span class="key-term">Segmentation</span> divides a process into <strong>variable-size</strong> logical segments that match the program's structure (e.g. code segment, data segment, stack segment):</p>
+    <ul>
+      <li>Each segment has a base address and a length stored in a <strong>segment table</strong></li>
+      <li>More natural to the programmer — segments match logical divisions of code</li>
+      <li>Can cause <strong>external fragmentation</strong> as free gaps accumulate between segments</li>
+      <li>Modern systems often combine paging and segmentation</li>
+    </ul>
+
+    <table class="plain-table" style="max-width:460px">
+      <thead><tr><th></th><th>Paging</th><th>Segmentation</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Block size</strong></td><td>Fixed (equal-size pages)</td><td>Variable (logical size)</td></tr>
+        <tr><td><strong>Programmer view</strong></td><td>Transparent — invisible</td><td>Visible — matches code structure</td></tr>
+        <tr><td><strong>External fragmentation</strong></td><td>None</td><td>Yes</td></tr>
+        <tr><td><strong>Internal fragmentation</strong></td><td>Yes (last page)</td><td>None</td></tr>
+      </tbody>
+    </table>
+
+    <h3>2.3 Virtual Memory</h3>
+    <p><span class="key-term">Virtual memory</span> extends the apparent size of RAM by using secondary storage (hard disk or SSD) as overflow:</p>
+    <ul>
+      <li>Pages that are not currently needed are <strong>swapped out</strong> to a swap file/partition on disk</li>
+      <li>When a process needs a swapped-out page, a <strong>page fault</strong> occurs — the OS loads it back into RAM</li>
+      <li>Allows running programs larger than physical RAM</li>
+      <li><strong>Disadvantage:</strong> disk access is orders of magnitude slower than RAM — too much paging (<em>thrashing</em>) can cripple performance</li>
+    </ul>
+
+    <div class="callout warn">
+      <strong>Thrashing:</strong> When the OS spends more time swapping pages in and out than actually executing processes. Occurs when there is far too little RAM for the workload. Adding more RAM or reducing the number of running processes resolves it.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 3: PROCESS MANAGEMENT         -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="process-mgmt">
+    <h2><span class="section-num">3</span> Process Management</h2>
+
+    <p>A <span class="key-term">process</span> is a program in execution — it includes the program code, current values of registers, stack, and heap. The OS must share the CPU fairly among all processes.</p>
+
+    <h3>3.1 Process States</h3>
+    <p>At any moment a process is in one of three states:</p>
+
+    <div class="state-flow">
+      <div class="state-box">READY<br><small style="font-weight:400;color:var(--text-muted)">Waiting for CPU</small></div>
+      <div class="state-arrow"><small>scheduled →</small><span>→</span></div>
+      <div class="state-box">RUNNING<br><small style="font-weight:400;color:var(--text-muted)">On the CPU</small></div>
+      <div class="state-arrow"><small>I/O wait →</small><span>→</span></div>
+      <div class="state-box">BLOCKED<br><small style="font-weight:400;color:var(--text-muted)">Waiting for I/O</small></div>
+    </div>
+    <ul style="margin-top:.5rem">
+      <li><strong>Ready → Running:</strong> the scheduler picks this process and gives it CPU time</li>
+      <li><strong>Running → Blocked:</strong> process requests I/O (e.g. disk read) and must wait</li>
+      <li><strong>Running → Ready:</strong> time slice expires (preemption) — another process gets the CPU</li>
+      <li><strong>Blocked → Ready:</strong> I/O completes — process can run again when the CPU is free</li>
+    </ul>
+
+    <h3>3.2 Scheduling Algorithms</h3>
+    <table class="plain-table">
+      <thead><tr><th>Algorithm</th><th>How it works</th><th>Advantage</th><th>Disadvantage</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Round Robin</strong></td>
+          <td>Each process gets a fixed time slice (quantum) in turn. When the quantum expires, the next process runs.</td>
+          <td>Fair — every process gets CPU time. Good response for interactive systems.</td>
+          <td>High context-switch overhead if quantum is very short. Long processes take many turns.</td>
+        </tr>
+        <tr>
+          <td><strong>Shortest Job First (SJF)</strong></td>
+          <td>The process with the shortest estimated run time is selected next.</td>
+          <td>Minimises average waiting time — theoretically optimal.</td>
+          <td>Requires knowing job length in advance. Long processes may <em>starve</em> (never get CPU).</td>
+        </tr>
+        <tr>
+          <td><strong>Priority Scheduling</strong></td>
+          <td>Each process has a priority number. Highest priority runs first. Equal priorities use round-robin.</td>
+          <td>Critical OS processes can be guaranteed fast response.</td>
+          <td>Low-priority processes may starve. Priorities must be set carefully.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout tip">
+      <strong>Context switch:</strong> When the OS switches the CPU from one process to another, it saves the current process's register values (PC, ACC, SR, etc.) to its Process Control Block (PCB) and loads the next process's saved state. This overhead is why very short time slices are inefficient.
+    </div>
+
+    <h3>3.3 Multi-programming vs Multi-tasking</h3>
+    <ul>
+      <li><strong>Multi-programming:</strong> keeping several processes in memory so the CPU is always busy — when one process waits for I/O, another runs</li>
+      <li><strong>Multi-tasking:</strong> rapidly switching the CPU between processes to give the <em>illusion</em> of simultaneous execution (on a single-core CPU)</li>
+      <li><strong>Multi-processing:</strong> true parallel execution on multiple CPU cores</li>
+    </ul>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 4: FILE & DEVICE MANAGEMENT   -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="file-device">
+    <h2><span class="section-num">4</span> File &amp; Device Management</h2>
+
+    <h3>4.1 File Management</h3>
+    <p>The OS provides a <span class="key-term">file system</span> — a structured way to store, name, organise, and retrieve data on secondary storage.</p>
+    <ul>
+      <li><strong>Hierarchical directory structure</strong> — folders (directories) contain files and sub-folders, forming a tree from a root</li>
+      <li><strong>File permissions</strong> — read (r), write (w), execute (x) per user/group/other</li>
+      <li><strong>File Allocation Table (FAT)</strong> — records which disk clusters belong to each file</li>
+      <li><strong>Access methods:</strong>
+        <ul>
+          <li><em>Sequential access</em> — records read/written in order (e.g. tape, log files)</li>
+          <li><em>Random (direct) access</em> — jump to any record directly by address (e.g. database)</li>
+        </ul>
+      </li>
+      <li><strong>File metadata</strong> — filename, size, timestamps, permissions, owner, type</li>
+    </ul>
+
+    <h3>4.2 Device Management</h3>
+    <p>The OS hides hardware complexity from applications through <span class="key-term">device drivers</span>:</p>
+    <ul>
+      <li><strong>Device driver</strong> — software that translates generic OS commands into device-specific signals. A new peripheral only needs a driver, not a rewrite of all applications.</li>
+      <li><strong>I/O spooling</strong> — jobs (e.g. print jobs) are queued in a spool buffer so the application can continue without waiting for the slow device. The OS feeds the spool to the device as it becomes ready.</li>
+      <li><strong>Plug and Play</strong> — the OS automatically detects new hardware, selects, and installs the correct driver without user intervention.</li>
+      <li><strong>Interrupt-driven I/O</strong> — a device raises an interrupt when it is ready rather than the CPU constantly polling the device (busy-wait), freeing the CPU for other work.</li>
+    </ul>
+
+    <div class="callout">
+      <strong>Exam point:</strong> The key reason for device drivers is <em>hardware abstraction</em> — applications use one standard interface regardless of the actual device model. Without drivers, every application would have to handle every possible hardware variant.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 5: LANGUAGE TRANSLATORS       -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="translators">
+    <h2><span class="section-num">5</span> Language Translators</h2>
+
+    <p>A <span class="key-term">language translator</span> converts source code written by a programmer into a form the computer can execute. There are three types.</p>
+
+    <table class="plain-table">
+      <thead><tr><th>Translator</th><th>Input</th><th>Output</th><th>Key characteristic</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Assembler</strong></td>
+          <td>Assembly language (mnemonics)</td>
+          <td>Machine code</td>
+          <td>One-to-one translation: each mnemonic → one machine code instruction. Very fast; no optimisation.</td>
+        </tr>
+        <tr>
+          <td><strong>Compiler</strong></td>
+          <td>High-level source code</td>
+          <td>Machine code executable file</td>
+          <td>Translates the <em>entire</em> program before execution. Produces a standalone executable. Fast at runtime; errors reported after full analysis.</td>
+        </tr>
+        <tr>
+          <td><strong>Interpreter</strong></td>
+          <td>High-level source code</td>
+          <td>Immediate execution (no file)</td>
+          <td>Translates and executes <em>one statement at a time</em>. Slower at runtime; reports errors as soon as the line is reached. Easier to debug interactively.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>5.1 Assembler</h3>
+    <p>The assembler performs a <strong>two-pass</strong> process:</p>
+    <ul>
+      <li><strong>Pass 1:</strong> scan the source to build a symbol table — records all label names and their addresses</li>
+      <li><strong>Pass 2:</strong> translate each mnemonic into its binary opcode, replacing labels with addresses from the symbol table</li>
+    </ul>
+    <p>Assembly language is <em>machine-specific</em> — code written for one CPU architecture will not run on another without rewriting.</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 6: COMPILER STAGES            -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="compiler-stages">
+    <h2><span class="section-num">6</span> Stages of Compilation</h2>
+
+    <p>A compiler translates the entire source program through a sequence of stages. Each stage transforms a representation of the program and passes it to the next.</p>
+
+    <div class="pipeline">
+      <div class="pipe-stage">
+        <div class="pipe-box">1. Lexical Analysis</div>
+        <div class="pipe-desc">The source text is scanned and split into <strong>tokens</strong> (keywords, identifiers, operators, literals). Whitespace and comments are removed. A <strong>symbol table</strong> is started to record identifiers. <em>Lexical errors</em> (invalid characters) are reported here.</div>
+      </div>
+      <div class="pipe-stage">
+        <div class="pipe-box">2. Syntax Analysis</div>
+        <div class="pipe-desc">Tokens are checked against the grammar rules of the language using a <strong>parser</strong>. A <strong>parse tree</strong> (or Abstract Syntax Tree) is built representing the program structure. <em>Syntax errors</em> (e.g. missing semicolon, mismatched brackets) are reported here.</div>
+      </div>
+      <div class="pipe-stage">
+        <div class="pipe-box">3. Semantic Analysis</div>
+        <div class="pipe-desc">The parse tree is checked for <strong>meaning</strong> — type checking, variable declarations, scope rules, function signatures. Detects <em>semantic errors</em> such as adding a string to an integer, or using an undeclared variable.</div>
+      </div>
+      <div class="pipe-stage">
+        <div class="pipe-box">4. Intermediate Code Generation</div>
+        <div class="pipe-desc">The validated parse tree is converted to a <strong>platform-independent intermediate representation</strong> (e.g. three-address code or bytecode). This decouples the front end (language-specific) from the back end (architecture-specific).</div>
+      </div>
+      <div class="pipe-stage">
+        <div class="pipe-box">5. Code Optimisation</div>
+        <div class="pipe-desc">The intermediate code is transformed to run faster or use less memory — without changing what the program does. Examples: removing dead code, constant folding (<code>3+4</code> → <code>7</code>), loop unrolling, inlining small functions.</div>
+      </div>
+      <div class="pipe-stage">
+        <div class="pipe-box">6. Code Generation</div>
+        <div class="pipe-desc">The optimised intermediate code is translated into <strong>target machine code</strong> for the specific CPU architecture. Register allocation decides which values live in registers vs memory. The result is an executable object file.</div>
+      </div>
+    </div>
+
+    <div class="callout exam">
+      <strong>Exam tip:</strong> The most commonly tested stages are Lexical Analysis, Syntax Analysis, and Semantic Analysis. Know what each stage checks for and what type of error it produces. You may be asked to state <em>at which stage</em> a given error would be detected.
+    </div>
+
+    <h3>6.1 Symbol Table</h3>
+    <p>The <span class="key-term">symbol table</span> is built during lexical analysis and used throughout compilation. It records:</p>
+    <ul>
+      <li>Identifier names (variable names, function names)</li>
+      <li>Data type (integer, string, boolean…)</li>
+      <li>Scope (global, local to a function)</li>
+      <li>Memory address or register assignment</li>
+    </ul>
+    <p>During semantic analysis, the compiler looks up the symbol table to check types match, variables are declared before use, and functions are called with the correct number and types of arguments.</p>
+
+    <div class="worked">
+      <div class="worked-title">Error classification worked example</div>
+      <p>Consider: <code>DECLARE x : INTEGER &nbsp; x ← "hello"</code></p>
+      <div class="step">
+        <div class="step-num">✗</div>
+        <div class="step-text"><strong>Not a lexical error</strong> — all characters are valid tokens (keywords, identifiers, string literal).</div>
+      </div>
+      <div class="step">
+        <div class="step-num">✗</div>
+        <div class="step-text"><strong>Not a syntax error</strong> — the statement <code>x ← "hello"</code> is grammatically valid assignment syntax.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">✓</div>
+        <div class="step-text"><strong>Semantic error</strong> — assigning a STRING to an INTEGER variable violates type rules. Detected during semantic analysis when the type of the right-hand side is checked against the declared type of <code>x</code>.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 7: COMPILER VS INTERPRETER    -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="comparison">
+    <h2><span class="section-num">7</span> Compiler vs Interpreter</h2>
+
+    <table class="plain-table">
+      <thead><tr><th>Feature</th><th>Compiler</th><th>Interpreter</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Translation time</strong></td>
+          <td>Translates entire program once before running</td>
+          <td>Translates one statement at a time during execution</td>
+        </tr>
+        <tr>
+          <td><strong>Output</strong></td>
+          <td>Standalone executable machine code file</td>
+          <td>No persistent output — executes directly</td>
+        </tr>
+        <tr>
+          <td><strong>Execution speed</strong></td>
+          <td>Fast at runtime — machine code runs directly on CPU</td>
+          <td>Slower — translation overhead on every run</td>
+        </tr>
+        <tr>
+          <td><strong>Error reporting</strong></td>
+          <td>All errors reported after full analysis; harder to locate</td>
+          <td>Stops at first error and reports its line immediately</td>
+        </tr>
+        <tr>
+          <td><strong>Debugging</strong></td>
+          <td>Harder — must recompile after each fix</td>
+          <td>Easier — run partially, inspect variables interactively</td>
+        </tr>
+        <tr>
+          <td><strong>Distribution</strong></td>
+          <td>Distribute executable — source code hidden</td>
+          <td>Must distribute source code (or bytecode + runtime)</td>
+        </tr>
+        <tr>
+          <td><strong>Portability</strong></td>
+          <td>Executable is platform-specific; recompile for each target</td>
+          <td>Source runs on any platform with the interpreter installed</td>
+        </tr>
+        <tr>
+          <td><strong>Memory use</strong></td>
+          <td>Only executable in memory at runtime</td>
+          <td>Interpreter and source must both be in memory</td>
+        </tr>
+        <tr>
+          <td><strong>Examples</strong></td>
+          <td>C, C++, Rust, Pascal</td>
+          <td>Python, Ruby, JavaScript (traditionally)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout tip">
+      <strong>Modern blurred line:</strong> Many modern languages use a hybrid approach — Java and Python compile to <em>bytecode</em> first, then interpret (or JIT-compile) that bytecode at runtime. The Cambridge exam treats compiler and interpreter as distinct approaches, so use the table above.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 8: UTILITY SOFTWARE           -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="utility">
+    <h2><span class="section-num">8</span> Utility Software</h2>
+
+    <p><span class="key-term">Utility programs</span> are system software tools that help maintain, configure, and optimise the computer. They sit between the OS and application software.</p>
+
+    <table class="plain-table">
+      <thead><tr><th>Utility</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Disk Defragmenter</strong></td>
+          <td>Rearranges fragmented files on an HDD so each file's blocks are contiguous, reducing seek time. Not useful or applicable to SSDs.</td>
+        </tr>
+        <tr>
+          <td><strong>Disk Formatter</strong></td>
+          <td>Creates a file system structure on a storage device (e.g. FAT32, NTFS, ext4), making it ready to store files.</td>
+        </tr>
+        <tr>
+          <td><strong>Backup Software</strong></td>
+          <td>Copies files to a separate location to protect against data loss. Types: full backup, incremental (only changes since last backup), differential.</td>
+        </tr>
+        <tr>
+          <td><strong>Anti-malware / Antivirus</strong></td>
+          <td>Detects, quarantines, and removes malicious software. Uses signature databases and heuristic analysis to identify threats.</td>
+        </tr>
+        <tr>
+          <td><strong>File Compression</strong></td>
+          <td>Reduces file size using lossless algorithms (e.g. ZIP/DEFLATE) to save disk space and speed up transfers.</td>
+        </tr>
+        <tr>
+          <td><strong>Encryption Tool</strong></td>
+          <td>Encrypts files or entire drives (e.g. BitLocker, VeraCrypt) to protect data if the device is lost or stolen.</td>
+        </tr>
+        <tr>
+          <td><strong>System Monitor</strong></td>
+          <td>Displays real-time information about CPU usage, memory use, running processes, and network activity. Helps diagnose bottlenecks.</td>
+        </tr>
+        <tr>
+          <td><strong>Debugger</strong></td>
+          <td>Allows a developer to run a program step-by-step, set breakpoints, inspect register and variable values, and trace errors.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <strong>Exam tip:</strong> Be ready to <em>describe the purpose</em> of a utility — not just name it. "A disk defragmenter rearranges file fragments so data is stored contiguously, reducing the time the read/write head needs to move" scores more than "it tidies files."
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- EXAM PRACTICE                         -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="exam-practice">
+    <h2><span class="section-num">📝</span> Exam Practice</h2>
+
+    <div class="practice">
+      <div class="pq-title">Question 1 · 4 marks</div>
+      <p>State <strong>four</strong> functions of an operating system. [4]</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p>Award 1 mark each for four of:</p>
+        <ul>
+          <li>Memory management — allocates RAM to processes, implements paging/virtual memory</li>
+          <li>Process management — schedules CPU time, handles multi-tasking</li>
+          <li>File management — maintains a directory structure, controls file permissions</li>
+          <li>Device management — provides device drivers as a hardware interface</li>
+          <li>Security — user authentication and access control</li>
+          <li>Provides a user interface (GUI or CLI)</li>
+          <li>Handles interrupts</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Question 2 · 6 marks</div>
+      <p>(a) Describe what is meant by <strong>paging</strong> in memory management. [3]</p>
+      <p>(b) State <strong>one</strong> advantage and <strong>one</strong> disadvantage of paging compared with segmentation. [2]</p>
+      <p>(c) Explain what happens when a <strong>page fault</strong> occurs. [1]</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>(a)</strong> Award up to 3:</p>
+        <ul>
+          <li>Physical memory (RAM) is divided into fixed-size blocks called <em>frames</em> [1]</li>
+          <li>The process's logical memory is divided into equal-size blocks called <em>pages</em> [1]</li>
+          <li>The OS maintains a page table mapping page numbers to frame numbers; pages need not be contiguous in RAM [1]</li>
+        </ul>
+        <p><strong>(b)</strong></p>
+        <ul>
+          <li><em>Advantage:</em> no external fragmentation — fixed-size pages fit exactly into fixed-size frames [1]</li>
+          <li><em>Disadvantage:</em> internal fragmentation — the last page of a process may not be completely filled, wasting some memory [1]</li>
+        </ul>
+        <p><strong>(c)</strong> The required page is not currently in RAM; the OS must load it from the swap file on disk into a free frame before the process can continue. [1]</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Question 3 · 6 marks</div>
+      <p>Describe the stages of compilation in order, stating the type of error detected at each relevant stage. [6]</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p>Award 1 mark each for six of the following points:</p>
+        <ul>
+          <li><strong>Lexical analysis:</strong> source code tokenised; whitespace and comments removed; symbol table started [1]</li>
+          <li>Detects <em>lexical errors</em> (invalid characters / unrecognised tokens) [1]</li>
+          <li><strong>Syntax analysis:</strong> tokens checked against grammar; parse tree / AST constructed [1]</li>
+          <li>Detects <em>syntax errors</em> (grammatically incorrect statements) [1]</li>
+          <li><strong>Semantic analysis:</strong> parse tree checked for meaning — type checking, undeclared variables, scope rules [1]</li>
+          <li>Detects <em>semantic errors</em> (type mismatches, undeclared variables) [1]</li>
+          <li><strong>Intermediate code generation:</strong> platform-independent representation produced [1]</li>
+          <li><strong>Code optimisation:</strong> intermediate code improved — dead code removal, constant folding, loop optimisation [1]</li>
+          <li><strong>Code generation:</strong> target machine code produced for the specific CPU [1]</li>
+        </ul>
+        <p><em>Accept any 6 correct points.</em></p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Question 4 · 4 marks</div>
+      <p>State <strong>two</strong> advantages of a compiler over an interpreter, and <strong>two</strong> advantages of an interpreter over a compiler. [4]</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Compiler advantages (any 2):</strong></p>
+        <ul>
+          <li>Compiled program executes faster — runs directly as machine code with no translation overhead at runtime</li>
+          <li>Source code does not need to be distributed — only the compiled executable is shared, protecting intellectual property</li>
+          <li>Only needs to be compiled once; subsequent runs need no translator</li>
+        </ul>
+        <p><strong>Interpreter advantages (any 2):</strong></p>
+        <ul>
+          <li>Easier to debug — stops and reports an error immediately at the offending line</li>
+          <li>More portable — source code runs on any machine that has the interpreter installed</li>
+          <li>Interactive development — code can be tested and changed without a full compilation step</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Question 5 · 3 marks</div>
+      <p>Describe the purpose of <strong>three</strong> different types of utility software. [3]</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p>Award 1 mark each for a correct description (not just a name) of any 3 of:</p>
+        <ul>
+          <li><strong>Disk defragmenter:</strong> rearranges file fragments on an HDD so data is stored contiguously, reducing read/write head movement and access times</li>
+          <li><strong>Backup software:</strong> copies files to a separate location to protect against data loss from hardware failure or corruption</li>
+          <li><strong>Anti-malware:</strong> scans for, detects, and removes malicious software using signature databases and heuristic analysis</li>
+          <li><strong>File compression:</strong> reduces file size using lossless algorithms to save storage space and speed up transfers</li>
+          <li><strong>Encryption tool:</strong> encrypts files or drives so data cannot be read without the correct key, protecting against unauthorised access</li>
+          <li><strong>System monitor:</strong> displays real-time CPU, memory, and process usage to help diagnose performance bottlenecks</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Summary Checklist -->
+  <div class="lesson-section">
+    <h2><span class="section-num">✓</span> Summary Checklist</h2>
+    <ul class="checklist">
+      <li>State the six main functions of an operating system</li>
+      <li>Explain paging: pages, frames, page table, and how it eliminates external fragmentation</li>
+      <li>Explain segmentation: variable-size segments matching code structure</li>
+      <li>Describe virtual memory, page faults, swapping, and thrashing</li>
+      <li>Describe the three process states (ready, running, blocked) and transitions between them</li>
+      <li>Compare round-robin, SJF, and priority scheduling — advantages and disadvantages</li>
+      <li>Explain context switching and the Process Control Block (PCB)</li>
+      <li>Describe device drivers and why they are needed</li>
+      <li>Explain I/O spooling and interrupt-driven I/O</li>
+      <li>Distinguish assembler, compiler, and interpreter — input, output, key features</li>
+      <li>List and describe all six stages of compilation in order</li>
+      <li>State which stage detects lexical, syntax, and semantic errors</li>
+      <li>Compare compiler and interpreter on speed, debugging, portability, and distribution</li>
+      <li>Describe the purpose of at least four types of utility software</li>
+    </ul>
+  </div>
+
+</main>
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+
+  <div class="sidebar-box">
+    <h3>Contents</h3>
+    <ul class="toc-list">
+      <li><a href="#os-functions">1. OS Functions</a></li>
+      <li><a href="#memory-mgmt">2. Memory Management</a></li>
+      <li><a href="#process-mgmt">3. Process Management</a></li>
+      <li><a href="#file-device">4. File &amp; Device</a></li>
+      <li><a href="#translators">5. Translators</a></li>
+      <li><a href="#compiler-stages">6. Compiler Stages</a></li>
+      <li><a href="#comparison">7. Compiler vs Interpreter</a></li>
+      <li><a href="#utility">8. Utility Software</a></li>
+      <li><a href="#exam-practice">📝 Exam Practice</a></li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>OS Functions</h3>
+    <ul style="font-size:.78rem;padding-left:1.1rem;color:var(--text)">
+      <li style="margin:.2rem 0">Memory management</li>
+      <li style="margin:.2rem 0">Process management</li>
+      <li style="margin:.2rem 0">File management</li>
+      <li style="margin:.2rem 0">Device management</li>
+      <li style="margin:.2rem 0">Security / access control</li>
+      <li style="margin:.2rem 0">User interface (GUI/CLI)</li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>Compiler Stages</h3>
+    <ol style="font-size:.78rem;padding-left:1.2rem;color:var(--text);margin:0">
+      <li style="margin:.25rem 0">Lexical analysis</li>
+      <li style="margin:.25rem 0">Syntax analysis</li>
+      <li style="margin:.25rem 0">Semantic analysis</li>
+      <li style="margin:.25rem 0">Intermediate code gen</li>
+      <li style="margin:.25rem 0">Code optimisation</li>
+      <li style="margin:.25rem 0">Code generation</li>
+    </ol>
+    <p style="font-size:.72rem;color:var(--text-muted);margin:.6rem 0 0">Lexical → lexical errors<br>Syntax → syntax errors<br>Semantic → semantic errors</p>
+  </div>
+
+  <div class="sidebar-box" style="border-left:4px solid #00695c">
+    <h3 style="color:#00695c">Common Mistakes</h3>
+    <ul style="font-size:.78rem;padding-left:1.1rem;color:var(--text)">
+      <li style="margin:.3rem 0">Saying virtual memory is fast — it uses disk, which is much slower than RAM</li>
+      <li style="margin:.3rem 0">Confusing paging (fixed-size) with segmentation (variable-size)</li>
+      <li style="margin:.3rem 0">Saying the interpreter produces an executable — it doesn't</li>
+      <li style="margin:.3rem 0">Placing type-checking in syntax analysis — it belongs to semantic analysis</li>
+      <li style="margin:.3rem 0">Saying a compiler is "better" — compilers and interpreters each have advantages in different contexts</li>
+    </ul>
+  </div>
+
+  <a href="topic5-processor-fundamentals.html" style="display:block;text-align:center;background:var(--surface2);color:var(--primary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.65rem;font-weight:700;font-size:.82rem;text-decoration:none;margin-top:.25rem">
+    ← Topic 5: Processor Fundamentals
+  </a>
+  <a href="index.html" style="display:block;text-align:center;background:var(--primary);color:#fff;border-radius:var(--radius-sm);padding:.75rem;font-weight:700;font-size:.875rem;text-decoration:none;margin-top:.5rem">
+    ← Back to All Topics
+  </a>
+
+</aside>
+
+</div><!-- /lesson-wrap -->
+
+<footer style="background:var(--surface);border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;font-size:.8rem;color:var(--text-muted)">
+  Cambridge International AS &amp; A Level Computer Science 9618 — Topic 6: System Software &nbsp;|&nbsp;
+  Not affiliated with Cambridge Assessment International Education.
+</footer>
+
+<script src="script.js"></script>
+<script>
+  const sections = document.querySelectorAll('.lesson-section[id]');
+  const navLinks = document.querySelectorAll('.toc-list a, .page-nav a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+  document.querySelectorAll('.reveal-btn').forEach(btn => { btn.textContent = 'Show Answer'; });
+</script>
+</body>
+</html>
