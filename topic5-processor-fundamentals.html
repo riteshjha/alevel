@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Topic 5: Processor Fundamentals — CS 9618</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .page-nav { background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:64px; z-index:90; overflow-x:auto; }
+    .page-nav-inner { max-width:1100px; margin:0 auto; padding:0 2rem; display:flex; gap:0; }
+    .page-nav a { display:block; padding:.75rem 1.1rem; font-size:.82rem; font-weight:600; color:var(--text-muted); text-decoration:none; white-space:nowrap; border-bottom:3px solid transparent; transition:color .2s,border-color .2s; }
+    .page-nav a:hover,.page-nav a.active { color:var(--primary); border-bottom-color:var(--primary); }
+
+    .lesson-wrap { max-width:1100px; margin:0 auto; padding:2.5rem 2rem 4rem; display:grid; grid-template-columns:1fr 280px; gap:2.5rem; align-items:start; }
+    @media(max-width:900px){ .lesson-wrap{grid-template-columns:1fr} .sidebar{display:none} }
+
+    .sidebar { position:sticky; top:120px; }
+    .sidebar-box { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; margin-bottom:1rem; box-shadow:var(--shadow); }
+    .sidebar-box h3 { font-size:.85rem; font-weight:700; margin-bottom:.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; }
+    .toc-list { list-style:none; }
+    .toc-list li { padding:.2rem 0; }
+    .toc-list a { font-size:.82rem; color:var(--text-muted); text-decoration:none; display:block; padding:.25rem .5rem; border-radius:4px; transition:background .15s,color .15s; }
+    .toc-list a:hover { background:var(--surface2); color:var(--primary); }
+    .toc-list a.active { background:var(--accent-light); color:var(--primary); font-weight:600; }
+    .toc-list .sub { padding-left:1rem; }
+
+    .lesson-section { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:2rem 2.25rem; margin-bottom:2rem; box-shadow:var(--shadow); scroll-margin-top:130px; }
+    .lesson-section h2 { font-size:1.5rem; font-weight:800; color:var(--primary); margin-bottom:.4rem; display:flex; align-items:center; gap:.6rem; }
+    .section-num { background:var(--primary); color:#fff; width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:.9rem; font-weight:800; flex-shrink:0; }
+    .lesson-section h3 { font-size:1.1rem; font-weight:700; margin:1.75rem 0 .75rem; padding-bottom:.4rem; border-bottom:2px solid var(--border); color:var(--text); }
+    .lesson-section h4 { font-size:.95rem; font-weight:700; margin:1.25rem 0 .5rem; color:var(--primary-light); }
+    .lesson-section p { font-size:.9rem; line-height:1.75; color:var(--text); margin-bottom:.75rem; }
+    .lesson-section ul,.lesson-section ol { padding-left:1.5rem; margin-bottom:.75rem; }
+    .lesson-section li { font-size:.9rem; line-height:1.75; color:var(--text); }
+
+    /* Worked example box */
+    .worked { background:linear-gradient(135deg,#fde8e8,#fff0f0); border:1px solid #f5a0a0; border-left:5px solid #c62828; border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:1.25rem 1.5rem; margin:1rem 0; }
+    [data-theme="dark"] .worked { background:#2d1010; border-color:#c62828; }
+    .worked .worked-title { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#c62828; margin-bottom:.6rem; }
+    [data-theme="dark"] .worked .worked-title { color:#ef9a9a; }
+    .worked p,.worked li { font-size:.875rem; color:var(--text); }
+    .worked .step { display:flex; gap:.75rem; margin:.4rem 0; align-items:flex-start; }
+    .worked .step-num { background:#c62828; color:#fff; min-width:22px; height:22px; border-radius:50%; font-size:.72rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+    .worked .step-text { font-size:.875rem; line-height:1.6; }
+    .worked .answer { margin-top:.75rem; padding:.6rem 1rem; background:#c62828; color:#fff; border-radius:var(--radius-sm); font-weight:700; font-size:.9rem; }
+
+    /* Practice question box */
+    .practice { background:var(--surface2); border:1px solid var(--border); border-left:5px solid #2e7d32; border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:1.25rem 1.5rem; margin:1rem 0; }
+    .practice .pq-title { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#2e7d32; margin-bottom:.6rem; }
+    .practice p,.practice li { font-size:.875rem; }
+    .practice .reveal-btn { background:#2e7d32; color:#fff; border:none; border-radius:6px; padding:.4rem 1rem; font-size:.8rem; font-weight:700; cursor:pointer; margin-top:.75rem; transition:background .2s; }
+    .practice .reveal-btn:hover { background:#1b5e20; }
+    .practice .answer-reveal { display:none; margin-top:.75rem; padding:.75rem 1rem; background:#e8f5e9; border-radius:var(--radius-sm); font-size:.875rem; }
+    [data-theme="dark"] .practice .answer-reveal { background:#1b2e1c; color:#c8e6c9; }
+    .practice .answer-reveal.open { display:block; }
+
+    /* Callout boxes */
+    .callout { background:var(--surface2); border-left:4px solid var(--accent); border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:.85rem 1.1rem; margin:.75rem 0; font-size:.875rem; color:var(--text); }
+    .callout.warn { border-color:#f59e0b; }
+    .callout.tip  { border-color:#22c55e; }
+    .callout.exam { border-color:#7c3aed; }
+
+    /* Register table */
+    .reg-table { width:100%; border-collapse:collapse; font-size:.875rem; margin:.75rem 0; }
+    .reg-table th { background:var(--primary); color:#fff; padding:.5rem .85rem; text-align:left; font-size:.82rem; }
+    .reg-table td { border:1px solid var(--border); padding:.45rem .85rem; vertical-align:top; font-size:.85rem; color:var(--text); }
+    .reg-table tr:nth-child(even) td { background:var(--surface2); }
+    .reg-abbr { font-family:monospace; font-weight:800; color:#c62828; }
+
+    /* FDE step box */
+    .fde-box { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:.75rem 1rem; margin:.75rem 0; }
+    .fde-step { display:grid; grid-template-columns:80px 1fr; gap:.4rem 1rem; align-items:start; padding:.4rem 0; border-bottom:1px solid var(--border); font-size:.875rem; }
+    .fde-step:last-child { border:none; }
+    .fde-phase { font-weight:700; font-size:.7rem; text-transform:uppercase; letter-spacing:.04em; padding:.2rem .5rem; border-radius:4px; text-align:center; }
+    .fde-phase.fetch   { background:#1565c022; color:#1565c0; }
+    .fde-phase.decode  { background:#7c3aed22; color:#7c3aed; }
+    .fde-phase.execute { background:#15803d22; color:#15803d; }
+    .fde-step code { font-size:.88em; background:var(--surface); padding:.1rem .35rem; border-radius:3px; border:1px solid var(--border); }
+
+    /* Instruction table */
+    .ins-table { width:100%; border-collapse:collapse; font-size:.82rem; margin:.75rem 0; }
+    .ins-table th { background:var(--primary); color:#fff; padding:.4rem .7rem; text-align:left; }
+    .ins-table td { border:1px solid var(--border); padding:.35rem .7rem; color:var(--text); }
+    .ins-table tr:nth-child(even) td { background:var(--surface2); }
+    .ins-table td:first-child { font-family:monospace; font-weight:700; color:#c62828; font-size:.85rem; }
+
+    /* Code block */
+    .code-block { background:#0d1117; color:#e2e8f0; border-radius:var(--radius-sm); padding:1rem 1.25rem; font-family:'Consolas','Courier New',monospace; font-size:.84rem; line-height:1.75; margin:.75rem 0; overflow-x:auto; }
+    .code-block .cm  { color:#6e7681; }
+    .code-block .kw  { color:#79c0ff; font-weight:600; }
+    .code-block .num { color:#ffa657; }
+    .code-block .str { color:#7ee787; }
+    .code-block .lbl { color:#d2a8ff; font-weight:700; }
+
+    /* Trace table */
+    .trace-table { border-collapse:collapse; font-size:.85rem; margin:.75rem 0; width:100%; }
+    .trace-table th { background:var(--primary); color:#fff; padding:.35rem .7rem; text-align:center; }
+    .trace-table td { border:1px solid var(--border); padding:.3rem .65rem; text-align:center; color:var(--text); font-family:monospace; }
+    .trace-table tr:nth-child(even) td { background:var(--surface2); }
+    .trace-table td:first-child,.trace-table td:nth-child(2) { text-align:left; font-family:inherit; }
+
+    /* Performance cards */
+    .perf-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:.75rem; margin:.75rem 0; }
+    .perf-card { background:var(--surface2); border-left:4px solid var(--accent); border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:.9rem 1rem; }
+    .perf-card .perf-name { font-weight:800; font-size:.88rem; color:var(--text); margin-bottom:.3rem; }
+    .perf-card p { font-size:.78rem; color:var(--text-muted); margin:0; line-height:1.5; }
+
+    /* Addressing modes grid */
+    .addr-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:.75rem; margin:.75rem 0; }
+    .addr-card { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:.85rem 1rem; }
+    .addr-card .mode-name { font-weight:800; font-size:.88rem; color:#c62828; margin-bottom:.3rem; }
+    .addr-card p { font-size:.8rem; color:var(--text-muted); margin:0; line-height:1.5; }
+    .addr-card code { background:var(--surface); padding:.1rem .3rem; border-radius:3px; font-size:.85em; border:1px solid var(--border); }
+
+    /* Interrupt flow */
+    .int-flow { display:flex; flex-wrap:wrap; gap:.4rem; align-items:center; margin:.75rem 0; }
+    .int-step { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:.45rem .85rem; font-size:.8rem; text-align:center; line-height:1.4; }
+    .int-arrow { color:var(--primary); font-weight:700; font-size:1rem; }
+
+    /* Key term highlight */
+    .key-term { background:linear-gradient(transparent 60%,rgba(198,40,40,.15) 60%); font-weight:700; }
+
+    /* Objectives list */
+    .objectives-list { list-style:none; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:.5rem; }
+    .objectives-list li { font-size:.85rem; display:flex; align-items:flex-start; gap:.5rem; padding:.4rem 0; color:var(--text); }
+    .objectives-list li::before { content:'✦'; color:var(--accent); flex-shrink:0; }
+
+    /* Checklist */
+    .breadcrumb { display:flex; align-items:center; gap:.4rem; font-size:.82rem; color:var(--text-muted); margin-bottom:1.5rem; }
+    .breadcrumb a { color:var(--primary-light); text-decoration:none; }
+    .breadcrumb a:hover { text-decoration:underline; }
+    .checklist { list-style:none; padding:0; }
+    .checklist li { display:flex; align-items:flex-start; gap:.6rem; padding:.35rem 0; font-size:.875rem; color:var(--text); }
+    .checklist li::before { content:'☐'; color:var(--primary-light); font-size:1rem; flex-shrink:0; }
+
+    /* Bus diagram */
+    .bus-diagram-svg { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:1.25rem 1.5rem; overflow-x:auto; margin:.75rem 0; }
+    .bus-diagram-svg svg { display:block; margin:0 auto; }
+
+    /* Formula */
+    .formula { background:var(--surface2); border:2px dashed var(--accent); border-radius:var(--radius-sm); padding:1rem 1.5rem; text-align:center; margin:.75rem 0; font-size:1rem; font-family:'Consolas',monospace; color:var(--text); }
+    .formula .formula-title { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--accent); margin-bottom:.4rem; font-family:'Segoe UI',sans-serif; }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="header-inner">
+    <a class="logo" href="index.html">
+      <div class="logo-icon">💻</div>
+      <div>
+        <div class="logo-text">CS 9618</div>
+        <div class="logo-sub">Cambridge AS &amp; A Level</div>
+      </div>
+    </a>
+    <div class="header-actions">
+      <button class="btn-icon" id="theme-btn" title="Toggle theme">🌙</button>
+    </div>
+  </div>
+</header>
+
+<!-- Section nav -->
+<nav class="page-nav" aria-label="Sections">
+  <div class="page-nav-inner">
+    <a href="#registers" class="active">1. Registers</a>
+    <a href="#system-bus">2. System Bus</a>
+    <a href="#fde-cycle">3. FDE Cycle</a>
+    <a href="#addressing">4. Addressing</a>
+    <a href="#performance">5. Performance</a>
+    <a href="#interrupts">6. Interrupts</a>
+    <a href="#assembly">7. Assembly</a>
+    <a href="#exam-practice">📝 Exam Practice</a>
+  </div>
+</nav>
+
+<div class="lesson-wrap">
+
+  <!-- ── MAIN CONTENT ── -->
+  <main>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <a href="index.html">Home</a>
+      <span>›</span>
+      <a href="index.html#tab-as">Paper 1 — Theory</a>
+      <span>›</span>
+      <strong style="color:var(--text)">Topic 5: Processor Fundamentals</strong>
+    </div>
+
+    <!-- Hero section -->
+    <div class="lesson-section" style="background:linear-gradient(135deg,#b71c1c,#c62828,#e53935);color:#fff;border:none">
+      <div style="display:flex;align-items:flex-start;gap:1.25rem">
+        <div style="font-size:3rem;flex-shrink:0">⚙️</div>
+        <div>
+          <div style="font-size:.75rem;font-weight:700;opacity:.7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem">Paper 1 · Topic 5</div>
+          <h1 style="font-size:1.9rem;font-weight:900;margin-bottom:.5rem;color:#fff">Processor Fundamentals</h1>
+          <p style="opacity:.85;font-size:.95rem;max-width:620px;margin-bottom:1rem;color:#fff">How the CPU works — registers, the fetch-decode-execute cycle, the system bus, interrupts, and Cambridge assembly language. One of the most heavily examined Paper 1 topics.</p>
+          <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+            <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">Paper 1 · AS &amp; A Level</span>
+            <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">~14% of Paper 1 marks</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Learning objectives -->
+    <div class="lesson-section">
+      <h2><span class="section-num">✦</span> Learning Objectives</h2>
+      <p>By the end of this topic you should be able to:</p>
+      <ul class="objectives-list">
+        <li>Name and state the purpose of each CPU register (PC, MAR, MDR, CIR, ACC, SR, IX)</li>
+        <li>Describe every step of the Fetch-Decode-Execute cycle using register notation</li>
+        <li>Explain the role of the address, data, and control buses and the effect of their width</li>
+        <li>Distinguish immediate, direct, indirect, and indexed addressing modes</li>
+        <li>Identify factors affecting CPU performance and explain how each helps</li>
+        <li>Describe what an interrupt is and give hardware and software examples</li>
+        <li>Trace the interrupt handling sequence including saving state to the stack and ISR execution</li>
+        <li>Use the Cambridge 9618 assembly instruction set to write short programs</li>
+        <li>Complete trace tables for assembly programs</li>
+      </ul>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- SECTION 1: REGISTERS                  -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="lesson-section" id="registers">
+      <h2><span class="section-num">1</span> CPU Registers</h2>
+
+      <p>Registers are the CPU's own tiny, ultra-fast storage locations — they hold a single word of data (the same width as the data bus) and are accessed in a single clock cycle. They are <span class="key-term">volatile</span>: values change every few cycles.</p>
+
+      <table class="reg-table">
+        <thead>
+          <tr><th>Abbr.</th><th>Full Name</th><th>Purpose</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="reg-abbr">PC</td>
+            <td>Program Counter</td>
+            <td>Holds the address of the <strong>next</strong> instruction to be fetched. Incremented during Fetch, before Execute.</td>
+          </tr>
+          <tr>
+            <td class="reg-abbr">MAR</td>
+            <td>Memory Address Register</td>
+            <td>Holds the address of the memory location currently being read from or written to. Connected directly to the address bus.</td>
+          </tr>
+          <tr>
+            <td class="reg-abbr">MDR / MBR</td>
+            <td>Memory Data Register</td>
+            <td>Holds data read from memory, or data about to be written to memory. Connected directly to the data bus.</td>
+          </tr>
+          <tr>
+            <td class="reg-abbr">CIR / IR</td>
+            <td>Current Instruction Register</td>
+            <td>Holds the instruction currently being decoded and executed. Split into an <strong>opcode</strong> (what to do) and an <strong>operand</strong> (what to act on).</td>
+          </tr>
+          <tr>
+            <td class="reg-abbr">ACC</td>
+            <td>Accumulator</td>
+            <td>Holds the result of ALU arithmetic and logic operations. The primary working register for most calculations.</td>
+          </tr>
+          <tr>
+            <td class="reg-abbr">SR / PSR</td>
+            <td>Status Register</td>
+            <td>A set of flag bits set by the ALU after each operation: <strong>Carry (C)</strong>, <strong>Zero (Z)</strong>, <strong>Negative (N)</strong>, <strong>Overflow (V)</strong>. Used by conditional jump instructions.</td>
+          </tr>
+          <tr>
+            <td class="reg-abbr">IX</td>
+            <td>Index Register</td>
+            <td>Used in indexed addressing. Effective address = operand + IX. Enables efficient looping over arrays.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout tip">
+        <strong>Memory tip:</strong> PC always points to the <em>next</em> instruction — not the current one. It is incremented during the Fetch stage (before Decode/Execute). If an interrupt occurs, the current PC value is pushed to the stack so execution can resume after the ISR.
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- SECTION 2: SYSTEM BUS                 -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="lesson-section" id="system-bus">
+      <h2><span class="section-num">2</span> The System Bus</h2>
+
+      <p>The <span class="key-term">system bus</span> is the shared set of electrical connections that carries signals between the CPU, main memory, and I/O devices. It has three logically separate buses:</p>
+
+      <h3>2.1 Address Bus</h3>
+      <p><strong>Unidirectional</strong> — signals travel from CPU to memory/device only. Carries the address of the memory location to be accessed. The width of the address bus determines the maximum amount of directly addressable memory:</p>
+      <div class="formula">
+        <div class="formula-title">Maximum addressable memory</div>
+        2<sup>n</sup> locations &nbsp;&nbsp; (n = number of address bus bits)
+      </div>
+      <p>A 32-bit address bus can address 2<sup>32</sup> = 4 GiB of memory. A 64-bit bus can address 16 EiB.</p>
+
+      <h3>2.2 Data Bus</h3>
+      <p><strong>Bidirectional</strong> — data flows in both directions. Carries the actual data being transferred between components. Its width equals the CPU word size (8, 16, 32, or 64 bits). A wider data bus means more data transferred per clock cycle, improving throughput.</p>
+
+      <h3>2.3 Control Bus</h3>
+      <p><strong>Bidirectional</strong> — individual control lines carry synchronisation signals. Key signals include: Read/Write, Clock, Interrupt request, Reset, Bus grant/request. It coordinates activity on the other two buses.</p>
+
+      <div class="bus-diagram-svg">
+        <svg width="540" height="150" viewBox="0 0 540 150" style="max-width:100%">
+          <rect x="5" y="45" width="110" height="70" rx="6" fill="none" stroke="var(--primary)" stroke-width="2"/>
+          <text x="60" y="77" text-anchor="middle" font-size="13" fill="var(--text)" font-family="sans-serif" font-weight="700">CPU</text>
+          <text x="60" y="93" text-anchor="middle" font-size="10" fill="var(--text-muted)" font-family="sans-serif">ALU · CU · Regs</text>
+
+          <rect x="220" y="45" width="100" height="70" rx="6" fill="none" stroke="var(--primary)" stroke-width="2"/>
+          <text x="270" y="77" text-anchor="middle" font-size="13" fill="var(--text)" font-family="sans-serif" font-weight="700">Memory</text>
+          <text x="270" y="93" text-anchor="middle" font-size="10" fill="var(--text-muted)" font-family="sans-serif">RAM / ROM</text>
+
+          <rect x="425" y="45" width="110" height="70" rx="6" fill="none" stroke="var(--primary)" stroke-width="2"/>
+          <text x="480" y="77" text-anchor="middle" font-size="13" fill="var(--text)" font-family="sans-serif" font-weight="700">I/O</text>
+          <text x="480" y="93" text-anchor="middle" font-size="10" fill="var(--text-muted)" font-family="sans-serif">Devices / Ports</text>
+
+          <!-- Address bus -->
+          <line x1="115" y1="58" x2="220" y2="58" stroke="#1565c0" stroke-width="3"/>
+          <line x1="320" y1="58" x2="425" y2="58" stroke="#1565c0" stroke-width="3"/>
+          <polygon points="218,52 218,64 230,58" fill="#1565c0"/>
+          <polygon points="423,52 423,64 435,58" fill="#1565c0"/>
+          <text x="270" y="50" text-anchor="middle" font-size="9.5" fill="#1565c0" font-family="sans-serif" font-weight="700">ADDRESS BUS →</text>
+
+          <!-- Data bus -->
+          <line x1="115" y1="80" x2="220" y2="80" stroke="#2e7d32" stroke-width="3"/>
+          <line x1="320" y1="80" x2="425" y2="80" stroke="#2e7d32" stroke-width="3"/>
+          <polygon points="117,74 117,86 105,80" fill="#2e7d32"/>
+          <polygon points="218,74 218,86 230,80" fill="#2e7d32"/>
+          <polygon points="322,74 322,86 310,80" fill="#2e7d32"/>
+          <polygon points="423,74 423,86 435,80" fill="#2e7d32"/>
+          <text x="270" y="76" text-anchor="middle" font-size="9.5" fill="#2e7d32" font-family="sans-serif" font-weight="700">↔ DATA BUS ↔</text>
+
+          <!-- Control bus -->
+          <line x1="115" y1="102" x2="220" y2="102" stroke="#c62828" stroke-width="3"/>
+          <line x1="320" y1="102" x2="425" y2="102" stroke="#c62828" stroke-width="3"/>
+          <polygon points="117,96 117,108 105,102" fill="#c62828"/>
+          <polygon points="218,96 218,108 230,102" fill="#c62828"/>
+          <polygon points="322,96 322,108 310,102" fill="#c62828"/>
+          <polygon points="423,96 423,108 435,102" fill="#c62828"/>
+          <text x="270" y="98" text-anchor="middle" font-size="9.5" fill="#c62828" font-family="sans-serif" font-weight="700">↔ CONTROL BUS ↔</text>
+
+          <rect x="5" y="132" width="10" height="10" fill="#1565c0"/><text x="19" y="141" font-size="9" fill="var(--text-muted)" font-family="sans-serif">Address (uni)</text>
+          <rect x="130" y="132" width="10" height="10" fill="#2e7d32"/><text x="144" y="141" font-size="9" fill="var(--text-muted)" font-family="sans-serif">Data (bi)</text>
+          <rect x="255" y="132" width="10" height="10" fill="#c62828"/><text x="269" y="141" font-size="9" fill="var(--text-muted)" font-family="sans-serif">Control (bi)</text>
+        </svg>
+      </div>
+
+      <div class="callout">
+        <strong>Exam point:</strong> Wider address bus = more addressable memory. Wider data bus = more data per cycle. Both increase performance, but for different reasons — be precise about which you mean.
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- SECTION 3: FDE CYCLE                  -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="lesson-section" id="fde-cycle">
+      <h2><span class="section-num">3</span> The Fetch-Decode-Execute Cycle</h2>
+
+      <p>The <span class="key-term">FDE cycle</span> is the sequence the CPU repeats continuously for every instruction. Each repetition takes at least one clock cycle. The steps must be stated with register transfer notation in the exam.</p>
+
+      <div class="fde-box">
+        <div class="fde-step">
+          <span class="fde-phase fetch">FETCH</span>
+          <span><code>MAR ← PC</code> — copy the address of the next instruction to MAR</span>
+        </div>
+        <div class="fde-step">
+          <span class="fde-phase fetch">FETCH</span>
+          <span><code>PC ← PC + 1</code> — increment PC to point to the following instruction</span>
+        </div>
+        <div class="fde-step">
+          <span class="fde-phase fetch">FETCH</span>
+          <span><code>MDR ← Memory[MAR]</code> — read the instruction from memory into MDR (address bus carries MAR; data bus returns data)</span>
+        </div>
+        <div class="fde-step">
+          <span class="fde-phase fetch">FETCH</span>
+          <span><code>CIR ← MDR</code> — copy the instruction from MDR to CIR ready for decoding</span>
+        </div>
+        <div class="fde-step">
+          <span class="fde-phase decode">DECODE</span>
+          <span><code>CU decodes CIR</code> — the Control Unit splits the instruction into opcode and operand, determines what action is required</span>
+        </div>
+        <div class="fde-step">
+          <span class="fde-phase execute">EXECUTE</span>
+          <span><code>ALU / CU acts</code> — the ALU performs arithmetic or logic, or the CU controls a data transfer or jump; result stored in ACC or memory</span>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <strong>Common mistake:</strong> Students say the PC holds the address of the <em>current</em> instruction. It holds the address of the <em>next</em> — it was already incremented during Fetch.
+      </div>
+
+      <h3>3.1 Opcode and Operand</h3>
+      <p>Each instruction in memory is a binary pattern split into two fields:</p>
+      <ul>
+        <li><strong>Opcode</strong> — identifies <em>what</em> operation to perform (e.g. ADD, LOAD, JUMP). The Control Unit decodes this field.</li>
+        <li><strong>Operand</strong> — the data or address the instruction acts on. Its interpretation depends on the <em>addressing mode</em>.</li>
+      </ul>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- SECTION 4: ADDRESSING MODES           -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="lesson-section" id="addressing">
+      <h2><span class="section-num">4</span> Addressing Modes</h2>
+
+      <p>The <span class="key-term">addressing mode</span> determines how the operand field of an instruction is interpreted to find the actual data.</p>
+
+      <div class="addr-grid">
+        <div class="addr-card">
+          <div class="mode-name">Immediate</div>
+          <p>The operand <em>is</em> the data value itself. No memory access needed — fast.<br>
+          <code>LDI 42</code> → ACC ← 42</p>
+        </div>
+        <div class="addr-card">
+          <div class="mode-name">Direct</div>
+          <p>The operand is the memory address of the data. One memory read needed.<br>
+          <code>LDD 200</code> → ACC ← Mem[200]</p>
+        </div>
+        <div class="addr-card">
+          <div class="mode-name">Indirect</div>
+          <p>The operand is the address of a memory location that <em>contains</em> the effective address. Two memory reads needed. Flexible but slow.<br>
+          <code>LDA 200</code> → ACC ← Mem[Mem[200]]</p>
+        </div>
+        <div class="addr-card">
+          <div class="mode-name">Indexed</div>
+          <p>Effective address = operand + IX register. Used for looping over arrays without rewriting code.<br>
+          <code>LDX 300</code> → ACC ← Mem[300 + IX]</p>
+        </div>
+      </div>
+
+      <div class="worked">
+        <div class="worked-title">Worked Example — Addressing modes compared</div>
+        <p>Suppose Mem[200] = 50 and Mem[50] = 99, and IX = 5.</p>
+        <div class="step"><div class="step-num">1</div><div class="step-text"><code>LDI 200</code> → ACC = <strong>200</strong> (the number 200 itself)</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text"><code>LDD 200</code> → ACC = <strong>50</strong> (the value stored at address 200)</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text"><code>LDA 200</code> → ACC = <strong>99</strong> (the value stored at address 50, which was found in address 200)</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-text"><code>LDX 195</code> → ACC = <strong>50</strong> (the value stored at address 195 + 5 = 200)</div></div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- SECTION 5: PERFORMANCE                -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="lesson-section" id="performance">
+      <h2><span class="section-num">5</span> Factors Affecting CPU Performance</h2>
+
+      <p>Several hardware characteristics determine how many instructions the CPU can execute per second. You must be able to explain <em>how</em> each factor helps — not just name it.</p>
+
+      <div class="perf-grid">
+        <div class="perf-card">
+          <div class="perf-name">⏱ Clock Speed</div>
+          <p>Number of cycles per second (Hz / GHz). More cycles = more FDE cycles per second = faster execution. Typical modern CPU: 3–5 GHz.</p>
+        </div>
+        <div class="perf-card">
+          <div class="perf-name">🧩 Number of Cores</div>
+          <p>Each core is an independent processor. Multiple cores allow true parallel execution of separate threads or programs simultaneously.</p>
+        </div>
+        <div class="perf-card">
+          <div class="perf-name">💾 Cache Size</div>
+          <p>Cache is very fast SRAM on or near the CPU die. Larger cache stores more frequently-used data, reducing slow main-memory accesses (cache misses).</p>
+        </div>
+        <div class="perf-card">
+          <div class="perf-name">📏 Word Length</div>
+          <p>The size of registers and the data bus (e.g. 64-bit). A wider word processes more data per instruction, reducing instructions needed for large values.</p>
+        </div>
+        <div class="perf-card">
+          <div class="perf-name">🗺 Address Bus Width</div>
+          <p>Determines the maximum RAM addressable. Larger addressable memory prevents bottlenecks in RAM-intensive programs.</p>
+        </div>
+        <div class="perf-card">
+          <div class="perf-name">🔁 Pipelining</div>
+          <p>Overlaps FDE stages of successive instructions: while one instruction executes, the next decodes, and the one after is fetched simultaneously.</p>
+        </div>
+      </div>
+
+      <div class="callout exam">
+        <strong>Exam tip:</strong> "State two ways a CPU can be made to perform better" — always add a brief explanation. "Increase clock speed so more FDE cycles occur per second" scores 2 marks; "increase clock speed" alone usually scores only 1.
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- SECTION 6: INTERRUPTS                 -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="lesson-section" id="interrupts">
+      <h2><span class="section-num">6</span> Interrupts</h2>
+
+      <p>An <span class="key-term">interrupt</span> is a signal sent to the CPU by hardware or software to indicate that an event requires immediate attention. The CPU pauses the current task, handles the interrupt, then resumes.</p>
+
+      <h3>6.1 Types of Interrupt</h3>
+
+      <table class="reg-table">
+        <thead><tr><th>Type</th><th>Source</th><th>Examples</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Hardware</strong></td>
+            <td>Physical device</td>
+            <td>Keyboard key pressed, I/O transfer complete, printer ready, timer expiry</td>
+          </tr>
+          <tr>
+            <td><strong>Software</strong></td>
+            <td>Running program</td>
+            <td>System call to the OS (deliberately), division by zero, illegal memory access (errors)</td>
+          </tr>
+          <tr>
+            <td><strong>Maskable</strong></td>
+            <td>Low-priority device</td>
+            <td>Can be temporarily ignored (masked) if the CPU is in a critical section. Most hardware interrupts are maskable.</td>
+          </tr>
+          <tr>
+            <td><strong>Non-maskable (NMI)</strong></td>
+            <td>Critical failure</td>
+            <td>Power failure, memory parity error, hardware fault — cannot be ignored under any circumstances.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>6.2 Interrupt Handling Sequence</h3>
+
+      <div class="int-flow">
+        <div class="int-step">Interrupt signal<br>raised</div>
+        <span class="int-arrow">→</span>
+        <div class="int-step">CPU checks flag<br>at end of FDE cycle</div>
+        <span class="int-arrow">→</span>
+        <div class="int-step">Save CPU state<br>to stack (PC, ACC, SR…)</div>
+        <span class="int-arrow">→</span>
+        <div class="int-step">Load ISR address<br>into PC</div>
+        <span class="int-arrow">→</span>
+        <div class="int-step">Execute ISR</div>
+        <span class="int-arrow">→</span>
+        <div class="int-step">Restore state<br>from stack, resume</div>
+      </div>
+
+      <ul style="margin-top:.5rem">
+        <li><strong>ISR (Interrupt Service Routine)</strong> — a subroutine that handles a specific interrupt. Each interrupt type maps to its ISR's address via the <em>Interrupt Vector Table</em>.</li>
+        <li><strong>Priority</strong> — higher-priority interrupts can preempt a running ISR. An NMI preempts everything.</li>
+        <li><strong>Stack</strong> — the CPU's state (all registers) is pushed onto the system stack before the ISR runs, and popped back once the ISR finishes, so the original program resumes exactly where it left off.</li>
+      </ul>
+
+      <div class="callout tip">
+        <strong>Why check only at the end of a cycle?</strong> Checking mid-instruction would leave registers in an inconsistent state (e.g. only half an addition done). Waiting for the current FDE cycle to complete ensures data integrity before the context switch.
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- SECTION 7: ASSEMBLY LANGUAGE          -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="lesson-section" id="assembly">
+      <h2><span class="section-num">7</span> Assembly Language (Cambridge 9618)</h2>
+
+      <p>Cambridge 9618 uses a single-accumulator assembly language. Each instruction has an <strong>opcode</strong> (mnemonic) and one <strong>operand</strong>. You must know all mnemonics below.</p>
+
+      <h3>7.1 Instruction Set</h3>
+
+      <table class="ins-table">
+        <thead>
+          <tr><th>Mnemonic</th><th>Operation</th><th>Effect on ACC / memory</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>LDD &lt;addr&gt;</td><td>Load Direct</td><td>ACC ← Mem[addr]</td></tr>
+          <tr><td>LDI &lt;val&gt;</td><td>Load Immediate</td><td>ACC ← val (the literal number, not an address)</td></tr>
+          <tr><td>LDX &lt;addr&gt;</td><td>Load Indexed</td><td>ACC ← Mem[addr + IX]</td></tr>
+          <tr><td>LDA &lt;addr&gt;</td><td>Load Indirect</td><td>ACC ← Mem[Mem[addr]]</td></tr>
+          <tr><td>STO &lt;addr&gt;</td><td>Store</td><td>Mem[addr] ← ACC</td></tr>
+          <tr><td>STX &lt;addr&gt;</td><td>Store Indexed</td><td>Mem[addr + IX] ← ACC</td></tr>
+          <tr><td>ADD &lt;addr&gt;</td><td>Add</td><td>ACC ← ACC + Mem[addr]</td></tr>
+          <tr><td>SUB &lt;addr&gt;</td><td>Subtract</td><td>ACC ← ACC − Mem[addr]</td></tr>
+          <tr><td>INC &lt;reg&gt;</td><td>Increment</td><td>ACC ← ACC + 1 &nbsp;or&nbsp; IX ← IX + 1</td></tr>
+          <tr><td>DEC &lt;reg&gt;</td><td>Decrement</td><td>ACC ← ACC − 1 &nbsp;or&nbsp; IX ← IX − 1</td></tr>
+          <tr><td>CMP &lt;addr&gt;</td><td>Compare</td><td>Set flags based on ACC − Mem[addr] — ACC unchanged</td></tr>
+          <tr><td>CMI &lt;val&gt;</td><td>Compare Immediate</td><td>Set flags based on ACC − val — ACC unchanged</td></tr>
+          <tr><td>JMP &lt;label&gt;</td><td>Unconditional Jump</td><td>PC ← address of label</td></tr>
+          <tr><td>JPE &lt;label&gt;</td><td>Jump if Equal (Z=1)</td><td>If Zero flag set: PC ← address of label</td></tr>
+          <tr><td>JPN &lt;label&gt;</td><td>Jump if Not Equal (Z=0)</td><td>If Zero flag clear: PC ← address of label</td></tr>
+          <tr><td>AND &lt;addr&gt;</td><td>Bitwise AND</td><td>ACC ← ACC AND Mem[addr]</td></tr>
+          <tr><td>OR &lt;addr&gt;</td><td>Bitwise OR</td><td>ACC ← ACC OR Mem[addr]</td></tr>
+          <tr><td>XOR &lt;addr&gt;</td><td>Bitwise XOR</td><td>ACC ← ACC XOR Mem[addr]</td></tr>
+          <tr><td>LSL &lt;n&gt;</td><td>Logical Shift Left n bits</td><td>ACC ← ACC × 2<sup>n</sup></td></tr>
+          <tr><td>LSR &lt;n&gt;</td><td>Logical Shift Right n bits</td><td>ACC ← ACC ÷ 2<sup>n</sup> (integer)</td></tr>
+          <tr><td>IN</td><td>Input</td><td>ACC ← value from input device</td></tr>
+          <tr><td>OUT</td><td>Output</td><td>Send ACC value to output device</td></tr>
+          <tr><td>END</td><td>Halt</td><td>Stop execution</td></tr>
+        </tbody>
+      </table>
+
+      <h3>7.2 Worked Example — Add two inputs</h3>
+      <p>Read two numbers, add them together, output the result.</p>
+
+      <div class="code-block">
+       <span class="kw">IN</span>              <span class="cm">; ACC ← user input (first number)</span>
+       <span class="kw">STO</span> Num1        <span class="cm">; Mem[Num1] ← ACC</span>
+       <span class="kw">IN</span>              <span class="cm">; ACC ← user input (second number)</span>
+       <span class="kw">ADD</span> Num1        <span class="cm">; ACC ← ACC + Mem[Num1]</span>
+       <span class="kw">OUT</span>             <span class="cm">; output the sum</span>
+       <span class="kw">END</span>
+      </div>
+
+      <h3>7.3 Worked Example — Count down loop</h3>
+      <p>Count from 5 down to 1, outputting each value.</p>
+
+      <div class="code-block">
+       <span class="kw">LDI</span> <span class="num">5</span>           <span class="cm">; ACC ← 5 (counter)</span>
+       <span class="kw">STO</span> Count      <span class="cm">; Mem[Count] ← 5</span>
+<span class="lbl">LOOP:</span>  <span class="kw">LDD</span> Count      <span class="cm">; ACC ← current counter</span>
+       <span class="kw">OUT</span>             <span class="cm">; output current value</span>
+       <span class="kw">DEC</span> ACC         <span class="cm">; ACC ← ACC − 1</span>
+       <span class="kw">STO</span> Count      <span class="cm">; save updated counter</span>
+       <span class="kw">CMI</span> <span class="num">0</span>           <span class="cm">; compare counter with 0</span>
+       <span class="kw">JPN</span> LOOP       <span class="cm">; if not zero, loop again</span>
+       <span class="kw">END</span>
+      </div>
+
+      <h3>7.4 Trace Tables</h3>
+      <p>A trace table shows the state of all relevant registers/memory locations after each instruction. It is frequently required in exam questions — one row per instruction executed.</p>
+
+      <div class="worked">
+        <div class="worked-title">Worked Trace — LDI 10 / STO 300 / LDI 3 / ADD 300 / STO 301 / SUB 300 / OUT / END</div>
+        <table class="trace-table">
+          <thead><tr><th>Line</th><th>Instruction</th><th>ACC</th><th>Mem[300]</th><th>Mem[301]</th><th>Output</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>LDI 10</td><td>10</td><td>—</td><td>—</td><td></td></tr>
+            <tr><td>2</td><td>STO 300</td><td>10</td><td>10</td><td>—</td><td></td></tr>
+            <tr><td>3</td><td>LDI 3</td><td>3</td><td>10</td><td>—</td><td></td></tr>
+            <tr><td>4</td><td>ADD 300</td><td>13</td><td>10</td><td>—</td><td></td></tr>
+            <tr><td>5</td><td>STO 301</td><td>13</td><td>10</td><td>13</td><td></td></tr>
+            <tr><td>6</td><td>SUB 300</td><td>3</td><td>10</td><td>13</td><td></td></tr>
+            <tr><td>7</td><td>OUT</td><td>3</td><td>10</td><td>13</td><td>3</td></tr>
+            <tr><td>8</td><td>END</td><td>—</td><td>10</td><td>13</td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <strong>Technique:</strong> Fill the table left-to-right, row-by-row. Only update a column if the instruction changes that value. Leave unchanged cells carrying the previous value — markers award marks per correct cell.
+      </div>
+
+      <div class="callout exam">
+        <strong>Key assembly exam points:</strong>
+        <ul style="margin:.4rem 0 0 1rem">
+          <li><code>LDI</code> loads the literal value; <code>LDD</code> loads from an address — do not mix them up.</li>
+          <li><code>CMP</code>/<code>CMI</code> set flags but do <em>not</em> change ACC.</li>
+          <li><code>JPE</code> fires when Z=1 (ACC equalled the compared value); <code>JPN</code> fires when Z=0 (not equal — not "negative").</li>
+          <li><code>LSL 1</code> multiplies by 2; <code>LSR 1</code> divides by 2 (integer).</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- SECTION: EXAM PRACTICE                -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="lesson-section" id="exam-practice">
+      <h2><span class="section-num">📝</span> Exam Practice</h2>
+
+      <!-- Q1 -->
+      <div class="practice">
+        <div class="pq-title">Question 1 · 4 marks</div>
+        <p>State the purpose of each register: <strong>(a)</strong> PC &nbsp; <strong>(b)</strong> MAR &nbsp; <strong>(c)</strong> MDR &nbsp; <strong>(d)</strong> ACC</p>
+        <button class="reveal-btn">Show Answer</button>
+        <div class="answer-reveal">
+          <p><strong>(a) PC:</strong> Holds the address of the next instruction to be fetched. [1]</p>
+          <p><strong>(b) MAR:</strong> Holds the address of the memory location currently being read from or written to. [1]</p>
+          <p><strong>(c) MDR:</strong> Holds the data that has been read from memory, or the data to be written to memory. [1]</p>
+          <p><strong>(d) ACC:</strong> Holds the result of ALU arithmetic and logical operations. [1]</p>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="practice">
+        <div class="pq-title">Question 2 · 6 marks</div>
+        <p>Describe the Fetch stage of the FDE cycle, using register transfer notation. [6]</p>
+        <button class="reveal-btn">Show Answer</button>
+        <div class="answer-reveal">
+          <p>Award 1 mark each (max 6):</p>
+          <ul>
+            <li><code>MAR ← PC</code> — the address of the next instruction is copied to MAR [1]</li>
+            <li><code>PC ← PC + 1</code> — PC incremented to point to the following instruction [1]</li>
+            <li><code>MDR ← Memory[MAR]</code> — instruction fetched from memory into MDR [1]</li>
+            <li><code>CIR ← MDR</code> — instruction copied from MDR to CIR ready for decoding [1]</li>
+            <li>MAR is placed on the address bus; memory reads via the control bus [1]</li>
+            <li>The instruction returns on the data bus into MDR [1]</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="practice">
+        <div class="pq-title">Question 3 · 5 marks</div>
+        <p>Trace the following program. Complete the trace table. [5]</p>
+        <div class="code-block" style="margin-bottom:.5rem">
+<span class="lbl">START:</span> <span class="kw">LDI</span> <span class="num">8</span>
+        <span class="kw">STO</span> <span class="num">400</span>
+        <span class="kw">LSR</span> <span class="num">1</span>
+        <span class="kw">STO</span> <span class="num">401</span>
+        <span class="kw">ADD</span> <span class="num">400</span>
+        <span class="kw">OUT</span>
+        <span class="kw">END</span>
+        </div>
+        <table class="trace-table">
+          <thead><tr><th>Line</th><th>Instruction</th><th>ACC</th><th>Mem[400]</th><th>Mem[401]</th><th>Output</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>LDI 8</td><td></td><td>—</td><td>—</td><td></td></tr>
+            <tr><td>2</td><td>STO 400</td><td></td><td></td><td>—</td><td></td></tr>
+            <tr><td>3</td><td>LSR 1</td><td></td><td></td><td>—</td><td></td></tr>
+            <tr><td>4</td><td>STO 401</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>5</td><td>ADD 400</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>6</td><td>OUT</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>7</td><td>END</td><td>—</td><td></td><td></td><td></td></tr>
+          </tbody>
+        </table>
+        <button class="reveal-btn">Show Answer</button>
+        <div class="answer-reveal">
+          <table class="trace-table">
+            <thead><tr><th>Line</th><th>Instruction</th><th>ACC</th><th>Mem[400]</th><th>Mem[401]</th><th>Output</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>LDI 8</td><td>8</td><td>—</td><td>—</td><td></td></tr>
+              <tr><td>2</td><td>STO 400</td><td>8</td><td>8</td><td>—</td><td></td></tr>
+              <tr><td>3</td><td>LSR 1</td><td>4</td><td>8</td><td>—</td><td></td></tr>
+              <tr><td>4</td><td>STO 401</td><td>4</td><td>8</td><td>4</td><td></td></tr>
+              <tr><td>5</td><td>ADD 400</td><td>12</td><td>8</td><td>4</td><td></td></tr>
+              <tr><td>6</td><td>OUT</td><td>12</td><td>8</td><td>4</td><td>12</td></tr>
+              <tr><td>7</td><td>END</td><td>—</td><td>8</td><td>4</td><td></td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:.5rem">Award 1 mark each for lines 1, 3, 4, 5, 6 correct. [5]</p>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="practice">
+        <div class="pq-title">Question 4 · 4 marks</div>
+        <p>(a) Describe what happens when an interrupt is received at the end of an FDE cycle. [3]<br>
+           (b) Explain why interrupts are only checked at the <em>end</em> of a cycle. [1]</p>
+        <button class="reveal-btn">Show Answer</button>
+        <div class="answer-reveal">
+          <p><strong>(a)</strong> Any 3 of:</p>
+          <ul>
+            <li>The CPU checks the interrupt register / flag at the end of the current FDE cycle</li>
+            <li>The current CPU state (PC, ACC, SR, etc.) is saved to the stack</li>
+            <li>The address of the appropriate ISR is loaded into the PC</li>
+            <li>The ISR executes to service the interrupt</li>
+            <li>After the ISR, the saved state is restored from the stack and execution resumes</li>
+          </ul>
+          <p><strong>(b)</strong> To ensure the current instruction completes fully — interrupting mid-instruction would leave registers in an inconsistent state, corrupting the program's data.</p>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="practice">
+        <div class="pq-title">Question 5 · 4 marks</div>
+        <p>Write a Cambridge 9618 assembly program that reads a number, doubles it, and outputs the result. [4]</p>
+        <button class="reveal-btn">Show Answer</button>
+        <div class="answer-reveal">
+          <div class="code-block">
+<span class="kw">IN</span>           <span class="cm">; ACC ← input</span>
+<span class="kw">LSL</span> <span class="num">1</span>        <span class="cm">; ACC ← ACC × 2  (shift left by 1 bit)</span>
+<span class="kw">OUT</span>          <span class="cm">; output doubled value</span>
+<span class="kw">END</span>
+          </div>
+          <p>Accept alternative using ADD: <code>STO Num / ADD Num / OUT / END</code></p>
+          <p>Award: 1 mark IN; 1 mark correct doubling instruction; 1 mark OUT; 1 mark END. [4]</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- SUMMARY CHECKLIST                     -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="lesson-section">
+      <h2><span class="section-num">✓</span> Summary Checklist</h2>
+      <ul class="checklist">
+        <li>Name and state the purpose of PC, MAR, MDR, CIR, ACC, SR, and IX</li>
+        <li>Describe all steps of the Fetch-Decode-Execute cycle using register transfer notation</li>
+        <li>Explain address, data, and control buses and how their width affects performance</li>
+        <li>Calculate maximum addressable memory from address bus width: 2<sup>n</sup></li>
+        <li>Distinguish immediate, direct, indirect, and indexed addressing modes with examples</li>
+        <li>Identify and explain six factors affecting CPU performance</li>
+        <li>Define interrupt and give examples of hardware, software, maskable, and NMI interrupts</li>
+        <li>Describe the full interrupt handling sequence including stack use and ISR execution</li>
+        <li>Explain why interrupts are only checked at the end of each FDE cycle</li>
+        <li>Use all Cambridge 9618 mnemonics: LDD, LDI, LDX, LDA, STO, STX, ADD, SUB, INC, DEC, CMP, CMI, JMP, JPE, JPN, AND, OR, XOR, LSL, LSR, IN, OUT, END</li>
+        <li>Complete trace tables for assembly programs showing register and memory state</li>
+        <li>Write short assembly programs for arithmetic, conditional, and loop tasks</li>
+      </ul>
+    </div>
+
+  </main>
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+
+    <div class="sidebar-box">
+      <h3>Contents</h3>
+      <ul class="toc-list">
+        <li><a href="#registers">1. CPU Registers</a></li>
+        <li><a href="#system-bus">2. System Bus</a></li>
+        <li><a href="#fde-cycle">3. FDE Cycle</a></li>
+        <li><a href="#addressing">4. Addressing Modes</a></li>
+        <li><a href="#performance">5. CPU Performance</a></li>
+        <li><a href="#interrupts">6. Interrupts</a></li>
+        <li><a href="#assembly">7. Assembly Language</a></li>
+        <li><a href="#exam-practice">📝 Exam Practice</a></li>
+      </ul>
+    </div>
+
+    <div class="sidebar-box">
+      <h3>Register Quick Ref</h3>
+      <table style="font-size:.76rem;width:100%;border-collapse:collapse">
+        <tr><td style="padding:.2rem .4rem;font-family:monospace;font-weight:700;color:#c62828">PC</td><td style="color:var(--text-muted)">next instruction addr</td></tr>
+        <tr><td style="padding:.2rem .4rem;font-family:monospace;font-weight:700;color:#c62828">MAR</td><td style="color:var(--text-muted)">address to access</td></tr>
+        <tr><td style="padding:.2rem .4rem;font-family:monospace;font-weight:700;color:#c62828">MDR</td><td style="color:var(--text-muted)">data to/from memory</td></tr>
+        <tr><td style="padding:.2rem .4rem;font-family:monospace;font-weight:700;color:#c62828">CIR</td><td style="color:var(--text-muted)">current instruction</td></tr>
+        <tr><td style="padding:.2rem .4rem;font-family:monospace;font-weight:700;color:#c62828">ACC</td><td style="color:var(--text-muted)">ALU result / working</td></tr>
+        <tr><td style="padding:.2rem .4rem;font-family:monospace;font-weight:700;color:#c62828">SR</td><td style="color:var(--text-muted)">flags C, Z, N, V</td></tr>
+        <tr><td style="padding:.2rem .4rem;font-family:monospace;font-weight:700;color:#c62828">IX</td><td style="color:var(--text-muted)">index for arrays</td></tr>
+      </table>
+    </div>
+
+    <div class="sidebar-box">
+      <h3>Key Mnemonics</h3>
+      <table style="font-size:.76rem;width:100%;border-collapse:collapse">
+        <tr><td style="padding:.15rem .4rem;font-family:monospace;color:#c62828;font-weight:700">LDI</td><td style="color:var(--text-muted)">load literal value</td></tr>
+        <tr><td style="padding:.15rem .4rem;font-family:monospace;color:#c62828;font-weight:700">LDD</td><td style="color:var(--text-muted)">load from address</td></tr>
+        <tr><td style="padding:.15rem .4rem;font-family:monospace;color:#c62828;font-weight:700">LDX</td><td style="color:var(--text-muted)">load via IX offset</td></tr>
+        <tr><td style="padding:.15rem .4rem;font-family:monospace;color:#c62828;font-weight:700">STO</td><td style="color:var(--text-muted)">store ACC to addr</td></tr>
+        <tr><td style="padding:.15rem .4rem;font-family:monospace;color:#c62828;font-weight:700">CMP</td><td style="color:var(--text-muted)">compare (flags only)</td></tr>
+        <tr><td style="padding:.15rem .4rem;font-family:monospace;color:#c62828;font-weight:700">JPE</td><td style="color:var(--text-muted)">jump if Z flag = 1</td></tr>
+        <tr><td style="padding:.15rem .4rem;font-family:monospace;color:#c62828;font-weight:700">JPN</td><td style="color:var(--text-muted)">jump if Z flag = 0</td></tr>
+        <tr><td style="padding:.15rem .4rem;font-family:monospace;color:#c62828;font-weight:700">LSL n</td><td style="color:var(--text-muted)">multiply by 2ⁿ</td></tr>
+        <tr><td style="padding:.15rem .4rem;font-family:monospace;color:#c62828;font-weight:700">LSR n</td><td style="color:var(--text-muted)">divide by 2ⁿ</td></tr>
+      </table>
+    </div>
+
+    <div class="sidebar-box" style="border-left:4px solid #c62828">
+      <h3 style="color:#c62828">Common Mistakes</h3>
+      <ul style="font-size:.78rem;padding-left:1.1rem;color:var(--text)">
+        <li style="margin:.3rem 0">PC holds the <em>next</em> instruction address — not the current one</li>
+        <li style="margin:.3rem 0">Confusing LDI (literal value) with LDD (address lookup)</li>
+        <li style="margin:.3rem 0">CMP does not change ACC — flags only</li>
+        <li style="margin:.3rem 0">JPN means "not equal" (Z=0), not "negative"</li>
+        <li style="margin:.3rem 0">Forgetting to save CPU state to the stack before the ISR</li>
+        <li style="margin:.3rem 0">Wider address bus = more memory; wider data bus = more data per cycle — don't swap these</li>
+      </ul>
+    </div>
+
+    <a href="topic4-logic-gates.html" style="display:block;text-align:center;background:var(--surface2);color:var(--primary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.65rem;font-weight:700;font-size:.82rem;text-decoration:none;margin-top:.25rem">
+      ← Topic 4: Logic Gates
+    </a>
+    <a href="index.html" style="display:block;text-align:center;background:var(--primary);color:#fff;border-radius:var(--radius-sm);padding:.75rem;font-weight:700;font-size:.875rem;text-decoration:none;margin-top:.5rem">
+      ← Back to All Topics
+    </a>
+
+  </aside>
+
+</div><!-- /lesson-wrap -->
+
+<footer style="background:var(--surface);border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;font-size:.8rem;color:var(--text-muted)">
+  Cambridge International AS &amp; A Level Computer Science 9618 — Topic 5: Processor Fundamentals &nbsp;|&nbsp;
+  Not affiliated with Cambridge Assessment International Education.
+</footer>
+
+<script src="script.js"></script>
+<script>
+  const sections = document.querySelectorAll('.lesson-section[id]');
+  const navLinks = document.querySelectorAll('.toc-list a, .page-nav a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+  document.querySelectorAll('.reveal-btn').forEach(btn => { btn.textContent = 'Show Answer'; });
+</script>
+</body>
+</html>
