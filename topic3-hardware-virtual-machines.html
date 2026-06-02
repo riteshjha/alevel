@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Topic 3: Hardware &amp; Virtual Machines — CS 9618</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .page-nav { background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:64px; z-index:90; overflow-x:auto; }
+    .page-nav-inner { max-width:1100px; margin:0 auto; padding:0 2rem; display:flex; gap:0; }
+    .page-nav a { display:block; padding:.75rem 1.1rem; font-size:.82rem; font-weight:600; color:var(--text-muted); text-decoration:none; white-space:nowrap; border-bottom:3px solid transparent; transition:color .2s,border-color .2s; }
+    .page-nav a:hover,.page-nav a.active { color:var(--primary); border-bottom-color:var(--primary); }
+
+    .lesson-wrap { max-width:1100px; margin:0 auto; padding:2.5rem 2rem 4rem; display:grid; grid-template-columns:1fr 280px; gap:2.5rem; align-items:start; }
+    @media(max-width:900px){ .lesson-wrap{grid-template-columns:1fr} .sidebar{display:none} }
+
+    .sidebar { position:sticky; top:120px; }
+    .sidebar-box { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; margin-bottom:1rem; box-shadow:var(--shadow); }
+    .sidebar-box h3 { font-size:.85rem; font-weight:700; margin-bottom:.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; }
+    .toc-list { list-style:none; }
+    .toc-list li { padding:.2rem 0; }
+    .toc-list a { font-size:.82rem; color:var(--text-muted); text-decoration:none; display:block; padding:.25rem .5rem; border-radius:4px; transition:background .15s,color .15s; }
+    .toc-list a:hover { background:var(--surface2); color:var(--primary); }
+    .toc-list a.active { background:var(--accent-light); color:var(--primary); font-weight:600; }
+    .toc-list .sub { padding-left:1rem; }
+
+    .lesson-section { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:2rem 2.25rem; margin-bottom:2rem; box-shadow:var(--shadow); scroll-margin-top:130px; }
+    .lesson-section h2 { font-size:1.5rem; font-weight:800; color:var(--primary); margin-bottom:.4rem; display:flex; align-items:center; gap:.6rem; }
+    .section-num { background:var(--primary); color:#fff; width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:.9rem; font-weight:800; flex-shrink:0; }
+    .lesson-section h3 { font-size:1.1rem; font-weight:700; margin:1.75rem 0 .75rem; padding-bottom:.4rem; border-bottom:2px solid var(--border); color:var(--text); }
+    .lesson-section h4 { font-size:.95rem; font-weight:700; margin:1.25rem 0 .5rem; color:var(--primary-light); }
+    .lesson-section p { font-size:.9rem; line-height:1.75; color:var(--text); margin-bottom:.75rem; }
+    .lesson-section ul,.lesson-section ol { padding-left:1.5rem; margin-bottom:.75rem; }
+    .lesson-section li { font-size:.9rem; line-height:1.75; color:var(--text); }
+
+    .worked { background:linear-gradient(135deg,#e8f4fd,#f0f8ff); border:1px solid #90caf9; border-left:5px solid #1565c0; border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:1.25rem 1.5rem; margin:1rem 0; }
+    [data-theme="dark"] .worked { background:#0d1f35; border-color:#1565c0; }
+    .worked .worked-title { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#1565c0; margin-bottom:.6rem; }
+    [data-theme="dark"] .worked .worked-title { color:#64b5f6; }
+    .worked p,.worked li { font-size:.875rem; color:var(--text); }
+    .worked .step { display:flex; gap:.75rem; margin:.4rem 0; align-items:flex-start; }
+    .worked .step-num { background:#1565c0; color:#fff; min-width:22px; height:22px; border-radius:50%; font-size:.72rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+    .worked .step-text { font-size:.875rem; line-height:1.6; }
+    .worked .answer { margin-top:.75rem; padding:.6rem 1rem; background:#1565c0; color:#fff; border-radius:var(--radius-sm); font-weight:700; font-size:.9rem; }
+
+    .practice { background:var(--surface2); border:1px solid var(--border); border-left:5px solid #2e7d32; border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:1.25rem 1.5rem; margin:1rem 0; }
+    .practice .pq-title { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#2e7d32; margin-bottom:.6rem; }
+    .practice p,.practice li { font-size:.875rem; }
+    .practice .reveal-btn { background:#2e7d32; color:#fff; border:none; border-radius:6px; padding:.4rem 1rem; font-size:.8rem; font-weight:700; cursor:pointer; margin-top:.75rem; transition:background .2s; }
+    .practice .reveal-btn:hover { background:#1b5e20; }
+    .practice .answer-reveal { display:none; margin-top:.75rem; padding:.75rem 1rem; background:#e8f5e9; border-radius:var(--radius-sm); font-size:.875rem; }
+    [data-theme="dark"] .practice .answer-reveal { background:#1b2e1c; color:#c8e6c9; }
+    .practice .answer-reveal.open { display:block; }
+
+    .formula { background:var(--surface2); border:2px dashed var(--accent); border-radius:var(--radius-sm); padding:1rem 1.5rem; text-align:center; margin:.75rem 0; font-size:1rem; font-family:'Consolas',monospace; color:var(--text); }
+    .formula .formula-title { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--accent); margin-bottom:.4rem; font-family:'Segoe UI',sans-serif; }
+
+    .key-term { background:linear-gradient(transparent 60%,rgba(0,172,193,.2) 60%); font-weight:700; }
+    .objectives-list { list-style:none; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:.5rem; }
+    .objectives-list li { font-size:.85rem; display:flex; align-items:flex-start; gap:.5rem; padding:.4rem 0; color:var(--text); }
+    .objectives-list li::before { content:'✦'; color:var(--accent); flex-shrink:0; }
+    .breadcrumb { display:flex; align-items:center; gap:.4rem; font-size:.82rem; color:var(--text-muted); margin-bottom:1.5rem; }
+    .breadcrumb a { color:var(--primary-light); text-decoration:none; }
+    .breadcrumb a:hover { text-decoration:underline; }
+    .checklist { list-style:none; padding:0; }
+    .checklist li { display:flex; align-items:flex-start; gap:.6rem; padding:.35rem 0; font-size:.875rem; color:var(--text); }
+    .checklist li::before { content:'☐'; color:var(--primary-light); font-size:1rem; flex-shrink:0; }
+
+    /* ── Architecture diagram ── */
+    .arch-diagram { background:#0d1117; border-radius:var(--radius-sm); padding:1.5rem; overflow-x:auto; margin:.75rem 0; }
+    .arch-diagram svg { display:block; margin:0 auto; }
+
+    /* ── Bus diagram ── */
+    .bus-diagram { display:flex; flex-direction:column; gap:.5rem; margin:.75rem 0; font-size:.82rem; }
+    .bus-row { display:flex; align-items:center; gap:.75rem; }
+    .bus-line { flex:1; height:14px; border-radius:4px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:.72rem; letter-spacing:.05em; }
+    .bus-label { width:110px; font-weight:700; text-align:right; font-size:.8rem; flex-shrink:0; }
+    .bus-width { width:70px; font-size:.75rem; color:var(--text-muted); flex-shrink:0; }
+    .addr-bus { background:#1565c0; }
+    .data-bus { background:#2e7d32; }
+    .ctrl-bus { background:#c62828; }
+
+    /* ── Memory hierarchy pyramid ── */
+    .mem-pyramid { display:flex; flex-direction:column; align-items:center; gap:3px; margin:.75rem 0; }
+    .mem-tier { display:flex; align-items:center; justify-content:space-between; border-radius:4px; padding:.45rem 1rem; color:#fff; font-weight:700; font-size:.82rem; transition:transform .15s; cursor:default; }
+    .mem-tier:hover { transform:scaleX(1.02); }
+    .mem-tier .tier-name { flex:1; }
+    .mem-tier .tier-speed { font-size:.72rem; opacity:.85; text-align:right; }
+    .mem-tier .tier-size { font-size:.72rem; opacity:.85; width:90px; text-align:center; }
+
+    /* ── Cache hit/miss diagram ── */
+    .cache-flow { background:#0d1117; border-radius:var(--radius-sm); padding:1.25rem 1.5rem; font-family:monospace; font-size:.82rem; color:#c9d1d9; line-height:2; overflow-x:auto; margin:.75rem 0; }
+    .cf-hit { color:#7ee787; font-weight:700; }
+    .cf-miss { color:#ff7b72; font-weight:700; }
+    .cf-path { color:#79c0ff; }
+    .cf-note { color:#8b949e; }
+
+    /* ── Storage comparison cards ── */
+    .storage-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:.75rem; margin:.75rem 0; }
+    .storage-card { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:.9rem 1rem; }
+    .storage-card .st-name { font-weight:800; font-size:.88rem; color:var(--primary); margin-bottom:.35rem; display:flex; align-items:center; gap:.4rem; }
+    .storage-card .st-icon { font-size:1.2rem; }
+    .storage-card ul { font-size:.78rem; list-style:none; padding:0; color:var(--text-muted); }
+    .storage-card ul li { padding:.1rem 0; }
+    .storage-card .st-pros li::before { content:'✓ '; color:#2e7d32; }
+    .storage-card .st-cons li::before { content:'✗ '; color:#c62828; }
+
+    /* ── VM diagram ── */
+    .vm-stack { display:flex; flex-direction:column; gap:3px; margin:.75rem 0; max-width:480px; }
+    .vm-row { display:flex; gap:3px; }
+    .vm-cell { flex:1; padding:.55rem .75rem; border-radius:5px; font-size:.8rem; font-weight:700; text-align:center; color:#fff; }
+    .vm-app { background:#6a1b9a; }
+    .vm-os { background:#1565c0; }
+    .vm-hyp { background:#c62828; }
+    .vm-hw { background:#37474f; }
+    .vm-label { font-size:.7rem; color:var(--text-muted); text-align:center; margin-bottom:2px; }
+
+    /* ── Performance factors ── */
+    .perf-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:.75rem; margin:.75rem 0; }
+    .perf-card { background:var(--surface2); border-left:4px solid var(--accent); border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:.9rem 1rem; }
+    .perf-card .perf-name { font-weight:800; font-size:.88rem; color:var(--text); margin-bottom:.3rem; }
+    .perf-card p { font-size:.78rem; color:var(--text-muted); margin:0; line-height:1.5; }
+
+    /* ── Harvard vs Von Neumann ── */
+    .arch-compare { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin:.75rem 0; }
+    @media(max-width:600px){ .arch-compare{grid-template-columns:1fr} }
+    .arch-card { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:1rem; }
+    .arch-card h4 { font-size:.9rem; font-weight:800; margin-bottom:.6rem; }
+    .arch-card ul { font-size:.8rem; padding-left:1.2rem; color:var(--text); }
+    .arch-card li { line-height:1.7; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a class="logo" href="index.html">
+      <div class="logo-icon">💻</div>
+      <div>
+        <div class="logo-text">CS 9618</div>
+        <div class="logo-sub">Cambridge AS &amp; A Level</div>
+      </div>
+    </a>
+    <div class="header-actions">
+      <button class="btn-icon" id="theme-btn" title="Toggle theme">🌙</button>
+    </div>
+  </div>
+</header>
+
+<nav class="page-nav" aria-label="Sections">
+  <div class="page-nav-inner">
+    <a href="#architecture" class="active">1. Architecture</a>
+    <a href="#buses">2. System Buses</a>
+    <a href="#memory">3. Memory</a>
+    <a href="#cache">4. Cache</a>
+    <a href="#secondary-storage">5. Secondary Storage</a>
+    <a href="#io-devices">6. I/O Devices</a>
+    <a href="#performance">7. CPU Performance</a>
+    <a href="#virtual-machines">8. Virtual Machines</a>
+    <a href="#exam-practice">📝 Exam Practice</a>
+  </div>
+</nav>
+
+<div class="lesson-wrap">
+<main>
+
+  <div class="breadcrumb">
+    <a href="index.html">Home</a>
+    <span>›</span>
+    <a href="index.html#tab-as">Paper 1 — Theory</a>
+    <span>›</span>
+    <strong style="color:var(--text)">Topic 3: Hardware &amp; Virtual Machines</strong>
+  </div>
+
+  <!-- Hero -->
+  <div class="lesson-section" style="background:linear-gradient(135deg,#4a148c,#6a1b9a,#8e24aa);color:#fff;border:none">
+    <div style="display:flex;align-items:flex-start;gap:1.25rem">
+      <div style="font-size:3rem;flex-shrink:0">🖥️</div>
+      <div>
+        <div style="font-size:.75rem;font-weight:700;opacity:.7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem">Paper 1 · Topic 3</div>
+        <h1 style="font-size:1.9rem;font-weight:900;margin-bottom:.5rem;color:#fff">Hardware &amp; Virtual Machines</h1>
+        <p style="opacity:.85;font-size:.95rem;max-width:620px;margin-bottom:1rem;color:#fff">The physical components that make up a computer — from the architecture of the CPU, through the memory hierarchy and storage technologies, to the virtual machines that let one physical computer run many operating systems simultaneously.</p>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+          <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">Paper 1 · AS &amp; A Level</span>
+          <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">~12% of Paper 1 marks</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Objectives -->
+  <div class="lesson-section">
+    <h2><span class="section-num">✦</span> Learning Objectives</h2>
+    <ul class="objectives-list">
+      <li>Describe the Von Neumann and Harvard architectures and compare them</li>
+      <li>Explain the role of the ALU, Control Unit, registers, and clock</li>
+      <li>Describe the address, data, and control buses and their widths</li>
+      <li>Explain the memory hierarchy: registers, cache, RAM, ROM, secondary storage</li>
+      <li>Describe how cache memory works (cache hit and miss)</li>
+      <li>Compare RAM and ROM, and describe the role of virtual memory</li>
+      <li>Compare HDD, SSD, optical, and magnetic tape storage</li>
+      <li>Describe common input and output devices and their purpose</li>
+      <li>Explain how clock speed, cores, cache size, and word length affect CPU performance</li>
+      <li>Define a virtual machine, describe the role of a hypervisor (Type 1 and 2)</li>
+      <li>State the benefits and limitations of virtual machines with examples</li>
+    </ul>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 1: ARCHITECTURE                -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="architecture">
+    <h2><span class="section-num">1</span> Computer Architecture</h2>
+
+    <p>A computer's <span class="key-term">architecture</span> defines how its components are organised and how they communicate. The two models you need to know are <strong>Von Neumann</strong> and <strong>Harvard</strong>.</p>
+
+    <h3>1.1 Von Neumann Architecture</h3>
+    <p>Proposed by John von Neumann in 1945, this is the basis of virtually all modern general-purpose computers. Its defining feature is the <span class="key-term">stored-program concept</span>: instructions and data are stored together in the same main memory, using the same bus to fetch both.</p>
+
+    <div class="arch-diagram">
+      <svg viewBox="0 0 560 220" width="100%" style="max-width:560px">
+        <!-- Main Memory -->
+        <rect x="20" y="20" width="140" height="180" rx="6" fill="#1e2a3a" stroke="#1565c0" stroke-width="2"/>
+        <text x="90" y="42" text-anchor="middle" fill="#64b5f6" font-size="11" font-weight="700">MAIN MEMORY</text>
+        <rect x="32" y="52" width="116" height="28" rx="3" fill="#1565c0" opacity=".6"/>
+        <text x="90" y="71" text-anchor="middle" fill="#fff" font-size="9">Program Instructions</text>
+        <rect x="32" y="86" width="116" height="28" rx="3" fill="#2e7d32" opacity=".6"/>
+        <text x="90" y="105" text-anchor="middle" fill="#fff" font-size="9">Data</text>
+        <rect x="32" y="120" width="116" height="28" rx="3" fill="#2e7d32" opacity=".4"/>
+        <text x="90" y="139" text-anchor="middle" fill="#fff" font-size="9">Data</text>
+        <rect x="32" y="154" width="116" height="28" rx="3" fill="#1565c0" opacity=".4"/>
+        <text x="90" y="173" text-anchor="middle" fill="#fff" font-size="9">More Instructions</text>
+
+        <!-- System Bus (single shared) -->
+        <rect x="170" y="95" width="180" height="30" rx="4" fill="#37474f" stroke="#607d8b" stroke-width="1.5"/>
+        <text x="260" y="115" text-anchor="middle" fill="#cfd8dc" font-size="10" font-weight="700">SHARED SYSTEM BUS</text>
+        <line x1="160" y1="110" x2="170" y2="110" stroke="#607d8b" stroke-width="2"/>
+        <line x1="350" y1="110" x2="390" y2="110" stroke="#607d8b" stroke-width="2"/>
+
+        <!-- CPU -->
+        <rect x="390" y="20" width="150" height="180" rx="6" fill="#1e2a3a" stroke="#6a1b9a" stroke-width="2"/>
+        <text x="465" y="42" text-anchor="middle" fill="#ce93d8" font-size="11" font-weight="700">CPU</text>
+        <!-- CU -->
+        <rect x="402" y="52" width="126" height="38" rx="3" fill="#c62828" opacity=".7"/>
+        <text x="465" y="75" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">Control Unit (CU)</text>
+        <!-- ALU -->
+        <rect x="402" y="98" width="126" height="38" rx="3" fill="#1565c0" opacity=".8"/>
+        <text x="465" y="121" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">ALU</text>
+        <!-- Registers -->
+        <rect x="402" y="144" width="126" height="46" rx="3" fill="#2e7d32" opacity=".7"/>
+        <text x="465" y="162" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">Registers</text>
+        <text x="465" y="176" text-anchor="middle" fill="#c8e6c9" font-size="8">PC MAR MDR CIR ACC</text>
+
+        <!-- I/O -->
+        <rect x="170" y="160" width="180" height="40" rx="4" fill="#37474f" stroke="#607d8b" stroke-width="1.5"/>
+        <text x="260" y="185" text-anchor="middle" fill="#cfd8dc" font-size="10" font-weight="700">INPUT / OUTPUT DEVICES</text>
+        <line x1="260" y1="125" x2="260" y2="160" stroke="#607d8b" stroke-width="1.5" stroke-dasharray="4 3"/>
+
+        <!-- Von Neumann label -->
+        <text x="10" y="212" fill="#8b949e" font-size="9">Von Neumann: single shared bus for instructions AND data → bottleneck</text>
+      </svg>
+    </div>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <span><strong>The Von Neumann Bottleneck:</strong> Because only one thing can travel on the shared bus at a time, the CPU often has to wait for the next instruction or data from memory. This mismatch between fast CPU speed and slower memory access is the Von Neumann bottleneck. It is partially addressed by cache memory.</span>
+    </div>
+
+    <h3>1.2 Harvard Architecture</h3>
+    <p>The Harvard architecture uses <strong>separate memory stores and buses</strong> for instructions and data, allowing both to be fetched simultaneously. This eliminates the Von Neumann bottleneck.</p>
+
+    <div class="arch-compare">
+      <div class="arch-card">
+        <h4 style="color:#1565c0">🔵 Von Neumann</h4>
+        <ul>
+          <li>Single shared memory for instructions and data</li>
+          <li>Single bus (address + data + control)</li>
+          <li>Simpler and cheaper design</li>
+          <li>Flexible: RAM can hold any mix of code and data</li>
+          <li>Subject to the Von Neumann bottleneck</li>
+          <li>Used in most general-purpose computers (PCs, laptops)</li>
+        </ul>
+      </div>
+      <div class="arch-card">
+        <h4 style="color:#c62828">🔴 Harvard</h4>
+        <ul>
+          <li>Separate memory for instructions and data</li>
+          <li>Separate buses — can fetch instruction and data simultaneously</li>
+          <li>More complex and expensive hardware</li>
+          <li>No bottleneck — higher throughput</li>
+          <li>Instructions often in read-only memory (ROM)</li>
+          <li>Used in microcontrollers, DSPs, CPUs with separate instruction cache</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <span><strong>Modern CPUs are a hybrid:</strong> Most modern processors use a modified Harvard architecture internally — they have separate L1 instruction cache and L1 data cache — but present a Von Neumann interface to the programmer (a single unified address space for instructions and data).</span>
+    </div>
+
+    <h3>1.3 CPU Components</h3>
+    <table class="styled-table">
+      <thead><tr><th>Component</th><th>Role</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Arithmetic Logic Unit (ALU)</strong></td>
+          <td>Performs all arithmetic operations (add, subtract, multiply, divide) and logical operations (AND, OR, NOT, comparisons). Results are stored in the accumulator.</td>
+        </tr>
+        <tr>
+          <td><strong>Control Unit (CU)</strong></td>
+          <td>Manages and coordinates all CPU operations. Decodes instructions, generates control signals, directs data flow between components, and manages the Fetch-Decode-Execute cycle.</td>
+        </tr>
+        <tr>
+          <td><strong>Registers</strong></td>
+          <td>Tiny, extremely fast storage locations inside the CPU. Hold data currently being processed. Examples: PC, MAR, MDR, CIR, ACC, SR. (Covered in detail in Topic 5.)</td>
+        </tr>
+        <tr>
+          <td><strong>Clock</strong></td>
+          <td>Generates regular pulses (the clock signal) that synchronise all CPU operations. One FDE cycle takes one or more clock cycles. Measured in GHz (billions of pulses per second).</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="practice">
+      <div class="pq-title">✏ Practice Questions</div>
+      <p><strong>(a)</strong> State <em>two</em> differences between Von Neumann and Harvard architectures.<br>
+         <strong>(b)</strong> Explain what is meant by the Von Neumann bottleneck.<br>
+         <strong>(c)</strong> State one application where Harvard architecture is preferred over Von Neumann, and explain why.</p>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+      <div class="answer-reveal">
+        <strong>(a)</strong> Any two: (1) Von Neumann uses a single shared memory for both instructions and data; Harvard uses separate memories. (2) Von Neumann has a single shared bus; Harvard has separate buses for instructions and data. (3) Harvard can fetch an instruction and data simultaneously; Von Neumann cannot.<br><br>
+        <strong>(b)</strong> The CPU can process instructions much faster than data can be fetched from main memory via the single shared bus [1]. The CPU must wait (stall) while memory access completes, limiting overall performance [1].<br><br>
+        <strong>(c)</strong> Example: a <strong>microcontroller</strong> in an embedded system (e.g. washing machine controller) [1]. Harvard is preferred because the program (stored in ROM) and data (sensor readings) can be fetched simultaneously, giving faster, more predictable performance which is critical in real-time control applications [1].
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 2: SYSTEM BUSES                -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="buses">
+    <h2><span class="section-num">2</span> System Buses</h2>
+
+    <p>A <span class="key-term">bus</span> is a set of parallel wires that carry electrical signals between components. In a Von Neumann system, the system bus has three logically distinct parts.</p>
+
+    <div class="bus-diagram">
+      <div class="bus-row">
+        <div class="bus-label" style="color:#64b5f6">Address Bus</div>
+        <div class="bus-line addr-bus">━━━━━━━━━━━━━ ADDRESS ━━━━━━━━━━━━━ → (unidirectional)</div>
+        <div class="bus-width">32-bit or 64-bit</div>
+      </div>
+      <div class="bus-row">
+        <div class="bus-label" style="color:#a5d6ff">CPU ↔ Memory</div>
+        <div class="bus-line data-bus">━━━━━━━━━━━━━━ DATA ━━━━━━━━━━━━━━ ↔ (bidirectional)</div>
+        <div class="bus-width">8, 16, 32, 64-bit</div>
+      </div>
+      <div class="bus-row">
+        <div class="bus-label" style="color:#ef9a9a">Control</div>
+        <div class="bus-line ctrl-bus">━━━━━━━━━━━━━ CONTROL ━━━━━━━━━━━━ ↔ (bidirectional)</div>
+        <div class="bus-width">various signals</div>
+      </div>
+    </div>
+
+    <table class="styled-table" style="margin-top:1rem">
+      <thead><tr><th>Bus</th><th>Direction</th><th>Carries</th><th>Width significance</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Address Bus</strong></td>
+          <td>Unidirectional (CPU → memory)</td>
+          <td>Memory address the CPU wants to read from or write to</td>
+          <td>Determines the maximum addressable memory. A 32-bit address bus can address 2³² = 4 GiB of memory.</td>
+        </tr>
+        <tr>
+          <td><strong>Data Bus</strong></td>
+          <td>Bidirectional</td>
+          <td>The actual data or instruction being transferred</td>
+          <td>Determines how much data moves per transfer (word size). Wider = more data per transfer = faster.</td>
+        </tr>
+        <tr>
+          <td><strong>Control Bus</strong></td>
+          <td>Bidirectional</td>
+          <td>Control signals: read/write, clock, interrupt request, reset, memory-ready</td>
+          <td>Coordinates and manages the operations of the address and data buses.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="formula">
+      <div class="formula-title">Maximum Addressable Memory</div>
+      Max memory = 2<sup>n</sup> locations &nbsp;(where n = number of address bus lines)
+      <br>
+      <small style="color:var(--text-muted)">32-bit address bus → 2³² = 4,294,967,296 bytes = 4 GiB &nbsp;|&nbsp; 64-bit → 16 EiB (theoretical)</small>
+    </div>
+
+    <div class="worked">
+      <div class="worked-title">✎ Worked Example — Maximum addressable memory</div>
+      <div class="step"><span class="step-num">Q</span><span class="step-text">A computer has a 24-bit address bus. What is the maximum amount of memory it can address?</span></div>
+      <div class="step"><span class="step-num">1</span><span class="step-text">Max locations = 2²⁴ = 16,777,216</span></div>
+      <div class="step"><span class="step-num">2</span><span class="step-text">If each location holds 1 byte: 16,777,216 bytes = 16 MiB</span></div>
+      <div class="answer">Maximum addressable memory = <strong>16 MiB</strong> (with 1 byte per address)</div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">✏ Practice Questions</div>
+      <p><strong>(a)</strong> Explain the difference between the address bus and the data bus.<br>
+         <strong>(b)</strong> A computer has a 16-bit address bus. Calculate the maximum amount of memory that can be addressed, giving your answer in KiB.<br>
+         <strong>(c)</strong> Explain why the address bus is unidirectional but the data bus is bidirectional.</p>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+      <div class="answer-reveal">
+        <strong>(a)</strong> The address bus carries the <em>memory address</em> (location) that the CPU wants to access [1]; the data bus carries the actual <em>data or instruction</em> being read from or written to that address [1].<br><br>
+        <strong>(b)</strong> 2¹⁶ = 65,536 bytes = <strong>64 KiB</strong> [2]<br><br>
+        <strong>(c)</strong> The address bus is unidirectional because only the CPU generates memory addresses — memory never needs to tell the CPU which address to use [1]. The data bus is bidirectional because data flows both ways: from memory to CPU when reading (load), and from CPU to memory when writing (store) [1].
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 3: MEMORY                      -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="memory">
+    <h2><span class="section-num">3</span> Memory</h2>
+
+    <h3>3.1 Memory Hierarchy</h3>
+    <p>Computer systems use a hierarchy of different memory types, trading off speed, size, and cost. Faster memories are small and expensive; larger memories are slower and cheaper. The CPU works from the top of the hierarchy downwards.</p>
+
+    <div class="mem-pyramid">
+      <div class="mem-tier" style="background:#c62828; width:60%">
+        <span class="tier-name">Registers</span>
+        <span class="tier-size">Bytes</span>
+        <span class="tier-speed">~1 cycle · fastest</span>
+      </div>
+      <div class="mem-tier" style="background:#e65100; width:70%">
+        <span class="tier-name">L1 Cache</span>
+        <span class="tier-size">32–64 KB</span>
+        <span class="tier-speed">~4 cycles</span>
+      </div>
+      <div class="mem-tier" style="background:#f57f17; width:78%">
+        <span class="tier-name">L2 Cache</span>
+        <span class="tier-size">256 KB – 1 MB</span>
+        <span class="tier-speed">~12 cycles</span>
+      </div>
+      <div class="mem-tier" style="background:#558b2f; width:86%">
+        <span class="tier-name">L3 Cache (shared)</span>
+        <span class="tier-size">4–32 MB</span>
+        <span class="tier-speed">~40 cycles</span>
+      </div>
+      <div class="mem-tier" style="background:#1565c0; width:93%">
+        <span class="tier-name">Main Memory (RAM)</span>
+        <span class="tier-size">8–64 GB</span>
+        <span class="tier-speed">~100 cycles</span>
+      </div>
+      <div class="mem-tier" style="background:#4a148c; width:100%">
+        <span class="tier-name">Secondary Storage (SSD / HDD)</span>
+        <span class="tier-size">256 GB – 4 TB+</span>
+        <span class="tier-speed">ms–μs · slowest</span>
+      </div>
+    </div>
+    <p style="font-size:.8rem;color:var(--text-muted);text-align:center;margin-top:.25rem">↑ Faster, smaller, more expensive &nbsp;&nbsp;&nbsp; ↓ Slower, larger, cheaper</p>
+
+    <h3>3.2 RAM and ROM</h3>
+    <table class="styled-table">
+      <thead><tr><th>Feature</th><th>RAM (Random Access Memory)</th><th>ROM (Read-Only Memory)</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Volatile?</strong></td><td>Yes — contents lost when power removed</td><td>No — contents preserved without power</td></tr>
+        <tr><td><strong>Read / Write</strong></td><td>Both read and write</td><td>Read only (typically; some variants writable)</td></tr>
+        <tr><td><strong>Speed</strong></td><td>Fast</td><td>Fast (similar to RAM)</td></tr>
+        <tr><td><strong>Capacity</strong></td><td>GBs — holds OS and running programs</td><td>KBs to MBs — holds firmware / BIOS</td></tr>
+        <tr><td><strong>Use</strong></td><td>Stores currently running programs and working data</td><td>Stores the BIOS / boot firmware — code needed before the OS loads</td></tr>
+        <tr><td><strong>Types</strong></td><td>DRAM (main memory), SRAM (cache)</td><td>PROM, EPROM, EEPROM, Flash</td></tr>
+      </tbody>
+    </table>
+
+    <h4>DRAM vs SRAM</h4>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="term">DRAM (Dynamic RAM)</div>
+        <div class="def">Uses a capacitor per bit — must be refreshed thousands of times per second. Slower, cheaper, higher density. Used for main memory.</div>
+      </div>
+      <div class="concept-card">
+        <div class="term">SRAM (Static RAM)</div>
+        <div class="def">Uses a flip-flop per bit — no refresh needed. Much faster, more expensive, lower density. Used for cache memory inside the CPU.</div>
+      </div>
+    </div>
+
+    <h3>3.3 Virtual Memory</h3>
+    <p>When a computer runs more programs than fit in physical RAM, the operating system uses an area of the <strong>hard disk or SSD</strong> as an extension of RAM. This is called <span class="key-term">virtual memory</span>.</p>
+
+    <div class="worked">
+      <div class="worked-title">✎ How Virtual Memory Works</div>
+      <div class="step"><span class="step-num">1</span><span class="step-text">The OS divides memory into fixed-size blocks called <strong>pages</strong> (typically 4 KB each).</span></div>
+      <div class="step"><span class="step-num">2</span><span class="step-text">When RAM is full and a new page is needed, the OS identifies a page in RAM that hasn't been used recently.</span></div>
+      <div class="step"><span class="step-num">3</span><span class="step-text">That page is <strong>swapped out</strong> to a dedicated area on the disk (called the <em>page file</em> or <em>swap space</em>).</span></div>
+      <div class="step"><span class="step-num">4</span><span class="step-text">The required new page is loaded into the freed RAM space.</span></div>
+      <div class="step"><span class="step-num">5</span><span class="step-text">If a swapped-out page is needed again, another swap occurs. Excessive swapping is called <strong>thrashing</strong>.</span></div>
+      <div class="answer">Virtual memory allows more programs to run than physical RAM alone would permit, but at the cost of performance (disk access is thousands of times slower than RAM).</div>
+    </div>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <span><strong>Thrashing:</strong> If too little RAM is installed, the system spends more time swapping pages in and out than actually executing program instructions. The computer becomes extremely slow — this is thrashing. Adding more RAM is the solution.</span>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">✏ Practice Questions</div>
+      <p><strong>(a)</strong> Explain why ROM is used to store the computer's BIOS rather than RAM.<br>
+         <strong>(b)</strong> Describe what happens when virtual memory is used and explain one disadvantage.<br>
+         <strong>(c)</strong> State the difference between DRAM and SRAM and explain why SRAM is used for cache.</p>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+      <div class="answer-reveal">
+        <strong>(a)</strong> ROM is non-volatile — it retains its contents when power is off [1]. The BIOS must be available immediately when the computer is switched on, before RAM can be loaded with any program [1]. If the BIOS were in RAM it would be lost when the computer was turned off [1].<br><br>
+        <strong>(b)</strong> When physical RAM is full, the OS moves unused pages from RAM to a page file on the hard disk [1], freeing RAM for the required pages. Disadvantage: accessing the hard disk/SSD is thousands of times slower than RAM [1], so the system runs much more slowly when virtual memory is in heavy use (which can lead to thrashing) [1].<br><br>
+        <strong>(c)</strong> DRAM uses capacitors and must be refreshed thousands of times per second — it is slower and cheaper [1]. SRAM uses flip-flops, requires no refreshing, and is much faster — but is more expensive and less dense [1]. SRAM is used for cache because speed is the priority — cache must supply data to the CPU faster than DRAM can [1].
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 4: CACHE                       -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="cache">
+    <h2><span class="section-num">4</span> Cache Memory</h2>
+
+    <p><span class="key-term">Cache memory</span> is a small, very fast SRAM memory that sits between the CPU and main memory. It stores copies of data and instructions that have been recently used or are likely to be needed soon. The purpose is to reduce the number of slow main-memory accesses.</p>
+
+    <h3>4.1 Cache Levels</h3>
+    <table class="styled-table">
+      <thead><tr><th>Level</th><th>Location</th><th>Size</th><th>Speed</th><th>Shared?</th></tr></thead>
+      <tbody>
+        <tr><td><strong>L1 Cache</strong></td><td>Inside the CPU core</td><td>32–128 KB</td><td>Fastest (~4 CPU cycles)</td><td>Per core — not shared</td></tr>
+        <tr><td><strong>L2 Cache</strong></td><td>Inside or very close to CPU core</td><td>256 KB – 4 MB</td><td>Fast (~12 cycles)</td><td>Usually per core</td></tr>
+        <tr><td><strong>L3 Cache</strong></td><td>On the CPU chip, outside cores</td><td>4–64 MB</td><td>Slower (~40 cycles)</td><td>Shared across all cores</td></tr>
+      </tbody>
+    </table>
+
+    <h3>4.2 Cache Hit and Cache Miss</h3>
+
+    <div class="cache-flow">
+<span class="cf-note">CPU needs data from address 0x4A2F:</span>
+
+<span class="cf-path">1. CPU checks L1 cache first</span>
+   <span class="cf-hit">→ CACHE HIT:</span> data found in L1 → returned to CPU in ~4 cycles ✓
+   <span class="cf-miss">→ CACHE MISS:</span> not in L1 → check L2...
+
+<span class="cf-path">2. CPU checks L2 cache</span>
+   <span class="cf-hit">→ CACHE HIT:</span> data found in L2 → returned in ~12 cycles ✓
+   <span class="cf-miss">→ CACHE MISS:</span> not in L2 → check L3...
+
+<span class="cf-path">3. CPU checks L3 cache</span>
+   <span class="cf-hit">→ CACHE HIT:</span> data found in L3 → returned in ~40 cycles ✓
+   <span class="cf-miss">→ CACHE MISS:</span> not in any cache...
+
+<span class="cf-path">4. Fetch from main memory (RAM)</span>
+   → Data returned in ~100 cycles (much slower)
+   → A copy is placed in L1/L2/L3 for future use
+    </div>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="term">Temporal Locality</div>
+        <div class="def">Data used recently is likely to be used again soon. Cache exploits this by keeping recently accessed data. Example: loop variables accessed thousands of times.</div>
+      </div>
+      <div class="concept-card">
+        <div class="term">Spatial Locality</div>
+        <div class="def">Data near recently accessed data is likely to be used soon. Cache loads a whole block (cache line) at a time, not just one byte. Example: array elements stored consecutively.</div>
+      </div>
+      <div class="concept-card">
+        <div class="term">Cache Hit Rate</div>
+        <div class="def">Percentage of memory accesses satisfied by cache. A high hit rate (>95%) means few slow main-memory accesses. Affected by cache size and the program's access patterns.</div>
+      </div>
+      <div class="concept-card">
+        <div class="term">Cache Replacement Policy</div>
+        <div class="def">When cache is full, old data must be evicted. Common policies: LRU (Least Recently Used), FIFO (First In First Out), random replacement.</div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">✏ Practice Questions</div>
+      <p><strong>(a)</strong> Explain why cache memory improves CPU performance.<br>
+         <strong>(b)</strong> Describe what happens when a <em>cache miss</em> occurs at all cache levels.<br>
+         <strong>(c)</strong> Explain the term <em>temporal locality</em> and state how cache exploits it.</p>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+      <div class="answer-reveal">
+        <strong>(a)</strong> Cache stores copies of frequently used data and instructions in fast SRAM [1]. The CPU can access this data much faster than going to main memory (DRAM) [1], reducing the number of slow memory accesses and keeping the CPU supplied with data without stalling [1].<br><br>
+        <strong>(b)</strong> If data is not found in L1, L2, or L3 cache, the CPU must fetch the data from main memory (RAM) [1], which is much slower (~100+ cycles) [1]. A copy of the data is then stored in the cache levels so future accesses to the same data will be faster (cache hit) [1].<br><br>
+        <strong>(c)</strong> Temporal locality: recently accessed data is likely to be accessed again soon [1]. Cache exploits this by keeping a copy of recently used instructions and data in fast SRAM [1], so when the CPU needs the same data again (e.g. in a loop), it can be read from cache instead of slow main memory [1].
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 5: SECONDARY STORAGE           -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="secondary-storage">
+    <h2><span class="section-num">5</span> Secondary Storage</h2>
+
+    <p><span class="key-term">Secondary storage</span> provides permanent, non-volatile data storage. Unlike RAM, it retains data when power is removed, making it suitable for long-term storage of files, programs, and the operating system.</p>
+
+    <div class="storage-grid">
+
+      <div class="storage-card">
+        <div class="st-name"><span class="st-icon">💿</span> HDD (Hard Disk Drive)</div>
+        <ul class="st-pros"><li>Very large capacity (1–20 TB)</li><li>Cheap per GB</li><li>Long-established technology</li></ul>
+        <ul class="st-cons"><li>Slow (moving parts, ms access)</li><li>Fragile — shock sensitive</li><li>Noisy</li><li>High power consumption</li></ul>
+        <div style="margin-top:.4rem;font-size:.72rem;color:var(--text-muted)"><strong>Technology:</strong> Magnetic platters, read/write head moves mechanically</div>
+      </div>
+
+      <div class="storage-card">
+        <div class="st-name"><span class="st-icon">🔷</span> SSD (Solid State Drive)</div>
+        <ul class="st-pros"><li>Fast (μs access time)</li><li>Silent, no moving parts</li><li>Light, shock-resistant</li><li>Low power consumption</li></ul>
+        <ul class="st-cons"><li>More expensive per GB than HDD</li><li>Limited write cycles (wear)</li></ul>
+        <div style="margin-top:.4rem;font-size:.72rem;color:var(--text-muted)"><strong>Technology:</strong> NAND flash memory cells — no mechanical parts</div>
+      </div>
+
+      <div class="storage-card">
+        <div class="st-name"><span class="st-icon">📀</span> Optical (CD/DVD/Blu-ray)</div>
+        <ul class="st-pros"><li>Cheap media</li><li>Portable and removable</li><li>Long shelf life (read-only)</li></ul>
+        <ul class="st-cons"><li>Very slow access</li><li>Low capacity (700 MB–100 GB)</li><li>Easily scratched</li><li>Declining use</li></ul>
+        <div style="margin-top:.4rem;font-size:.72rem;color:var(--text-muted)"><strong>Technology:</strong> Laser reads/writes pits and lands on a reflective disc</div>
+      </div>
+
+      <div class="storage-card">
+        <div class="st-name"><span class="st-icon">📼</span> Magnetic Tape</div>
+        <ul class="st-pros"><li>Extremely high capacity (TB)</li><li>Very cheap per GB</li><li>Durable for archiving</li></ul>
+        <ul class="st-cons"><li>Sequential access only — very slow random access</li><li>Not suitable for everyday use</li></ul>
+        <div style="margin-top:.4rem;font-size:.72rem;color:var(--text-muted)"><strong>Technology:</strong> Magnetic tape. Used for large-scale backups and archiving.</div>
+      </div>
+
+    </div>
+
+    <h3>How a Hard Disk Drive Works</h3>
+    <div class="arch-diagram">
+      <svg viewBox="0 0 480 180" width="100%" style="max-width:480px">
+        <!-- Platter -->
+        <ellipse cx="160" cy="90" rx="110" ry="110" fill="#1e2a3a" stroke="#1565c0" stroke-width="2"/>
+        <ellipse cx="160" cy="90" rx="80" ry="80" fill="#0d1117" stroke="#37474f" stroke-width="1.5"/>
+        <ellipse cx="160" cy="90" rx="50" ry="50" fill="#1e2a3a" stroke="#37474f" stroke-width="1" stroke-dasharray="6 3"/>
+        <ellipse cx="160" cy="90" rx="20" ry="20" fill="#37474f" stroke="#607d8b" stroke-width="2"/>
+        <!-- Tracks (circular dashed) -->
+        <ellipse cx="160" cy="90" rx="70" ry="70" fill="none" stroke="#1565c0" stroke-width="1" stroke-dasharray="4 6" opacity=".5"/>
+        <ellipse cx="160" cy="90" rx="95" ry="95" fill="none" stroke="#1565c0" stroke-width="1" stroke-dasharray="4 6" opacity=".3"/>
+        <!-- Sectors (pie slices) -->
+        <line x1="160" y1="90" x2="160" y2="-20" stroke="#37474f" stroke-width="1" opacity=".4"/>
+        <line x1="160" y1="90" x2="255" y2="50" stroke="#37474f" stroke-width="1" opacity=".4"/>
+        <line x1="160" y1="90" x2="270" y2="90" stroke="#37474f" stroke-width="1" opacity=".4"/>
+        <line x1="160" y1="90" x2="255" y2="130" stroke="#37474f" stroke-width="1" opacity=".4"/>
+        <!-- Read/Write arm -->
+        <line x1="240" y1="90" x2="310" y2="50" stroke="#ffa657" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="240" cy="90" r="5" fill="#ffa657"/>
+        <text x="316" y="48" fill="#ffa657" font-size="10" font-weight="700">Read/Write Head</text>
+        <!-- Labels -->
+        <text x="152" y="95" text-anchor="middle" fill="#8b949e" font-size="8">Spindle</text>
+        <text x="110" y="45" fill="#64b5f6" font-size="9">Track</text>
+        <text x="195" y="140" fill="#8b949e" font-size="9">Sector</text>
+        <text x="50" y="95" fill="#8b949e" font-size="9">Platter</text>
+        <!-- Annotations -->
+        <text x="310" y="100" fill="#c9d1d9" font-size="9" font-weight="700">Arm Assembly</text>
+        <text x="310" y="115" fill="#8b949e" font-size="8">(moves radially)</text>
+        <text x="310" y="140" fill="#c9d1d9" font-size="9" font-weight="700">Platters spin at</text>
+        <text x="310" y="153" fill="#8b949e" font-size="8">5400–7200 RPM</text>
+        <text x="310" y="170" fill="#8b949e" font-size="8">Data in concentric tracks</text>
+      </svg>
+    </div>
+
+    <p>Data is stored magnetically on spinning metal platters. The read/write head moves radially while the platter spins, allowing any location to be reached. <strong>Access time</strong> = seek time (head movement) + rotational latency (waiting for correct sector to spin under head).</p>
+
+    <h3>Choosing the Right Storage</h3>
+    <table class="styled-table">
+      <thead><tr><th>Scenario</th><th>Best Choice</th><th>Reason</th></tr></thead>
+      <tbody>
+        <tr><td>OS and applications on a laptop</td><td>SSD</td><td>Fast boot/load times, silent, shock-resistant for portable use</td></tr>
+        <tr><td>Large video archive in a studio</td><td>HDD</td><td>Highest capacity per pound; access speed acceptable for streaming</td></tr>
+        <tr><td>Daily server backups in a data centre</td><td>Magnetic Tape</td><td>Extremely cheap per TB; sequential backup is fine; long archival life</td></tr>
+        <tr><td>Distributing software to customers</td><td>Optical (DVD)</td><td>Cheap to replicate; customers can use without needing a drive (declining)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="practice">
+      <div class="pq-title">✏ Practice Questions</div>
+      <p><strong>(a)</strong> A hospital needs to archive patient scans for 30 years at minimum cost. Recommend a storage technology and justify your answer.<br>
+         <strong>(b)</strong> Describe <em>two</em> advantages and <em>two</em> disadvantages of SSD compared to HDD.<br>
+         <strong>(c)</strong> Explain why magnetic tape is only suitable for sequential access.</p>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+      <div class="answer-reveal">
+        <strong>(a)</strong> <strong>Magnetic tape</strong> [1]. Justification: very high capacity and extremely low cost per GB for long-term archiving [1]; data is rarely accessed randomly — backups are written sequentially and only retrieved in emergency, so sequential-only access is acceptable [1]; tape has a long archival life of 30+ years when stored correctly [1].<br><br>
+        <strong>(b)</strong> Advantages: (1) Much faster access times (microseconds vs milliseconds for HDD). (2) Silent — no moving parts. (3) More durable/shock-resistant — suitable for portable devices. (4) Lower power consumption [any 2, 1 mark each].<br>
+        Disadvantages: (1) More expensive per GB than HDD. (2) Limited number of write cycles before cells degrade (wear). [any 2, 1 mark each]<br><br>
+        <strong>(c)</strong> Magnetic tape is wound on a reel — to reach a specific piece of data, the tape must be wound forward or backward through all the data before it [1]. There is no way to jump directly to a random location without physically moving the tape past all the intervening data [1].
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 6: I/O DEVICES                 -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="io-devices">
+    <h2><span class="section-num">6</span> Input &amp; Output Devices</h2>
+
+    <p>A computer is only useful if it can receive data from the outside world (input) and communicate results back (output). Sensors and actuators extend this to physical systems.</p>
+
+    <table class="styled-table">
+      <thead>
+        <tr><th>Category</th><th>Device</th><th>Description &amp; Use</th></tr>
+      </thead>
+      <tbody>
+        <tr><td rowspan="6"><strong>Input</strong></td><td>Keyboard</td><td>Generates scan codes for each key press; connects via USB or wireless. Most common text input device.</td></tr>
+        <tr><td>Mouse / Touchpad</td><td>Tracks movement and button presses; relative or absolute positioning. Touchpad uses capacitive sensing.</td></tr>
+        <tr><td>Scanner (flatbed)</td><td>Shines light on a document; CCD sensor captures reflected light to create a digital bitmap image.</td></tr>
+        <tr><td>Microphone</td><td>Converts sound pressure waves into electrical signals → ADC → digital audio data.</td></tr>
+        <tr><td>Camera / Webcam</td><td>CCD or CMOS image sensor captures light falling on a pixel grid → digital image frames.</td></tr>
+        <tr><td>Sensor (temperature, pressure, etc.)</td><td>Converts a physical quantity into an electrical signal → ADC → digital value for processing (used in embedded/IoT systems).</td></tr>
+        <tr><td rowspan="4"><strong>Output</strong></td><td>Monitor (LCD / OLED)</td><td>Displays images by illuminating pixels. Resolution, refresh rate, and colour depth affect display quality.</td></tr>
+        <tr><td>Printer (inkjet / laser)</td><td>Inkjet: sprays tiny ink droplets. Laser: uses charged drum + toner powder + heat. Both produce hard-copy output.</td></tr>
+        <tr><td>Speaker</td><td>Receives digital audio → DAC → amplifier → converts electrical signal to sound waves via a vibrating cone.</td></tr>
+        <tr><td>Actuator (motor, solenoid)</td><td>Converts a digital control signal into physical movement. Used in robots, automated manufacturing, vehicles.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="concept-grid" style="margin-top:1rem">
+      <div class="concept-card">
+        <div class="term">ADC (Analogue to Digital Converter)</div>
+        <div class="def">Converts a continuous analogue signal (temperature, sound, light) into a digital binary value that the computer can process. Used with microphones, sensors, cameras.</div>
+      </div>
+      <div class="concept-card">
+        <div class="term">DAC (Digital to Analogue Converter)</div>
+        <div class="def">Converts a digital binary value back into a continuous analogue signal. Used with speakers, monitors, and control systems.</div>
+      </div>
+      <div class="concept-card">
+        <div class="term">Barcode / QR Reader</div>
+        <div class="def">Scans parallel lines (barcode) or 2D matrix (QR) using a laser or camera, decoding the pattern into a numeric or alphanumeric identifier.</div>
+      </div>
+      <div class="concept-card">
+        <div class="term">Touch Screen</div>
+        <div class="def">Capacitive screens detect the change in an electrical field caused by a finger. Resistive screens detect physical pressure. Both input and output in one device.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 7: CPU PERFORMANCE             -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="performance">
+    <h2><span class="section-num">7</span> Factors Affecting CPU Performance</h2>
+
+    <p>Four main factors determine how fast a CPU executes programs. These are common exam topics — you need to explain each one clearly.</p>
+
+    <div class="perf-grid">
+      <div class="perf-card">
+        <div class="perf-name">⏱ Clock Speed (GHz)</div>
+        <p>Number of clock pulses per second. Each pulse allows one or more operations. Doubling clock speed approximately doubles performance (all else equal). Modern CPUs: 3–5+ GHz. Increasing speed also increases heat and power consumption.</p>
+      </div>
+      <div class="perf-card">
+        <div class="perf-name">🔢 Number of Cores</div>
+        <p>Each core is an independent processing unit. A quad-core CPU can execute four instruction streams simultaneously. Benefits only multi-threaded software. Adding cores does not help single-threaded programs.</p>
+      </div>
+      <div class="perf-card">
+        <div class="perf-name">📦 Cache Size</div>
+        <p>Larger cache can store more recently-used data. Fewer cache misses → fewer slow main-memory accesses → CPU stalls less often. However, larger caches have greater latency — a balance is struck at each level.</p>
+      </div>
+      <div class="perf-card">
+        <div class="perf-name">📏 Word Length (bits)</div>
+        <p>The number of bits the CPU processes in one operation (32-bit or 64-bit). A 64-bit CPU can address more memory and process larger numbers in one instruction. Also determines data bus width and register size.</p>
+      </div>
+    </div>
+
+    <div class="worked">
+      <div class="worked-title">✎ Worked Example — Comparing two CPUs</div>
+      <p style="font-size:.875rem;margin-bottom:.5rem">CPU A: 3.2 GHz, 4 cores, 8 MB L3 cache, 64-bit &nbsp;vs&nbsp; CPU B: 4.5 GHz, 2 cores, 4 MB L3 cache, 64-bit</p>
+      <div class="step"><span class="step-num">1</span><span class="step-text">CPU B has higher clock speed — better for single-threaded tasks (gaming, older software).</span></div>
+      <div class="step"><span class="step-num">2</span><span class="step-text">CPU A has more cores — better for multi-threaded tasks (video rendering, running multiple programs).</span></div>
+      <div class="step"><span class="step-num">3</span><span class="step-text">CPU A has larger L3 cache — fewer cache misses, better for memory-intensive workloads.</span></div>
+      <div class="answer">Neither is universally better — the right choice depends on the workload. Always relate performance factors to the specific use case.</div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">✏ Practice Questions</div>
+      <p><strong>(a)</strong> Explain why increasing the number of cores does not always improve the speed of a program.<br>
+         <strong>(b)</strong> A video editing workstation is being upgraded. Discuss which CPU performance factor would be most beneficial to improve.<br>
+         <strong>(c)</strong> Explain why a 64-bit processor can address more memory than a 32-bit processor.</p>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+      <div class="answer-reveal">
+        <strong>(a)</strong> To benefit from multiple cores, the program must be written to use multiple threads — it must be able to split its work into independent parallel tasks [1]. If a program is single-threaded, additional cores sit idle because the program can only execute on one core at a time [1].<br><br>
+        <strong>(b)</strong> Video editing is a <strong>multi-threaded workload</strong> — encoding video involves processing many frames simultaneously [1]. Therefore <strong>increasing the number of cores</strong> would be most beneficial, as each core can encode a different portion of the video in parallel, significantly reducing render time [1]. A larger cache would also help since video editing accesses large amounts of data repeatedly [1].<br><br>
+        <strong>(c)</strong> The number of addressable memory locations = 2<sup>n</sup> where n is the number of address bits (word length) [1]. A 32-bit processor: 2³² = 4 GiB maximum addressable RAM. A 64-bit processor: 2⁶⁴ ≈ 16 EiB — vastly more [1].
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 8: VIRTUAL MACHINES            -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="virtual-machines">
+    <h2><span class="section-num">8</span> Virtual Machines</h2>
+
+    <p>A <span class="key-term">virtual machine (VM)</span> is a software emulation of a complete computer. It behaves exactly like a real physical computer — it has its own virtual CPU, RAM, hard disk, and network interface — but it is running entirely within software on a physical host machine.</p>
+
+    <h3>8.1 The Hypervisor</h3>
+    <p>A <span class="key-term">hypervisor</span> (also called a Virtual Machine Monitor, VMM) is the software layer that creates and manages virtual machines. It allocates physical hardware resources (CPU time, RAM, disk, network) to each VM.</p>
+
+    <div class="vm-stack">
+      <div style="text-align:center;font-size:.75rem;color:var(--text-muted);margin-bottom:.25rem">TYPE 1 — Bare Metal Hypervisor</div>
+      <div class="vm-row">
+        <div class="vm-cell vm-app">VM 1: App + Guest OS (Windows)</div>
+        <div class="vm-cell vm-app">VM 2: App + Guest OS (Linux)</div>
+      </div>
+      <div class="vm-row"><div class="vm-cell vm-hyp" style="background:#c62828">HYPERVISOR (e.g. VMware ESXi, Hyper-V, Xen)</div></div>
+      <div class="vm-row"><div class="vm-cell vm-hw" style="background:#37474f">Physical Hardware (CPU, RAM, Disk, Network)</div></div>
+    </div>
+
+    <div class="vm-stack" style="margin-top:1.25rem">
+      <div style="text-align:center;font-size:.75rem;color:var(--text-muted);margin-bottom:.25rem">TYPE 2 — Hosted Hypervisor</div>
+      <div class="vm-row">
+        <div class="vm-cell vm-app">VM 1: App + Guest OS</div>
+        <div class="vm-cell vm-app">VM 2: App + Guest OS</div>
+      </div>
+      <div class="vm-row"><div class="vm-cell vm-hyp" style="background:#e65100">HYPERVISOR (e.g. VirtualBox, VMware Workstation)</div></div>
+      <div class="vm-row"><div class="vm-cell vm-os" style="background:#1565c0">Host Operating System (Windows / macOS / Linux)</div></div>
+      <div class="vm-row"><div class="vm-cell vm-hw" style="background:#37474f">Physical Hardware</div></div>
+    </div>
+
+    <table class="styled-table" style="margin-top:1rem">
+      <thead><tr><th></th><th>Type 1 (Bare Metal)</th><th>Type 2 (Hosted)</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Runs on</strong></td><td>Directly on physical hardware</td><td>On top of a host operating system</td></tr>
+        <tr><td><strong>Performance</strong></td><td>Faster — no host OS overhead</td><td>Slower — extra OS layer</td></tr>
+        <tr><td><strong>Use case</strong></td><td>Data centres, enterprise servers</td><td>Developer workstations, testing</td></tr>
+        <tr><td><strong>Examples</strong></td><td>VMware ESXi, Microsoft Hyper-V, Xen</td><td>Oracle VirtualBox, VMware Workstation</td></tr>
+      </tbody>
+    </table>
+
+    <h3>8.2 Benefits of Virtual Machines</h3>
+    <div class="subtopic-list">
+      <div class="subtopic-item">
+        <h4>Server Consolidation</h4>
+        <ul>
+          <li>Multiple servers consolidated onto fewer physical machines</li>
+          <li>Each service runs in its own isolated VM</li>
+          <li>Reduces hardware costs and data centre space</li>
+          <li>Better utilisation of expensive physical hardware</li>
+        </ul>
+      </div>
+      <div class="subtopic-item">
+        <h4>Isolation &amp; Security</h4>
+        <ul>
+          <li>Each VM is sandboxed — a crash or malware in one VM cannot affect others</li>
+          <li>Ideal for running untrusted software safely</li>
+          <li>Security researchers use VMs to analyse malware</li>
+        </ul>
+      </div>
+      <div class="subtopic-item">
+        <h4>Snapshots &amp; Recovery</h4>
+        <ul>
+          <li>VM state can be saved as a snapshot at any point</li>
+          <li>Instantly rollback to a known-good state if something goes wrong</li>
+          <li>Simplifies backup and disaster recovery</li>
+        </ul>
+      </div>
+      <div class="subtopic-item">
+        <h4>Portability &amp; Development</h4>
+        <ul>
+          <li>A VM is just a set of files — easily moved to another physical host</li>
+          <li>Developers can test software on multiple OS versions simultaneously</li>
+          <li>Cloud computing is built on virtualisation (AWS, Azure, GCP)</li>
+        </ul>
+      </div>
+      <div class="subtopic-item">
+        <h4>Legacy Software</h4>
+        <ul>
+          <li>Run old operating systems (e.g. Windows XP) inside a VM on modern hardware</li>
+          <li>Continue using software that only runs on outdated OS</li>
+          <li>No need to maintain old physical hardware</li>
+        </ul>
+      </div>
+      <div class="subtopic-item">
+        <h4>Testing &amp; Education</h4>
+        <ul>
+          <li>Safely test software configurations without affecting the host</li>
+          <li>Educators can provide identical pre-configured environments to students</li>
+          <li>QA teams test across many OS and browser combinations</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>8.3 Limitations of Virtual Machines</h3>
+    <ul>
+      <li><strong>Performance overhead:</strong> The hypervisor adds a software layer between the VM and hardware — VMs are slower than running directly on hardware, especially for CPU-intensive tasks.</li>
+      <li><strong>Resource contention:</strong> Multiple VMs share the physical CPU, RAM, and storage — if one VM uses many resources it can starve others.</li>
+      <li><strong>Hardware access:</strong> VMs cannot directly access all hardware features — GPU-intensive tasks (gaming, 3D rendering) perform poorly in VMs.</li>
+      <li><strong>Complexity:</strong> Managing many VMs and the hypervisor itself requires specialist knowledge.</li>
+      <li><strong>Security:</strong> If the hypervisor itself is compromised, all VMs running on it are potentially compromised (VM escape attacks).</li>
+    </ul>
+
+    <h3>8.4 The Java Virtual Machine (JVM)</h3>
+    <p>The <span class="key-term">JVM</span> is a special type of virtual machine. Java source code is compiled to platform-independent <strong>bytecode</strong> (not machine code for any specific CPU). The JVM interprets and executes this bytecode on whatever hardware it is installed on.</p>
+
+    <div class="arch-diagram" style="padding:1rem 1.5rem">
+      <svg viewBox="0 0 520 80" width="100%" style="max-width:520px">
+        <rect x="10" y="20" width="100" height="40" rx="5" fill="#1565c0"/>
+        <text x="60" y="44" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">Java Source</text>
+        <text x="60" y="56" text-anchor="middle" fill="#c8e6c9" font-size="8">(.java file)</text>
+        <text x="120" y="44" text-anchor="middle" fill="#ffa657" font-size="10" font-weight="700">→ javac →</text>
+        <rect x="160" y="20" width="100" height="40" rx="5" fill="#6a1b9a"/>
+        <text x="210" y="44" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">Bytecode</text>
+        <text x="210" y="56" text-anchor="middle" fill="#e1bee7" font-size="8">(.class file)</text>
+        <text x="275" y="44" text-anchor="middle" fill="#8b949e" font-size="9">→ JVM →</text>
+        <rect x="310" y="10" width="90" height="25" rx="4" fill="#2e7d32"/>
+        <text x="355" y="27" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">Windows JVM</text>
+        <rect x="310" y="40" width="90" height="25" rx="4" fill="#c62828"/>
+        <text x="355" y="57" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">Linux JVM</text>
+        <rect x="410" y="10" width="90" height="25" rx="4" fill="#1565c0"/>
+        <text x="455" y="27" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">macOS JVM</text>
+        <rect x="410" y="40" width="90" height="25" rx="4" fill="#37474f"/>
+        <text x="455" y="57" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">Android JVM</text>
+      </svg>
+    </div>
+
+    <p>The key benefit is <strong>"Write Once, Run Anywhere"</strong>: compile your Java code once and the same bytecode runs on any platform that has a JVM installed, without recompilation.</p>
+
+    <div class="practice">
+      <div class="pq-title">✏ Practice Questions</div>
+      <p><strong>(a)</strong> Define a virtual machine and explain the role of a hypervisor.<br>
+         <strong>(b)</strong> State <em>two</em> benefits and <em>one</em> limitation of using virtual machines in a data centre.<br>
+         <strong>(c)</strong> Describe how the Java Virtual Machine allows Java programs to run on different operating systems.</p>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+      <div class="answer-reveal">
+        <strong>(a)</strong> A virtual machine is a software emulation of a complete computer system — it behaves like a real computer but runs within software on a physical host machine [1]. A hypervisor is software that creates and manages VMs, allocating physical hardware resources (CPU, RAM, storage) between them [1].<br><br>
+        <strong>(b)</strong> Benefits (any two): (1) Server consolidation — many virtual servers run on fewer physical machines, reducing hardware and energy costs. (2) Isolation — a failure or security breach in one VM does not affect others. (3) Snapshots — VMs can be saved and restored quickly. (4) Easy migration — VMs can be moved between physical hosts with minimal downtime. [1 each]<br>
+        Limitation (any one): (1) Performance overhead — the hypervisor adds latency; VMs are slower than native hardware. (2) Resource contention — VMs compete for physical hardware. (3) Complexity of management. [1]<br><br>
+        <strong>(c)</strong> Java source code is compiled to platform-independent bytecode [1]. The JVM is available on many different operating systems (Windows, Linux, macOS, Android) [1]. When a Java program runs, the JVM on that platform interprets/executes the same bytecode, translating it into the appropriate native machine code for the underlying hardware [1] — so the same bytecode runs on any system without recompilation.
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- EXAM PRACTICE                          -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="exam-practice" style="border-left:5px solid #c62828">
+    <h2><span class="section-num" style="background:#c62828">📝</span> Exam Practice — Mixed Questions</h2>
+
+    <div class="callout exam">
+      <span class="callout-icon">📝</span>
+      <span>Cambridge 9618 Paper 1 style. Show all reasoning for description/explanation questions.</span>
+    </div>
+
+    <!-- Q1 -->
+    <div class="practice" style="margin-top:1.25rem">
+      <div class="pq-title">Question 1 [7 marks]</div>
+      <p><strong>(a)</strong> [1] State what is meant by the Von Neumann bottleneck.</p>
+      <p><strong>(b)</strong> [2] A computer has a 20-bit address bus and a 32-bit data bus.<br>
+        (i) Calculate the maximum amount of memory that can be addressed.<br>
+        (ii) State how many bytes are transferred in a single data bus transaction.</p>
+      <p><strong>(c)</strong> [2] Describe the difference between the address bus and the control bus.</p>
+      <p><strong>(d)</strong> [2] Explain how cache memory reduces the effect of the Von Neumann bottleneck.</p>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+      <div class="answer-reveal">
+        <strong>(a)</strong> The CPU can process instructions faster than data/instructions can be fetched from main memory over the single shared bus, causing the CPU to stall and wait for memory access to complete. [1]<br><br>
+        <strong>(b)(i)</strong> 2²⁰ = 1,048,576 bytes = <strong>1 MiB</strong> [1]<br>
+        <strong>(b)(ii)</strong> 32 bits = <strong>4 bytes</strong> per transaction [1]<br><br>
+        <strong>(c)</strong> The address bus carries the memory location (address) that the CPU wants to access [1]; the control bus carries control signals (e.g. read/write, clock, interrupt) that coordinate the operation of the buses and components [1].<br><br>
+        <strong>(d)</strong> Cache stores copies of frequently-accessed instructions and data in fast SRAM close to the CPU [1]. When the CPU needs data already in cache (cache hit), it can be supplied in ~4 cycles without accessing slow main memory — far fewer stalls compared to the ~100 cycles needed for a main memory access [1].
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="practice">
+      <div class="pq-title">Question 2 [6 marks]</div>
+      <p>A software development company is upgrading its servers. It is considering replacing five physical servers with one powerful server running multiple virtual machines.</p>
+      <p><strong>(a)</strong> [1] Define the term <em>virtual machine</em>.</p>
+      <p><strong>(b)</strong> [2] Describe the role of a Type 1 hypervisor and explain why it offers better performance than a Type 2 hypervisor.</p>
+      <p><strong>(c)</strong> [3] Evaluate the use of virtual machines for this company. In your answer, include <em>two</em> benefits and <em>one</em> drawback.</p>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+      <div class="answer-reveal">
+        <strong>(a)</strong> A virtual machine is a software emulation of a complete physical computer that runs within a hypervisor on a real physical host. [1]<br><br>
+        <strong>(b)</strong> A Type 1 hypervisor runs <em>directly on the bare metal hardware</em> without a host operating system underneath it [1]. It offers better performance because there is no host OS overhead — hardware resources are allocated directly to VMs without an extra software layer [1].<br><br>
+        <strong>(c)</strong> Benefits (2 × 1 mark): (1) Hardware consolidation — five separate physical servers become five VMs on one machine, reducing hardware costs, power consumption, and physical space. (2) Isolation — each development/production VM is sandboxed; a crash or security issue in one VM does not affect others. (3) Snapshots — developers can save VM state before risky operations and rollback instantly if something breaks.<br>
+        Drawback (1 mark): Performance overhead — all five VMs share the physical CPU and RAM; under high load, VMs may compete for resources and perform more slowly than dedicated hardware.
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="practice">
+      <div class="pq-title">Question 3 [7 marks]</div>
+      <p><strong>(a)</strong> [3] Complete the table below comparing RAM, ROM, and secondary storage:</p>
+      <table class="styled-table" style="max-width:580px">
+        <thead><tr><th>Feature</th><th>RAM</th><th>ROM</th><th>SSD</th></tr></thead>
+        <tbody>
+          <tr><td>Volatile?</td><td>Yes</td><td></td><td></td></tr>
+          <tr><td>Read/Write?</td><td></td><td>Read only</td><td></td></tr>
+          <tr><td>Typical use</td><td></td><td></td><td>Long-term file storage</td></tr>
+        </tbody>
+      </table>
+      <p><strong>(b)</strong> [2] Explain what happens when a program requires more memory than is physically available in RAM.</p>
+      <p><strong>(c)</strong> [2] A user notices their computer becomes very slow when running many programs simultaneously. Explain why this happens and suggest one solution.</p>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+      <div class="answer-reveal">
+        <strong>(a)</strong> Table answers: [3 — 1 per correct pair]
+        <table class="styled-table" style="max-width:580px;margin:.5rem 0">
+          <thead><tr><th>Feature</th><th>RAM</th><th>ROM</th><th>SSD</th></tr></thead>
+          <tbody>
+            <tr><td>Volatile?</td><td>Yes</td><td><strong>No</strong></td><td><strong>No</strong></td></tr>
+            <tr><td>Read/Write?</td><td><strong>Read and Write</strong></td><td>Read only</td><td><strong>Read and Write</strong></td></tr>
+            <tr><td>Typical use</td><td><strong>Running programs and OS</strong></td><td><strong>BIOS / firmware</strong></td><td>Long-term file storage</td></tr>
+          </tbody>
+        </table>
+        <strong>(b)</strong> The OS uses virtual memory — it moves (swaps) pages of data from RAM to a page file on the hard disk/SSD [1], freeing RAM for the required data. The new page is loaded into the freed RAM space. This allows programs to run even when they exceed physical RAM capacity [1].<br><br>
+        <strong>(c)</strong> With many programs running, RAM fills up and the OS begins using virtual memory — swapping pages to and from the hard disk/SSD [1]. Disk/SSD access is far slower than RAM, so the CPU spends most of its time waiting for page swaps — this is called <em>thrashing</em> [1]. Solution: <strong>install more RAM</strong> — so that all running programs fit in physical memory without swapping [1].
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Checklist -->
+  <div class="lesson-section" style="border-left:5px solid var(--accent)">
+    <h2><span class="section-num" style="background:var(--accent)">✓</span> Topic Summary Checklist</h2>
+    <ul class="checklist">
+      <li>Describe Von Neumann architecture including its components and the stored-program concept</li>
+      <li>Describe Harvard architecture and compare with Von Neumann</li>
+      <li>Explain the Von Neumann bottleneck and how it arises</li>
+      <li>State the roles of ALU, Control Unit, registers, and clock</li>
+      <li>Describe the address, data, and control buses and their directions</li>
+      <li>Calculate maximum addressable memory from address bus width</li>
+      <li>Describe the memory hierarchy from registers to secondary storage</li>
+      <li>Compare RAM and ROM (volatile, read/write, typical use)</li>
+      <li>Explain virtual memory including paging, swapping, and thrashing</li>
+      <li>Explain cache memory: L1/L2/L3, cache hit and miss, temporal/spatial locality</li>
+      <li>Compare HDD, SSD, optical, and magnetic tape storage with appropriate use cases</li>
+      <li>Describe common input and output devices and the role of ADC/DAC</li>
+      <li>Explain how clock speed, cores, cache size, and word length affect performance</li>
+      <li>Define virtual machine and hypervisor (Type 1 and Type 2)</li>
+      <li>State benefits (consolidation, isolation, snapshots, portability) and limitations of VMs</li>
+      <li>Explain how the JVM allows Java to run on multiple platforms</li>
+    </ul>
+  </div>
+
+</main>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-box">
+    <h3>Contents</h3>
+    <ul class="toc-list">
+      <li><a href="#architecture" class="active">1. Architecture</a>
+        <ul>
+          <li><a href="#architecture" class="sub">Von Neumann</a></li>
+          <li><a href="#architecture" class="sub">Harvard</a></li>
+          <li><a href="#architecture" class="sub">CPU Components</a></li>
+        </ul>
+      </li>
+      <li><a href="#buses">2. System Buses</a>
+        <ul>
+          <li><a href="#buses" class="sub">Address / Data / Control</a></li>
+        </ul>
+      </li>
+      <li><a href="#memory">3. Memory</a>
+        <ul>
+          <li><a href="#memory" class="sub">Hierarchy</a></li>
+          <li><a href="#memory" class="sub">RAM vs ROM</a></li>
+          <li><a href="#memory" class="sub">Virtual Memory</a></li>
+        </ul>
+      </li>
+      <li><a href="#cache">4. Cache</a>
+        <ul>
+          <li><a href="#cache" class="sub">L1 / L2 / L3</a></li>
+          <li><a href="#cache" class="sub">Hit &amp; Miss</a></li>
+        </ul>
+      </li>
+      <li><a href="#secondary-storage">5. Secondary Storage</a>
+        <ul>
+          <li><a href="#secondary-storage" class="sub">HDD / SSD / Optical / Tape</a></li>
+        </ul>
+      </li>
+      <li><a href="#io-devices">6. I/O Devices</a></li>
+      <li><a href="#performance">7. CPU Performance</a></li>
+      <li><a href="#virtual-machines">8. Virtual Machines</a>
+        <ul>
+          <li><a href="#virtual-machines" class="sub">Hypervisor Type 1 &amp; 2</a></li>
+          <li><a href="#virtual-machines" class="sub">Benefits &amp; Limitations</a></li>
+          <li><a href="#virtual-machines" class="sub">JVM</a></li>
+        </ul>
+      </li>
+      <li><a href="#exam-practice" style="color:#c62828;font-weight:700">📝 Exam Practice</a></li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>Key Formula</h3>
+    <div style="font-family:monospace;font-size:.82rem;line-height:2;color:var(--text)">
+      <div style="color:var(--accent);font-weight:700">Max memory =</div>
+      <div>2<sup>n</sup> bytes</div>
+      <div style="color:var(--text-muted);font-size:.72rem">(n = address bus bits)</div>
+    </div>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>Memory Speeds</h3>
+    <table style="font-size:.75rem;width:100%;border-collapse:collapse">
+      <tr><td style="padding:.2rem .4rem"><span style="color:#c62828;font-weight:700">●</span> Registers</td><td style="color:var(--text-muted)">~1 cycle</td></tr>
+      <tr><td style="padding:.2rem .4rem"><span style="color:#e65100;font-weight:700">●</span> L1 Cache</td><td style="color:var(--text-muted)">~4 cycles</td></tr>
+      <tr><td style="padding:.2rem .4rem"><span style="color:#f57f17;font-weight:700">●</span> L2 Cache</td><td style="color:var(--text-muted)">~12 cycles</td></tr>
+      <tr><td style="padding:.2rem .4rem"><span style="color:#558b2f;font-weight:700">●</span> L3 Cache</td><td style="color:var(--text-muted)">~40 cycles</td></tr>
+      <tr><td style="padding:.2rem .4rem"><span style="color:#1565c0;font-weight:700">●</span> RAM</td><td style="color:var(--text-muted)">~100 cycles</td></tr>
+      <tr><td style="padding:.2rem .4rem"><span style="color:#4a148c;font-weight:700">●</span> SSD</td><td style="color:var(--text-muted)">~100,000 cycles</td></tr>
+      <tr><td style="padding:.2rem .4rem"><span style="color:#37474f;font-weight:700">●</span> HDD</td><td style="color:var(--text-muted)">~10,000,000 cycles</td></tr>
+    </table>
+  </div>
+
+  <div class="sidebar-box" style="border-left:4px solid #c62828">
+    <h3 style="color:#c62828">Common Mistakes</h3>
+    <ul style="font-size:.78rem;padding-left:1.1rem;color:var(--text)">
+      <li style="margin:.3rem 0">Saying ROM is "faster" than RAM — they are similar; the key difference is volatile vs non-volatile</li>
+      <li style="margin:.3rem 0">Confusing address bus (sends location) with data bus (sends content)</li>
+      <li style="margin:.3rem 0">Saying more cores always = faster — only for multi-threaded programs</li>
+      <li style="margin:.3rem 0">Saying virtual memory is "fast" — it uses the disk, which is much slower than RAM</li>
+      <li style="margin:.3rem 0">Confusing Type 1 (bare metal, no host OS) with Type 2 (runs on top of host OS) hypervisors</li>
+      <li style="margin:.3rem 0">Forgetting the JVM compiles to bytecode first — it is not directly interpreted from source code</li>
+    </ul>
+  </div>
+
+  <a href="topic2-communication-internet.html" style="display:block;text-align:center;background:var(--surface2);color:var(--primary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.65rem;font-weight:700;font-size:.82rem;text-decoration:none;margin-top:.25rem">
+    ← Topic 2: Communication &amp; Internet
+  </a>
+  <a href="index.html" style="display:block;text-align:center;background:var(--primary);color:#fff;border-radius:var(--radius-sm);padding:.75rem;font-weight:700;font-size:.875rem;text-decoration:none;margin-top:.5rem">
+    ← Back to All Topics
+  </a>
+</aside>
+
+</div><!-- /lesson-wrap -->
+
+<footer style="background:var(--surface);border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;font-size:.8rem;color:var(--text-muted)">
+  Cambridge International AS &amp; A Level Computer Science 9618 — Topic 3: Hardware &amp; Virtual Machines &nbsp;|&nbsp;
+  Not affiliated with Cambridge Assessment International Education.
+</footer>
+
+<script src="script.js"></script>
+<script>
+  const sections = document.querySelectorAll('.lesson-section[id]');
+  const navLinks = document.querySelectorAll('.toc-list a, .page-nav a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+  document.querySelectorAll('.reveal-btn').forEach(btn => { btn.textContent = 'Show Answer'; });
+</script>
+</body>
+</html>

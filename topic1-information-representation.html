@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Topic 1: Information Representation — CS 9618</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ── Page-specific additions ── */
+    .page-nav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 64px;
+      z-index: 90;
+      overflow-x: auto;
+    }
+    .page-nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      gap: 0;
+    }
+    .page-nav a {
+      display: block;
+      padding: 0.75rem 1.1rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-decoration: none;
+      white-space: nowrap;
+      border-bottom: 3px solid transparent;
+      transition: color .2s, border-color .2s;
+    }
+    .page-nav a:hover, .page-nav a.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+    .lesson-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem 4rem;
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 2.5rem;
+      align-items: start;
+    }
+    @media(max-width:900px){ .lesson-wrap { grid-template-columns: 1fr; } .sidebar { display: none; } }
+
+    /* Sidebar */
+    .sidebar { position: sticky; top: 120px; }
+    .sidebar-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow);
+    }
+    .sidebar-box h3 { font-size: 0.85rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; }
+    .toc-list { list-style: none; }
+    .toc-list li { padding: 0.2rem 0; }
+    .toc-list a { font-size: 0.82rem; color: var(--text-muted); text-decoration: none; display: block; padding: 0.25rem 0.5rem; border-radius: 4px; transition: background .15s, color .15s; }
+    .toc-list a:hover { background: var(--surface2); color: var(--primary); }
+    .toc-list a.active { background: var(--accent-light); color: var(--primary); font-weight: 600; }
+    .toc-list .sub { padding-left: 1rem; }
+
+    /* Content area */
+    .lesson-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem 2.25rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow);
+      scroll-margin-top: 130px;
+    }
+    .lesson-section h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .section-num {
+      background: var(--primary);
+      color: #fff;
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; font-weight: 800;
+      flex-shrink: 0;
+    }
+    .lesson-section h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 1.75rem 0 0.75rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 2px solid var(--border);
+      color: var(--text);
+    }
+    .lesson-section h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin: 1.25rem 0 0.5rem;
+      color: var(--primary-light);
+    }
+    .lesson-section p {
+      font-size: 0.9rem;
+      line-height: 1.75;
+      color: var(--text);
+      margin-bottom: 0.75rem;
+    }
+    .lesson-section ul, .lesson-section ol {
+      padding-left: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .lesson-section li {
+      font-size: 0.9rem;
+      line-height: 1.75;
+      color: var(--text);
+    }
+
+    /* Worked example box */
+    .worked {
+      background: linear-gradient(135deg, #e8f4fd, #f0f8ff);
+      border: 1px solid #90caf9;
+      border-left: 5px solid #1565c0;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 1.25rem 1.5rem;
+      margin: 1rem 0;
+    }
+    [data-theme="dark"] .worked { background: #0d1f35; border-color: #1565c0; }
+    .worked .worked-title {
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: #1565c0;
+      margin-bottom: 0.6rem;
+    }
+    [data-theme="dark"] .worked .worked-title { color: #64b5f6; }
+    .worked p, .worked li { font-size: 0.875rem; color: var(--text); }
+    .worked .step { display: flex; gap: 0.75rem; margin: 0.4rem 0; align-items: flex-start; }
+    .worked .step-num {
+      background: #1565c0;
+      color: #fff;
+      min-width: 22px; height: 22px;
+      border-radius: 50%;
+      font-size: 0.72rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 2px;
+    }
+    .worked .step-text { font-size: 0.875rem; line-height: 1.6; }
+    .worked .answer {
+      margin-top: 0.75rem;
+      padding: 0.6rem 1rem;
+      background: #1565c0;
+      color: #fff;
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    /* Practice question */
+    .practice {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-left: 5px solid #2e7d32;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 1.25rem 1.5rem;
+      margin: 1rem 0;
+    }
+    .practice .pq-title {
+      font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em;
+      color: #2e7d32; margin-bottom: 0.6rem;
+    }
+    .practice p, .practice li { font-size: 0.875rem; }
+    .practice .reveal-btn {
+      background: #2e7d32; color: #fff; border: none; border-radius: 6px;
+      padding: 0.4rem 1rem; font-size: 0.8rem; font-weight: 700;
+      cursor: pointer; margin-top: 0.75rem; transition: background .2s;
+    }
+    .practice .reveal-btn:hover { background: #1b5e20; }
+    .practice .answer-reveal {
+      display: none;
+      margin-top: 0.75rem;
+      padding: 0.75rem 1rem;
+      background: #e8f5e9;
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+    }
+    [data-theme="dark"] .practice .answer-reveal { background: #1b2e1c; color: #c8e6c9; }
+    .practice .answer-reveal.open { display: block; }
+
+    /* Place-value table */
+    .pv-table { border-collapse: collapse; margin: 0.75rem auto; }
+    .pv-table th {
+      background: var(--primary); color: #fff; padding: 0.5rem 0.75rem;
+      font-size: 0.8rem; text-align: center; min-width: 44px;
+    }
+    .pv-table td {
+      border: 1px solid var(--border); text-align: center;
+      padding: 0.5rem 0.75rem; font-size: 0.9rem; font-weight: 700;
+    }
+    .pv-table .val-row td { background: var(--surface2); font-size: 0.85rem; color: var(--text-muted); }
+    .pv-bit { font-size: 1.05rem; font-weight: 800; }
+    .pv-bit.one { color: #1565c0; }
+    .pv-bit.zero { color: var(--text-muted); }
+
+    /* Binary grid */
+    .binary-grid {
+      display: inline-flex;
+      gap: 2px;
+      margin: 0.5rem 0;
+      padding: 0.6rem 0.75rem;
+      background: #0d1117;
+      border-radius: var(--radius-sm);
+    }
+    .bit-cell {
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: monospace; font-size: 1.1rem; font-weight: 700;
+      border-radius: 4px;
+    }
+    .bit-cell.one { background: #1565c0; color: #fff; }
+    .bit-cell.zero { background: #2a2a2a; color: #777; }
+    .bit-sep { width: 6px; }
+
+    /* Hex grid */
+    .hex-grid { display: flex; gap: 0.4rem; flex-wrap: wrap; margin: 0.5rem 0; }
+    .hex-cell {
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;
+      padding: 0.5rem 0.75rem; text-align: center; min-width: 60px;
+    }
+    .hex-cell .hex-val { font-size: 1.1rem; font-weight: 800; font-family: monospace; color: var(--primary); }
+    .hex-cell .hex-bin { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; font-family: monospace; }
+    .hex-cell .hex-dec { font-size: 0.7rem; color: #c62828; margin-top: 1px; }
+    [data-theme="dark"] .hex-cell .hex-dec { color: #ef9a9a; }
+
+    /* Conversion arrow */
+    .conv-row {
+      display: flex; align-items: center; gap: 1rem; margin: 0.75rem 0; flex-wrap: wrap;
+    }
+    .conv-box {
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+      padding: 0.5rem 1rem; font-family: monospace; font-size: 1rem; font-weight: 700;
+      color: var(--text); min-width: 100px; text-align: center;
+    }
+    .conv-arrow { font-size: 1.4rem; color: var(--text-muted); }
+    .conv-label { font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 4px; }
+
+    /* Addition working */
+    .addition-work {
+      font-family: monospace;
+      font-size: 1rem;
+      background: #0d1117;
+      color: #c9d1d9;
+      border-radius: var(--radius-sm);
+      padding: 1.25rem 1.5rem;
+      display: inline-block;
+      margin: 0.75rem 0;
+      line-height: 2;
+    }
+    .add-carry { color: #79c0ff; font-size: 0.85rem; }
+    .add-line { border-top: 1px solid #333; margin: 0.25rem 0; }
+    .add-result { color: #a5d6ff; font-weight: 700; }
+    .add-overflow { color: #ff7b72; }
+
+    /* Image/sound diagram */
+    .diagram-wrap {
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+    .pixel-grid {
+      display: grid;
+      gap: 2px;
+      margin: 0 auto;
+      width: fit-content;
+    }
+    .pixel {
+      width: 28px; height: 28px;
+      border-radius: 2px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.6rem; font-weight: 700; color: rgba(255,255,255,0.6);
+    }
+
+    /* Sound wave diagram */
+    .wave-container {
+      position: relative;
+      height: 120px;
+      background: #0d1117;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      margin: 0.75rem 0;
+    }
+    .wave-container svg { width: 100%; height: 100%; }
+
+    /* Compression diagram */
+    .rle-demo { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin: 0.75rem 0; }
+    .rle-block {
+      display: flex; gap: 1px;
+    }
+    .rle-cell {
+      width: 22px; height: 22px;
+      border-radius: 2px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem; font-weight: 700; color: #fff;
+    }
+    .huffman-tree {
+      font-family: monospace;
+      font-size: 0.82rem;
+      background: #0d1117;
+      color: #c9d1d9;
+      border-radius: var(--radius-sm);
+      padding: 1rem 1.5rem;
+      line-height: 1.8;
+      overflow-x: auto;
+    }
+    .huffman-tree .node { color: #ffa657; }
+    .huffman-tree .leaf { color: #a5d6ff; }
+    .huffman-tree .code { color: #7ee787; }
+
+    /* Key term highlight */
+    .key-term {
+      background: linear-gradient(transparent 60%, rgba(0,172,193,0.2) 60%);
+      font-weight: 700;
+    }
+
+    /* Formula box */
+    .formula {
+      background: var(--surface2);
+      border: 2px dashed var(--accent);
+      border-radius: var(--radius-sm);
+      padding: 1rem 1.5rem;
+      text-align: center;
+      margin: 0.75rem 0;
+      font-size: 1rem;
+      font-family: 'Consolas', monospace;
+      color: var(--text);
+    }
+    .formula .formula-title {
+      font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--accent); margin-bottom: 0.4rem;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    /* Quick facts bar */
+    .quick-facts {
+      display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem;
+    }
+    .fact-chip {
+      display: flex; align-items: center; gap: 0.4rem;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 20px; padding: 0.35rem 0.9rem;
+      font-size: 0.8rem; font-weight: 600; color: var(--text);
+    }
+
+    /* Checklist */
+    .checklist { list-style: none; padding: 0; }
+    .checklist li {
+      display: flex; align-items: flex-start; gap: 0.6rem;
+      padding: 0.35rem 0; font-size: 0.875rem; color: var(--text);
+    }
+    .checklist li::before {
+      content: '☐';
+      color: var(--primary-light); font-size: 1rem; flex-shrink: 0;
+    }
+
+    /* Two's complement visual */
+    .twos-comp-visual {
+      display: flex; flex-direction: column; gap: 0.4rem; margin: 0.75rem 0;
+    }
+    .tc-row { display: flex; align-items: center; gap: 0.75rem; font-family: monospace; font-size: 0.9rem; }
+    .tc-label { width: 130px; font-size: 0.8rem; color: var(--text-muted); flex-shrink: 0; }
+    .tc-bits { display: flex; gap: 2px; }
+    .tc-bit {
+      width: 28px; height: 28px; border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.95rem;
+    }
+    .tc-bit.one { background: #1565c0; color: #fff; }
+    .tc-bit.zero { background: var(--surface2); color: var(--text-muted); border: 1px solid var(--border); }
+    .tc-bit.neg { background: #c62828; color: #fff; }
+    .tc-result { color: var(--accent); font-weight: 700; font-size: 0.9rem; }
+
+    /* ASCII table */
+    .ascii-sample {
+      display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.75rem 0;
+    }
+    .ascii-card {
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+      padding: 0.5rem 0.6rem; text-align: center; min-width: 52px;
+    }
+    .ascii-char { font-size: 1.2rem; font-weight: 800; font-family: monospace; color: var(--primary); }
+    .ascii-dec { font-size: 0.65rem; color: var(--text-muted); }
+    .ascii-hex { font-size: 0.65rem; color: #c62828; }
+    .ascii-bin { font-size: 0.6rem; color: var(--text-muted); font-family: monospace; }
+
+    /* Comparison table */
+    .compare-table th { white-space: nowrap; }
+
+    /* Progress breadcrumb */
+    .breadcrumb {
+      display: flex; align-items: center; gap: 0.4rem;
+      font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.5rem;
+    }
+    .breadcrumb a { color: var(--primary-light); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .breadcrumb span { color: var(--text-muted); }
+
+    .objectives-list { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 0.5rem; }
+    .objectives-list li {
+      font-size: 0.85rem; display: flex; align-items: flex-start; gap: 0.5rem; padding: 0.4rem 0; color: var(--text);
+    }
+    .objectives-list li::before { content: '✦'; color: var(--accent); flex-shrink: 0; }
+  </style>
+</head>
+<body>
+
+<!-- Header (reused) -->
+<header>
+  <div class="header-inner">
+    <a class="logo" href="index.html">
+      <div class="logo-icon">💻</div>
+      <div>
+        <div class="logo-text">CS 9618</div>
+        <div class="logo-sub">Cambridge AS &amp; A Level</div>
+      </div>
+    </a>
+    <div class="header-actions">
+      <button class="btn-icon" id="theme-btn" title="Toggle theme">🌙</button>
+    </div>
+  </div>
+</header>
+
+<!-- Section nav -->
+<nav class="page-nav" aria-label="Sections">
+  <div class="page-nav-inner">
+    <a href="#number-bases" class="active">1. Number Bases</a>
+    <a href="#arithmetic">2. Binary Arithmetic</a>
+    <a href="#twos-complement">3. Two's Complement</a>
+    <a href="#bcd">4. BCD</a>
+    <a href="#characters">5. Characters</a>
+    <a href="#images">6. Images</a>
+    <a href="#sound">7. Sound</a>
+    <a href="#compression">8. Compression</a>
+    <a href="#exam-practice">📝 Exam Practice</a>
+  </div>
+</nav>
+
+<div class="lesson-wrap">
+
+  <!-- ── MAIN CONTENT ── -->
+  <main>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <a href="index.html">Home</a>
+      <span>›</span>
+      <a href="index.html#tab-as">Paper 1 — Theory</a>
+      <span>›</span>
+      <strong style="color:var(--text)">Topic 1: Information Representation</strong>
+    </div>
+
+    <!-- Hero section -->
+    <div class="lesson-section" style="background:linear-gradient(135deg,var(--primary-dark),var(--primary-light));color:#fff;border:none">
+      <div style="display:flex;align-items:flex-start;gap:1.25rem">
+        <div style="font-size:3rem;flex-shrink:0">🔢</div>
+        <div>
+          <div style="font-size:0.75rem;font-weight:700;opacity:.7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:0.3rem">Paper 1 · Topic 1</div>
+          <h1 style="font-size:1.9rem;font-weight:900;margin-bottom:0.5rem;color:#fff">Information Representation</h1>
+          <p style="opacity:.85;font-size:0.95rem;max-width:620px;margin-bottom:1rem;color:#fff">How computers store every type of data — numbers, text, images, and sound — using binary. One of the highest-weighted topics in Paper 1.</p>
+          <div style="display:flex;gap:0.6rem;flex-wrap:wrap">
+            <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">Paper 1 · AS &amp; A Level</span>
+            <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">~15% of Paper 1 marks</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Learning objectives -->
+    <div class="lesson-section">
+      <h2><span class="section-num">✦</span> Learning Objectives</h2>
+      <p>By the end of this topic you should be able to:</p>
+      <ul class="objectives-list">
+        <li>Convert between binary, denary, and hexadecimal</li>
+        <li>Perform binary addition and identify overflow</li>
+        <li>Represent and interpret signed integers using two's complement</li>
+        <li>Explain BCD and state when it is used</li>
+        <li>Describe ASCII and Unicode character encoding</li>
+        <li>Calculate image file sizes from resolution and colour depth</li>
+        <li>Calculate audio file sizes from sample rate, bit depth, and duration</li>
+        <li>Explain and apply lossless and lossy compression techniques</li>
+        <li>Build a Huffman tree and encode/decode messages</li>
+        <li>Perform and decode Run-Length Encoding (RLE)</li>
+      </ul>
+    </div>
+
+    <!-- ════════════════════════════════════════
+         SECTION 1: NUMBER BASES
+    ════════════════════════════════════════ -->
+    <div class="lesson-section" id="number-bases">
+      <h2><span class="section-num">1</span> Number Bases</h2>
+
+      <h3>Why does this matter?</h3>
+      <p>Every piece of data in a computer — text, images, programs, video — is ultimately stored as <span class="key-term">binary digits (bits)</span>. A bit is either 0 or 1, corresponding to a transistor being off or on. Because humans find long binary strings hard to read, we also use <span class="key-term">hexadecimal</span> (base 16) as a compact shorthand.</p>
+
+      <!-- 1.1 Binary -->
+      <h3>1.1 Binary (Base 2)</h3>
+      <p>Binary uses only the digits <strong>0</strong> and <strong>1</strong>. Each position represents a power of 2, increasing right to left.</p>
+
+      <div style="overflow-x:auto">
+        <table class="pv-table">
+          <thead>
+            <tr>
+              <th>Bit position</th>
+              <th>7</th><th>6</th><th>5</th><th>4</th><th>3</th><th>2</th><th>1</th><th>0</th>
+            </tr>
+            <tr>
+              <th>Place value</th>
+              <th>128</th><th>64</th><th>32</th><th>16</th><th>8</th><th>4</th><th>2</th><th>1</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="val-row">
+              <td>Example: 10110101</td>
+              <td class="pv-bit one">1</td>
+              <td class="pv-bit zero">0</td>
+              <td class="pv-bit one">1</td>
+              <td class="pv-bit one">1</td>
+              <td class="pv-bit zero">0</td>
+              <td class="pv-bit one">1</td>
+              <td class="pv-bit zero">0</td>
+              <td class="pv-bit one">1</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p style="margin-top:.5rem;font-size:.875rem;color:var(--text-muted)">
+        Denary value = 128 + 32 + 16 + 4 + 1 = <strong style="color:var(--text)">181</strong>
+      </p>
+
+      <h4>Converting Binary → Denary</h4>
+      <p>Write out the place values, identify which bits are 1, then add those place values together.</p>
+
+      <div class="worked">
+        <div class="worked-title">✎ Worked Example — Convert 01101100 to denary</div>
+        <div class="step"><span class="step-num">1</span><span class="step-text">Write place values: 128, 64, 32, 16, 8, 4, 2, 1</span></div>
+        <div class="step"><span class="step-num">2</span><span class="step-text">Map bits: <code>0&nbsp;1&nbsp;1&nbsp;0&nbsp;1&nbsp;1&nbsp;0&nbsp;0</code></span></div>
+        <div class="step"><span class="step-num">3</span><span class="step-text">Active positions (bit = 1): 64 + 32 + 8 + 4</span></div>
+        <div class="answer">64 + 32 + 8 + 4 = <strong>108</strong> in denary</div>
+      </div>
+
+      <h4>Converting Denary → Binary (Repeated Division)</h4>
+      <p>Repeatedly divide the number by 2 and record the remainders. Read remainders bottom to top.</p>
+
+      <div class="worked">
+        <div class="worked-title">✎ Worked Example — Convert 219 to 8-bit binary</div>
+        <div class="step"><span class="step-num">1</span><span class="step-text">219 ÷ 2 = 109 remainder <strong>1</strong></span></div>
+        <div class="step"><span class="step-num">2</span><span class="step-text">109 ÷ 2 = 54 remainder <strong>1</strong></span></div>
+        <div class="step"><span class="step-num">3</span><span class="step-text">54 ÷ 2 = 27 remainder <strong>0</strong></span></div>
+        <div class="step"><span class="step-num">4</span><span class="step-text">27 ÷ 2 = 13 remainder <strong>1</strong></span></div>
+        <div class="step"><span class="step-num">5</span><span class="step-text">13 ÷ 2 = 6 remainder <strong>1</strong></span></div>
+        <div class="step"><span class="step-num">6</span><span class="step-text">6 ÷ 2 = 3 remainder <strong>0</strong></span></div>
+        <div class="step"><span class="step-num">7</span><span class="step-text">3 ÷ 2 = 1 remainder <strong>1</strong></span></div>
+        <div class="step"><span class="step-num">8</span><span class="step-text">1 ÷ 2 = 0 remainder <strong>1</strong></span></div>
+        <div class="step"><span class="step-num">✓</span><span class="step-text">Read remainders bottom to top: 1, 1, 0, 1, 1, 0, 1, 1</span></div>
+        <div class="answer">219 in 8-bit binary = <strong>11011011</strong></div>
+      </div>
+
+      <div class="practice">
+        <div class="pq-title">✏ Practice Question</div>
+        <p>Convert <strong>173</strong> to 8-bit binary using the repeated division method. Show all your working.</p>
+        <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+        <div class="answer-reveal">
+          173 ÷ 2 = 86 r <strong>1</strong><br>
+          86 ÷ 2 = 43 r <strong>0</strong><br>
+          43 ÷ 2 = 21 r <strong>1</strong><br>
+          21 ÷ 2 = 10 r <strong>1</strong><br>
+          10 ÷ 2 = 5 r <strong>0</strong><br>
+          5 ÷ 2 = 2 r <strong>1</strong><br>
+          2 ÷ 2 = 1 r <strong>0</strong><br>
+          1 ÷ 2 = 0 r <strong>1</strong><br>
+          Read bottom to top: <strong>10101101</strong>
+          <br><br>
+          Check: 128 + 32 + 8 + 4 + 1 = 173 ✓
+        </div>
+      </div>
+
+      <!-- 1.2 Hexadecimal -->
+      <h3>1.2 Hexadecimal (Base 16)</h3>
+      <p>Hexadecimal uses 16 digits. Since our numeral system only has 10 digit symbols (0–9), the letters A–F represent the values 10–15.</p>
+
+      <div class="hex-grid">
+        <div class="hex-cell"><div class="hex-val">0</div><div class="hex-bin">0000</div><div class="hex-dec">= 0</div></div>
+        <div class="hex-cell"><div class="hex-val">1</div><div class="hex-bin">0001</div><div class="hex-dec">= 1</div></div>
+        <div class="hex-cell"><div class="hex-val">2</div><div class="hex-bin">0010</div><div class="hex-dec">= 2</div></div>
+        <div class="hex-cell"><div class="hex-val">3</div><div class="hex-bin">0011</div><div class="hex-dec">= 3</div></div>
+        <div class="hex-cell"><div class="hex-val">4</div><div class="hex-bin">0100</div><div class="hex-dec">= 4</div></div>
+        <div class="hex-cell"><div class="hex-val">5</div><div class="hex-bin">0101</div><div class="hex-dec">= 5</div></div>
+        <div class="hex-cell"><div class="hex-val">6</div><div class="hex-bin">0110</div><div class="hex-dec">= 6</div></div>
+        <div class="hex-cell"><div class="hex-val">7</div><div class="hex-bin">0111</div><div class="hex-dec">= 7</div></div>
+        <div class="hex-cell"><div class="hex-val">8</div><div class="hex-bin">1000</div><div class="hex-dec">= 8</div></div>
+        <div class="hex-cell"><div class="hex-val">9</div><div class="hex-bin">1001</div><div class="hex-dec">= 9</div></div>
+        <div class="hex-cell"><div class="hex-val" style="color:#c62828">A</div><div class="hex-bin">1010</div><div class="hex-dec">= 10</div></div>
+        <div class="hex-cell"><div class="hex-val" style="color:#c62828">B</div><div class="hex-bin">1011</div><div class="hex-dec">= 11</div></div>
+        <div class="hex-cell"><div class="hex-val" style="color:#c62828">C</div><div class="hex-bin">1100</div><div class="hex-dec">= 12</div></div>
+        <div class="hex-cell"><div class="hex-val" style="color:#c62828">D</div><div class="hex-bin">1101</div><div class="hex-dec">= 13</div></div>
+        <div class="hex-cell"><div class="hex-val" style="color:#c62828">E</div><div class="hex-bin">1110</div><div class="hex-dec">= 14</div></div>
+        <div class="hex-cell"><div class="hex-val" style="color:#c62828">F</div><div class="hex-bin">1111</div><div class="hex-dec">= 15</div></div>
+      </div>
+
+      <div class="callout tip" style="margin-top:1rem">
+        <span class="callout-icon">💡</span>
+        <span><strong>Key insight:</strong> One hexadecimal digit always represents exactly <strong>4 bits</strong> (a nibble). So 2 hex digits = 1 byte. This makes hex a very compact way to write binary — e.g. <code>11001010</code> = <code>CA</code> in hex.</span>
+      </div>
+
+      <h4>Binary ↔ Hexadecimal conversion</h4>
+      <p>Group binary into nibbles (from the right) and convert each group independently.</p>
+
+      <div class="worked">
+        <div class="worked-title">✎ Worked Example — Convert 10111110 to hexadecimal</div>
+        <div class="step"><span class="step-num">1</span><span class="step-text">Split into 4-bit groups from the right: <code>1011</code> | <code>1110</code></span></div>
+        <div class="step"><span class="step-num">2</span><span class="step-text">Convert <code>1011</code>: 8+2+1 = 11 = <strong>B</strong></span></div>
+        <div class="step"><span class="step-num">3</span><span class="step-text">Convert <code>1110</code>: 8+4+2 = 14 = <strong>E</strong></span></div>
+        <div class="answer">10111110 in binary = <strong>BE</strong> in hexadecimal</div>
+      </div>
+
+      <div class="worked">
+        <div class="worked-title">✎ Worked Example — Convert 3F hex to denary</div>
+        <div class="step"><span class="step-num">1</span><span class="step-text">Hex place values (right to left): 16⁰ = 1, 16¹ = 16</span></div>
+        <div class="step"><span class="step-num">2</span><span class="step-text">3 × 16 = 48</span></div>
+        <div class="step"><span class="step-num">3</span><span class="step-text">F = 15, so 15 × 1 = 15</span></div>
+        <div class="answer">3F in hexadecimal = 48 + 15 = <strong>63</strong> in denary</div>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">ℹ️</span>
+        <div><strong>Why is hex used in computing?</strong><br>
+        Memory addresses, colour codes (#FF5733), MAC addresses (A4:C3:F0:…), and machine code opcodes are all expressed in hex — it's far shorter than binary but trivially reversible to binary, unlike denary.</div>
+      </div>
+
+      <div class="practice">
+        <div class="pq-title">✏ Practice Question</div>
+        <p><strong>(a)</strong> Convert <code>A9</code> (hex) to denary.<br>
+           <strong>(b)</strong> Convert <code>11110011</code> (binary) to hexadecimal.<br>
+           <strong>(c)</strong> What is the denary value of the hex colour code <code>FF</code>?</p>
+        <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+        <div class="answer-reveal">
+          <strong>(a)</strong> A = 10, so 10×16 + 9×1 = 160 + 9 = <strong>169</strong><br><br>
+          <strong>(b)</strong> Group: 1111 | 0011 → 15 = F, 3 = 3 → <strong>F3</strong><br><br>
+          <strong>(c)</strong> F = 15, so 15×16 + 15×1 = 240 + 15 = <strong>255</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════
+         SECTION 2: BINARY ARITHMETIC
+    ════════════════════════════════════════ -->
+    <div class="lesson-section" id="arithmetic">
+      <h2><span class="section-num">2</span> Binary Arithmetic</h2>
+
+      <h3>2.1 Binary Addition</h3>
+      <p>Addition in binary follows four simple rules:</p>
+      <table class="styled-table" style="max-width:320px">
+        <thead><tr><th>A</th><th>B</th><th>Sum</th><th>Carry</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+          <tr><td>0</td><td>1</td><td>1</td><td>0</td></tr>
+          <tr><td>1</td><td>0</td><td>1</td><td>0</td></tr>
+          <tr><td>1</td><td>1</td><td>0</td><td>1</td></tr>
+          <tr><td>1</td><td>1 + carry 1</td><td>1</td><td>1</td></tr>
+        </tbody>
+      </table>
+
+      <div class="worked">
+        <div class="worked-title">✎ Worked Example — Add 00110101 + 01001110 (8-bit)</div>
+        <div class="addition-work">
+<span class="add-carry">Carries:  0 1 1 0 0 0 0 0</span>
+  <br>  A:  <span style="color:#7ee787">0 0 1 1 0 1 0 1</span>  (= 53)
+  <br>  B:  <span style="color:#79c0ff">0 1 0 0 1 1 1 0</span>  (= 78)
+  <br><div class="add-line">─────────────────────</div>
+     <span class="add-result">0 1 1 1 0 0 1 1</span>  (= 115)</div>
+        <div class="answer">53 + 78 = <strong>115</strong> ✓ &nbsp; (Check: 64+32+16+2+1 = 115)</div>
+      </div>
+
+      <h3>2.2 Overflow</h3>
+      <p><span class="key-term">Overflow</span> occurs when the result of an arithmetic operation is too large to be stored in the available number of bits. In an 8-bit system, the maximum unsigned value is 255 (11111111). Any result larger than this will overflow.</p>
+
+      <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <span><strong>Overflow indicator:</strong> When adding two unsigned 8-bit numbers, a carry out of bit 7 (the MSB) signals overflow. The stored result will be incorrect (it wraps around).</span>
+      </div>
+
+      <div class="worked">
+        <div class="worked-title">✎ Worked Example — 200 + 100 with 8-bit overflow</div>
+        <div class="addition-work">
+<span class="add-carry">Carries: <span class="add-overflow">1</span> 1 1 0 0 0 0 0</span>
+  <br>  200: <span style="color:#7ee787">1 1 0 0 1 0 0 0</span>
+  <br>  100: <span style="color:#79c0ff">0 1 1 0 0 1 0 0</span>
+  <br><div class="add-line">──────────────────────</div>
+     <span class="add-overflow">1</span> <span class="add-result">0 0 1 0 1 1 0 0</span></div>
+        <p style="font-size:.875rem;margin-top:.5rem">The 9th bit (carry-out) is lost in an 8-bit register. The stored result is <strong>00101100 = 44</strong>, which is wrong. This is an overflow error.</p>
+        <div class="answer">300 > 255, so overflow occurs. The incorrect result stored is 44.</div>
+      </div>
+
+      <div class="practice">
+        <div class="pq-title">✏ Practice Question</div>
+        <p>Add the 8-bit binary numbers <code>10111001</code> and <code>01011110</code>. State the result in binary and denary, and identify whether overflow has occurred.</p>
+        <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+        <div class="answer-reveal">
+          10111001 (= 185) + 01011110 (= 94)<br>
+          185 + 94 = 279, which is greater than 255.<br><br>
+          Adding: result = 1<strong>00010111</strong><br>
+          The carry out of bit 7 is 1 → <strong>overflow has occurred</strong>.<br>
+          The 8-bit stored result is <strong>00010111 = 23</strong> (incorrect).
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════
+         SECTION 3: TWO'S COMPLEMENT
+    ════════════════════════════════════════ -->
+    <div class="lesson-section" id="twos-complement">
+      <h2><span class="section-num">3</span> Two's Complement</h2>
+
+      <p>To represent <span class="key-term">negative integers</span> in binary, computers use <strong>two's complement</strong>. The most significant bit (MSB) is the <em>sign bit</em>: 0 means positive, 1 means negative.</p>
+
+      <h3>3.1 Range</h3>
+      <div class="formula">
+        <div class="formula-title">Range for n-bit two's complement</div>
+        −2<sup>(n−1)</sup> &nbsp;to&nbsp; +2<sup>(n−1)</sup> − 1
+        <br><small style="color:var(--text-muted)">8-bit example: −128 to +127</small>
+      </div>
+
+      <h3>3.2 Converting a positive number to its negative</h3>
+      <p>To negate a two's complement number: <strong>invert all bits</strong>, then <strong>add 1</strong>.</p>
+
+      <div class="worked">
+        <div class="worked-title">✎ Worked Example — Represent −45 in 8-bit two's complement</div>
+        <div class="step"><span class="step-num">1</span><span class="step-text">Write +45 in binary: <strong>00101101</strong></span></div>
+        <div class="step"><span class="step-num">2</span><span class="step-text">Invert all bits: <strong>11010010</strong></span></div>
+        <div class="step"><span class="step-num">3</span><span class="step-text">Add 1: 11010010 + 1 = <strong>11010011</strong></span></div>
+        <div class="answer">−45 in 8-bit two's complement = <strong>11010011</strong></div>
+      </div>
+
+      <div class="twos-comp-visual">
+        <div class="tc-row">
+          <span class="tc-label">+45 (binary)</span>
+          <div class="tc-bits">
+            <div class="tc-bit zero">0</div><div class="tc-bit zero">0</div>
+            <div class="tc-bit one">1</div><div class="tc-bit zero">0</div>
+            <div class="tc-bit one">1</div><div class="tc-bit one">1</div>
+            <div class="tc-bit zero">0</div><div class="tc-bit one">1</div>
+          </div>
+          <span class="tc-result">= +45</span>
+        </div>
+        <div class="tc-row">
+          <span class="tc-label">After invert</span>
+          <div class="tc-bits">
+            <div class="tc-bit one">1</div><div class="tc-bit one">1</div>
+            <div class="tc-bit zero">0</div><div class="tc-bit one">1</div>
+            <div class="tc-bit zero">0</div><div class="tc-bit zero">0</div>
+            <div class="tc-bit one">1</div><div class="tc-bit zero">0</div>
+          </div>
+        </div>
+        <div class="tc-row">
+          <span class="tc-label">After add 1</span>
+          <div class="tc-bits">
+            <div class="tc-bit neg">1</div><div class="tc-bit one">1</div>
+            <div class="tc-bit zero">0</div><div class="tc-bit one">1</div>
+            <div class="tc-bit zero">0</div><div class="tc-bit zero">0</div>
+            <div class="tc-bit one">1</div><div class="tc-bit one">1</div>
+          </div>
+          <span class="tc-result">= −45</span>
+        </div>
+      </div>
+
+      <h3>3.3 Reading a two's complement value</h3>
+      <p>If the MSB is 1 (negative number): invert all bits, add 1, then read as a positive number and prefix with a minus sign.</p>
+
+      <div class="worked">
+        <div class="worked-title">✎ Worked Example — What denary value does 11001010 represent?</div>
+        <div class="step"><span class="step-num">1</span><span class="step-text">MSB = 1, so this is a negative number.</span></div>
+        <div class="step"><span class="step-num">2</span><span class="step-text">Invert all bits: <code>11001010</code> → <code>00110101</code></span></div>
+        <div class="step"><span class="step-num">3</span><span class="step-text">Add 1: <code>00110101</code> + 1 = <code>00110110</code></span></div>
+        <div class="step"><span class="step-num">4</span><span class="step-text">Convert to denary: 32+16+4+2 = 54</span></div>
+        <div class="answer">11001010 in two's complement = <strong>−54</strong></div>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">💡</span>
+        <span><strong>Alternative method for reading negatives:</strong> Give the MSB a place value of −128 (for 8-bit), then add the remaining bits normally. For 11001010: (−128) + 64 + 8 + 2 = <strong>−54</strong> ✓ — both methods work!</span>
+      </div>
+
+      <div class="practice">
+        <div class="pq-title">✏ Practice Questions</div>
+        <p><strong>(a)</strong> Represent −100 in 8-bit two's complement.<br>
+           <strong>(b)</strong> What denary value does the 8-bit two's complement pattern <code>10001111</code> represent?<br>
+           <strong>(c)</strong> State the range of values that can be stored in a 16-bit two's complement integer.</p>
+        <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+        <div class="answer-reveal">
+          <strong>(a)</strong> +100 = 01100100 → invert: 10011011 → +1: <strong>10011100</strong><br><br>
+          <strong>(b)</strong> MSB=1 → negative. Invert 10001111 → 01110000. Add 1 → 01110001 = 64+32+16+1 = 113. Answer: <strong>−113</strong><br>
+          (Alternative: −128 + 8 + 4 + 2 + 1 = −113 ✓)<br><br>
+          <strong>(c)</strong> n=16: range is −2<sup>15</sup> to 2<sup>15</sup>−1 = <strong>−32768 to +32767</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════
+         SECTION 4: BCD
+    ════════════════════════════════════════ -->
+    <div class="lesson-section" id="bcd">
+      <h2><span class="section-num">4</span> Binary Coded Decimal (BCD)</h2>
+
+      <p><span class="key-term">BCD</span> stores each <em>decimal digit</em> as a 4-bit binary pattern. Unlike standard binary which converts the whole number to base 2, BCD keeps each digit separate.</p>
+
+      <div class="worked">
+        <div class="worked-title">✎ Example — Represent 479 in BCD</div>
+        <div class="step"><span class="step-num">1</span><span class="step-text">Separate the digits: 4, 7, 9</span></div>
+        <div class="step"><span class="step-num">2</span><span class="step-text">Convert each digit to 4-bit binary:</span></div>
+        <div style="margin:.5rem 0 .5rem 2rem;font-family:monospace;font-size:.9rem">
+          4 → 0100 &nbsp;&nbsp; 7 → 0111 &nbsp;&nbsp; 9 → 1001
+        </div>
+        <div class="answer">479 in BCD = <strong>0100 0111 1001</strong></div>
+      </div>
+
+      <h3>When is BCD used?</h3>
+      <ul>
+        <li><strong>Financial systems</strong> — avoids floating-point rounding errors on decimal money values</li>
+        <li><strong>Digital displays</strong> — calculators, digital clocks that display individual digits</li>
+        <li><strong>Billing systems</strong> — any application where exact decimal arithmetic is essential</li>
+      </ul>
+
+      <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <span><strong>Limitation:</strong> BCD uses more storage than standard binary. For example, 999 needs 12 bits in BCD but only 10 bits in binary. The bit patterns 1010–1111 are invalid in BCD (only 0000–1001 are used).</span>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════
+         SECTION 5: CHARACTER ENCODING
+    ════════════════════════════════════════ -->
+    <div class="lesson-section" id="characters">
+      <h2><span class="section-num">5</span> Character Encoding</h2>
+
+      <p>Computers cannot directly store letters or symbols. Instead, each character is assigned a unique numeric code (a <span class="key-term">code point</span>), and that number is stored in binary.</p>
+
+      <h3>5.1 ASCII</h3>
+      <p><strong>ASCII</strong> (American Standard Code for Information Interchange) uses <strong>7 bits</strong>, giving 128 possible characters (0–127). <em>Extended ASCII</em> uses 8 bits for 256 characters, adding accented letters and special symbols.</p>
+
+      <h4>Key ASCII code points to remember:</h4>
+      <div class="ascii-sample">
+        <div class="ascii-card"><div class="ascii-char">A</div><div class="ascii-dec">Dec: 65</div><div class="ascii-hex">Hex: 41</div><div class="ascii-bin">1000001</div></div>
+        <div class="ascii-card"><div class="ascii-char">B</div><div class="ascii-dec">Dec: 66</div><div class="ascii-hex">Hex: 42</div><div class="ascii-bin">1000010</div></div>
+        <div class="ascii-card"><div class="ascii-char">Z</div><div class="ascii-dec">Dec: 90</div><div class="ascii-hex">Hex: 5A</div><div class="ascii-bin">1011010</div></div>
+        <div class="ascii-card"><div class="ascii-char">a</div><div class="ascii-dec">Dec: 97</div><div class="ascii-hex">Hex: 61</div><div class="ascii-bin">1100001</div></div>
+        <div class="ascii-card"><div class="ascii-char">z</div><div class="ascii-dec">Dec: 122</div><div class="ascii-hex">Hex: 7A</div><div class="ascii-bin">1111010</div></div>
+        <div class="ascii-card"><div class="ascii-char">0</div><div class="ascii-dec">Dec: 48</div><div class="ascii-hex">Hex: 30</div><div class="ascii-bin">0110000</div></div>
+        <div class="ascii-card"><div class="ascii-char">9</div><div class="ascii-dec">Dec: 57</div><div class="ascii-hex">Hex: 39</div><div class="ascii-bin">0111001</div></div>
+        <div class="ascii-card"><div class="ascii-char">SP</div><div class="ascii-dec">Dec: 32</div><div class="ascii-hex">Hex: 20</div><div class="ascii-bin">0100000</div></div>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">💡</span>
+        <span><strong>Exam shortcut:</strong> Uppercase and lowercase letters differ by exactly 32 (or bit 5). So if A=65, then a=65+32=97. If you know one, you know the other. Digit characters start at 48, so '0'=48, '1'=49, …, '9'=57.</span>
+      </div>
+
+      <h3>5.2 Unicode</h3>
+      <p>ASCII only covers English. <span class="key-term">Unicode</span> is an international standard that assigns a unique code point to every character in every writing system — over 1.1 million possible characters.</p>
+
+      <table class="styled-table compare-table">
+        <thead><tr><th>Feature</th><th>ASCII</th><th>Unicode (UTF-8)</th><th>Unicode (UTF-16)</th></tr></thead>
+        <tbody>
+          <tr><td>Bit width</td><td>7-bit (or 8-bit extended)</td><td>Variable: 1–4 bytes</td><td>Variable: 2 or 4 bytes</td></tr>
+          <tr><td>Characters</td><td>128 (or 256)</td><td>1,114,112</td><td>1,114,112</td></tr>
+          <tr><td>ASCII compatible</td><td>—</td><td>Yes (first 128 identical)</td><td>No (different encoding)</td></tr>
+          <tr><td>Storage</td><td>Compact for English</td><td>Efficient for English/Latin</td><td>Efficient for Asian scripts</td></tr>
+          <tr><td>Use</td><td>Legacy systems</td><td>World Wide Web</td><td>Windows, Java, .NET</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout info">
+        <span class="callout-icon">ℹ️</span>
+        <div><strong>Code point notation:</strong> Unicode code points are written as U+XXXX in hex. Examples:<br>
+        U+0041 = 'A' &nbsp;|&nbsp; U+4E2D = '中' (Chinese character) &nbsp;|&nbsp; U+1F600 = '😀' (emoji)</div>
+      </div>
+
+      <div class="practice">
+        <div class="pq-title">✏ Practice Questions</div>
+        <p><strong>(a)</strong> The ASCII code for 'M' is 77 (denary). What is the ASCII code for 'm'?<br>
+           <strong>(b)</strong> A file stores the text <strong>"CS"</strong> using ASCII. How many bytes does this require?<br>
+           <strong>(c)</strong> State <em>two</em> advantages of Unicode over ASCII.</p>
+        <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+        <div class="answer-reveal">
+          <strong>(a)</strong> 'M' = 77; lowercase = uppercase + 32 → 'm' = <strong>109</strong><br><br>
+          <strong>(b)</strong> Each ASCII character = 7 bits (or 8 bits in extended). "CS" = 2 characters × 1 byte = <strong>2 bytes</strong><br><br>
+          <strong>(c)</strong> Any two from:<br>
+          • Unicode supports characters from all world languages; ASCII only covers English/Latin.<br>
+          • Unicode can represent symbols, emoji, and mathematical symbols not in ASCII.<br>
+          • Unicode provides a universal, internationally agreed standard — avoids incompatibility between regional encodings.
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════
+         SECTION 6: IMAGES
+    ════════════════════════════════════════ -->
+    <div class="lesson-section" id="images">
+      <h2><span class="section-num">6</span> Representing Images</h2>
+
+      <p>A <span class="key-term">bitmap image</span> is made up of a grid of <span class="key-term">pixels</span> (picture elements). Each pixel stores a colour value represented in binary. The quality of the image depends on two key factors: resolution and colour depth.</p>
+
+      <h3>6.1 Resolution and Colour Depth</h3>
+
+      <table class="styled-table">
+        <thead><tr><th>Term</th><th>Definition</th><th>Effect of increasing</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Resolution</strong></td>
+            <td>The number of pixels across the width × height of an image (e.g. 1920×1080)</td>
+            <td>More detail, larger file size</td>
+          </tr>
+          <tr>
+            <td><strong>Pixel density</strong></td>
+            <td>Pixels per inch (ppi) when printed or displayed — affects physical sharpness</td>
+            <td>Sharper print output at same physical size</td>
+          </tr>
+          <tr>
+            <td><strong>Colour depth</strong></td>
+            <td>Number of bits used to store one pixel's colour</td>
+            <td>More colours available, larger file size</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Common colour depths:</h4>
+      <div class="concept-grid" style="margin:.75rem 0">
+        <div class="concept-card"><div class="term">1-bit</div><div class="def">2 colours: black/white only. Each pixel is a single 0 or 1.</div></div>
+        <div class="concept-card"><div class="term">8-bit</div><div class="def">2⁸ = 256 colours. Used in older GIF images and indexed colour.</div></div>
+        <div class="concept-card"><div class="term">24-bit (True Colour)</div><div class="def">2²⁴ = 16,777,216 colours. 8 bits each for Red, Green, Blue. Standard for photos.</div></div>
+        <div class="concept-card"><div class="term">32-bit</div><div class="def">24-bit colour + 8-bit alpha channel (transparency). Used in PNG, RGBA.</div></div>
+      </div>
+
+      <!-- Visual pixel demo -->
+      <h4>How a pixel grid forms an image:</h4>
+      <div style="display:flex;gap:1.5rem;align-items:flex-start;flex-wrap:wrap;margin:.75rem 0">
+        <div>
+          <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:.4rem">4×4 pixel grid (zoomed in)</div>
+          <div class="pixel-grid" style="grid-template-columns:repeat(4,36px)">
+            <div class="pixel" style="background:#1a237e"></div>
+            <div class="pixel" style="background:#1a237e"></div>
+            <div class="pixel" style="background:#1a237e"></div>
+            <div class="pixel" style="background:#1a237e"></div>
+            <div class="pixel" style="background:#1a237e"></div>
+            <div class="pixel" style="background:#ffffff;border:1px solid #eee"></div>
+            <div class="pixel" style="background:#1a237e"></div>
+            <div class="pixel" style="background:#ffffff;border:1px solid #eee"></div>
+            <div class="pixel" style="background:#ffffff;border:1px solid #eee"></div>
+            <div class="pixel" style="background:#1a237e"></div>
+            <div class="pixel" style="background:#ffffff;border:1px solid #eee"></div>
+            <div class="pixel" style="background:#1a237e"></div>
+            <div class="pixel" style="background:#1a237e"></div>
+            <div class="pixel" style="background:#1a237e"></div>
+            <div class="pixel" style="background:#1a237e"></div>
+            <div class="pixel" style="background:#1a237e"></div>
+          </div>
+        </div>
+        <div style="font-size:0.85rem;color:var(--text-muted);margin-top:1.5rem">
+          Each pixel stores a colour value in binary.<br>
+          With 1-bit colour depth:<br>
+          Dark pixel = 1, Light pixel = 0<br><br>
+          Data: <code style="font-family:monospace">1111 1010 0101 1111</code>
+        </div>
+      </div>
+
+      <h3>6.2 File Size Calculation</h3>
+      <div class="formula">
+        <div class="formula-title">Image file size (uncompressed)</div>
+        File size (bits) = Width (px) × Height (px) × Colour depth (bits)
+        <br>
+        File size (bytes) = File size (bits) ÷ 8
+      </div>
+
+      <div class="worked">
+        <div class="worked-title">✎ Worked Example — Calculate the file size of a 1920×1080 24-bit image</div>
+        <div class="step"><span class="step-num">1</span><span class="step-text">Total pixels = 1920 × 1080 = 2,073,600 pixels</span></div>
+        <div class="step"><span class="step-num">2</span><span class="step-text">Bits per pixel = 24 (true colour)</span></div>
+        <div class="step"><span class="step-num">3</span><span class="step-text">Total bits = 2,073,600 × 24 = 49,766,400 bits</span></div>
+        <div class="step"><span class="step-num">4</span><span class="step-text">Total bytes = 49,766,400 ÷ 8 = 6,220,800 bytes</span></div>
+        <div class="step"><span class="step-num">5</span><span class="step-text">≈ 6.22 MB (÷ 1,048,576)</span></div>
+        <div class="answer">File size ≈ <strong>6.22 MB</strong> (uncompressed)</div>
+      </div>
+
+      <h3>6.3 Metadata</h3>
+      <p>Image files also contain <span class="key-term">metadata</span> — data about the data. This is stored in a header at the start of the file and includes information like the image dimensions, colour depth, file format, date taken, and camera settings. Metadata adds to the total file size.</p>
+
+      <div class="practice">
+        <div class="pq-title">✏ Practice Questions</div>
+        <p><strong>(a)</strong> Calculate the uncompressed file size in bytes of an image that is 800 pixels wide, 600 pixels tall, using a colour depth of 16 bits per pixel.<br>
+           <strong>(b)</strong> An image file is 3,145,728 bytes. The image dimensions are 1024 × 768 pixels. Calculate the colour depth used.<br>
+           <strong>(c)</strong> State <em>two</em> items that might be stored in image metadata.</p>
+        <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+        <div class="answer-reveal">
+          <strong>(a)</strong> 800 × 600 × 16 = 7,680,000 bits ÷ 8 = <strong>960,000 bytes</strong> (≈ 937.5 KB)<br><br>
+          <strong>(b)</strong> Total bits = 3,145,728 × 8 = 25,165,824 bits<br>
+          Total pixels = 1024 × 768 = 786,432 pixels<br>
+          Colour depth = 25,165,824 ÷ 786,432 = <strong>32 bits per pixel</strong><br><br>
+          <strong>(c)</strong> Any two: image dimensions (width × height), colour depth, date/time created, camera model, GPS location, file format/version, author/creator.
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════
+         SECTION 7: SOUND
+    ════════════════════════════════════════ -->
+    <div class="lesson-section" id="sound">
+      <h2><span class="section-num">7</span> Representing Sound</h2>
+
+      <p>Sound is a continuous (analogue) wave. To store it digitally, we must convert it through a process called <span class="key-term">sampling</span>.</p>
+
+      <h3>7.1 Analogue to Digital Conversion</h3>
+
+      <!-- Sound wave SVG -->
+      <div class="wave-container">
+        <svg viewBox="0 0 600 120" preserveAspectRatio="none">
+          <!-- Analogue wave -->
+          <path d="M 0 60 C 30 10, 60 10, 90 60 S 150 110, 180 60 S 240 10, 270 60 S 330 110, 360 60 S 420 10, 450 60 S 510 110, 540 60 S 570 40, 600 60"
+                fill="none" stroke="#3949ab" stroke-width="2" opacity="0.5"/>
+          <!-- Sample points -->
+          <line x1="0" y1="0" x2="0" y2="120" stroke="#2e3250" stroke-width="1"/>
+          <line x1="60" y1="0" x2="60" y2="120" stroke="#2e3250" stroke-width="1" stroke-dasharray="4"/>
+          <line x1="120" y1="0" x2="120" y2="120" stroke="#2e3250" stroke-width="1" stroke-dasharray="4"/>
+          <line x1="180" y1="0" x2="180" y2="120" stroke="#2e3250" stroke-width="1" stroke-dasharray="4"/>
+          <line x1="240" y1="0" x2="240" y2="120" stroke="#2e3250" stroke-width="1" stroke-dasharray="4"/>
+          <line x1="300" y1="0" x2="300" y2="120" stroke="#2e3250" stroke-width="1" stroke-dasharray="4"/>
+          <line x1="360" y1="0" x2="360" y2="120" stroke="#2e3250" stroke-width="1" stroke-dasharray="4"/>
+          <line x1="420" y1="0" x2="420" y2="120" stroke="#2e3250" stroke-width="1" stroke-dasharray="4"/>
+          <line x1="480" y1="0" x2="480" y2="120" stroke="#2e3250" stroke-width="1" stroke-dasharray="4"/>
+          <line x1="540" y1="0" x2="540" y2="120" stroke="#2e3250" stroke-width="1" stroke-dasharray="4"/>
+          <!-- Sampled (quantised) stepped reconstruction -->
+          <polyline points="0,60 60,60 60,14 120,14 120,60 180,60 180,105 240,105 240,60 300,60 300,14 360,14 360,60 420,60 420,105 480,105 480,60 540,60 540,45 600,45"
+                    fill="none" stroke="#00acc1" stroke-width="2"/>
+          <!-- Sample dots -->
+          <circle cx="0" cy="60" r="4" fill="#ffa657"/>
+          <circle cx="60" cy="14" r="4" fill="#ffa657"/>
+          <circle cx="120" cy="60" r="4" fill="#ffa657"/>
+          <circle cx="180" cy="105" r="4" fill="#ffa657"/>
+          <circle cx="240" cy="60" r="4" fill="#ffa657"/>
+          <circle cx="300" cy="14" r="4" fill="#ffa657"/>
+          <circle cx="360" cy="60" r="4" fill="#ffa657"/>
+          <circle cx="420" cy="105" r="4" fill="#ffa657"/>
+          <circle cx="480" cy="60" r="4" fill="#ffa657"/>
+          <circle cx="540" cy="45" r="4" fill="#ffa657"/>
+          <!-- Labels -->
+          <text x="5" y="15" fill="#8b949e" font-size="9">Analogue wave</text>
+          <text x="5" y="28" fill="#00acc1" font-size="9">Digital (sampled)</text>
+          <text x="5" y="41" fill="#ffa657" font-size="9">● Sample point</text>
+          <text x="50" y="115" fill="#8b949e" font-size="8">← sample interval →</text>
+        </svg>
+      </div>
+
+      <div class="concept-grid" style="margin:.75rem 0">
+        <div class="concept-card">
+          <div class="term">Sample Rate (Hz)</div>
+          <div class="def">Number of amplitude measurements taken per second. Higher = more accurate reproduction. CD quality: <strong>44,100 Hz</strong>. Telephone: <strong>8,000 Hz</strong>.</div>
+        </div>
+        <div class="concept-card">
+          <div class="term">Bit Depth (Bit Resolution)</div>
+          <div class="def">Number of bits used to store each sample's amplitude value. Higher = finer amplitude resolution (less quantisation noise). CD quality: <strong>16-bit</strong>.</div>
+        </div>
+        <div class="concept-card">
+          <div class="term">Quantisation</div>
+          <div class="def">Rounding each sample to the nearest representable value. With higher bit depth, quantisation error is smaller.</div>
+        </div>
+        <div class="concept-card">
+          <div class="term">Nyquist's Theorem</div>
+          <div class="def">The sample rate must be <strong>at least twice</strong> the highest frequency in the signal. Human hearing limit ≈ 20 kHz → need at least 40 kHz → CD uses 44.1 kHz.</div>
+        </div>
+      </div>
+
+      <h3>7.2 File Size Calculation</h3>
+      <div class="formula">
+        <div class="formula-title">Audio file size (uncompressed)</div>
+        File size (bits) = Sample rate (Hz) × Bit depth (bits) × Duration (seconds) × Channels
+        <br>
+        File size (bytes) = File size (bits) ÷ 8
+        <br>
+        <small style="color:var(--text-muted)">Channels: 1 = mono, 2 = stereo</small>
+      </div>
+
+      <div class="worked">
+        <div class="worked-title">✎ Worked Example — Calculate the file size of 3 minutes of CD-quality stereo audio</div>
+        <div class="step"><span class="step-num">1</span><span class="step-text">Sample rate = 44,100 Hz; Bit depth = 16; Duration = 3 × 60 = 180 s; Channels = 2</span></div>
+        <div class="step"><span class="step-num">2</span><span class="step-text">File size (bits) = 44,100 × 16 × 180 × 2 = 254,016,000 bits</span></div>
+        <div class="step"><span class="step-num">3</span><span class="step-text">File size (bytes) = 254,016,000 ÷ 8 = 31,752,000 bytes</span></div>
+        <div class="step"><span class="step-num">4</span><span class="step-text">≈ 31.75 MB</span></div>
+        <div class="answer">Uncompressed audio ≈ <strong>31.75 MB</strong> (this is why MP3 compression exists!)</div>
+      </div>
+
+      <div class="practice">
+        <div class="pq-title">✏ Practice Questions</div>
+        <p><strong>(a)</strong> A 60-second mono audio recording uses a sample rate of 22,050 Hz and a bit depth of 8 bits. Calculate the file size in bytes.<br>
+           <strong>(b)</strong> Explain the effect of halving the sample rate on both the audio quality and file size.<br>
+           <strong>(c)</strong> State Nyquist's theorem and explain why CD audio uses a sample rate of 44,100 Hz.</p>
+        <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+        <div class="answer-reveal">
+          <strong>(a)</strong> 22,050 × 8 × 60 × 1 = 10,584,000 bits ÷ 8 = <strong>1,323,000 bytes</strong> (≈ 1.26 MB)<br><br>
+          <strong>(b)</strong> Halving the sample rate: audio quality decreases (fewer measurements per second, less accurate waveform reproduction — higher frequency sounds are lost or distorted). File size is also halved (fewer samples per second = fewer bits to store).<br><br>
+          <strong>(c)</strong> Nyquist's theorem states the sample rate must be at least twice the highest frequency present in the signal. The human ear can hear up to approximately 20,000 Hz. Therefore a minimum sample rate of 40,000 Hz is needed. CD audio uses 44,100 Hz to exceed this minimum with some margin, ensuring all audible frequencies are accurately reproduced.
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════
+         SECTION 8: COMPRESSION
+    ════════════════════════════════════════ -->
+    <div class="lesson-section" id="compression">
+      <h2><span class="section-num">8</span> Compression</h2>
+
+      <p>Large files take longer to transmit and require more storage. <span class="key-term">Compression</span> reduces file size. There are two fundamentally different approaches:</p>
+
+      <table class="styled-table">
+        <thead><tr><th></th><th>Lossless</th><th>Lossy</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Data loss</strong></td><td>None — original fully recoverable</td><td>Some data permanently removed</td></tr>
+          <tr><td><strong>Quality</strong></td><td>Identical to original</td><td>Reduced (depends on compression level)</td></tr>
+          <tr><td><strong>File size reduction</strong></td><td>Moderate</td><td>Very large (10:1 or more)</td></tr>
+          <tr><td><strong>Best for</strong></td><td>Text, programs, medical images</td><td>Photos, audio, video for streaming</td></tr>
+          <tr><td><strong>File types</strong></td><td>PNG, GIF, ZIP, FLAC</td><td>JPEG, MP3, MP4, AAC</td></tr>
+        </tbody>
+      </table>
+
+      <h3>8.1 Run-Length Encoding (RLE) — Lossless</h3>
+      <p>RLE stores a <em>value</em> and the <em>count</em> of how many times it appears consecutively. It works well for data with long runs of the same value, such as simple graphics or fax data.</p>
+
+      <div style="margin:.75rem 0">
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:.4rem">Example: encoding a row of coloured pixels</div>
+        <div class="rle-demo">
+          <div>
+            <div style="font-size:.72rem;color:var(--text-muted);margin-bottom:3px">Original (24 pixels)</div>
+            <div class="rle-block">
+              <div class="rle-cell" style="background:#1565c0" title="Blue"></div><div class="rle-cell" style="background:#1565c0"></div>
+              <div class="rle-cell" style="background:#1565c0"></div><div class="rle-cell" style="background:#1565c0"></div>
+              <div class="rle-cell" style="background:#1565c0"></div><div class="rle-cell" style="background:#1565c0"></div>
+              <div class="rle-cell" style="background:#c62828"></div><div class="rle-cell" style="background:#c62828"></div>
+              <div class="rle-cell" style="background:#c62828"></div><div class="rle-cell" style="background:#c62828"></div>
+              <div class="rle-cell" style="background:#f9a825"></div><div class="rle-cell" style="background:#f9a825"></div>
+              <div class="rle-cell" style="background:#f9a825"></div><div class="rle-cell" style="background:#f9a825"></div>
+              <div class="rle-cell" style="background:#f9a825"></div><div class="rle-cell" style="background:#f9a825"></div>
+              <div class="rle-cell" style="background:#f9a825"></div><div class="rle-cell" style="background:#f9a825"></div>
+              <div class="rle-cell" style="background:#2e7d32"></div><div class="rle-cell" style="background:#2e7d32"></div>
+              <div class="rle-cell" style="background:#2e7d32"></div><div class="rle-cell" style="background:#2e7d32"></div>
+              <div class="rle-cell" style="background:#2e7d32"></div><div class="rle-cell" style="background:#2e7d32"></div>
+            </div>
+          </div>
+          <div style="font-size:1.5rem;color:var(--text-muted)">→</div>
+          <div>
+            <div style="font-size:.72rem;color:var(--text-muted);margin-bottom:3px">RLE encoded (4 pairs)</div>
+            <code style="font-size:.9rem;font-family:monospace">
+              (6, Blue) (4, Red) (8, Yellow) (6, Green)
+            </code>
+          </div>
+        </div>
+        <p style="font-size:.8rem;color:var(--text-muted)">Original: 24 values to store. RLE: 8 values (4 pairs of count+colour) — a 3:1 compression ratio.</p>
+      </div>
+
+      <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <span><strong>When RLE is ineffective:</strong> If there are no repeated values (e.g. a photographic image with many different colours), RLE can actually <em>increase</em> file size because every pixel requires a count+value pair instead of just a value.</span>
+      </div>
+
+      <h3>8.2 Huffman Coding — Lossless</h3>
+      <p>Huffman coding assigns <em>shorter binary codes</em> to more frequent characters and <em>longer codes</em> to rarer characters. This is more efficient than fixed-length encoding (like ASCII which uses 8 bits for every character regardless of frequency).</p>
+
+      <h4>Building a Huffman Tree — Step by step:</h4>
+
+      <div class="worked">
+        <div class="worked-title">✎ Worked Example — Huffman encode "ABRACADABRA"</div>
+        <p style="font-size:.875rem;margin:.25rem 0 .75rem">Step 1: Count character frequencies</p>
+        <table class="styled-table" style="max-width:360px;margin:.5rem 0">
+          <thead><tr><th>Character</th><th>Frequency</th></tr></thead>
+          <tbody>
+            <tr><td>A</td><td>5</td></tr>
+            <tr><td>B</td><td>2</td></tr>
+            <tr><td>R</td><td>2</td></tr>
+            <tr><td>C</td><td>1</td></tr>
+            <tr><td>D</td><td>1</td></tr>
+          </tbody>
+        </table>
+        <p style="font-size:.875rem;margin:.75rem 0 .5rem">Step 2: Build the tree (always combine two lowest-frequency nodes)</p>
+        <div class="huffman-tree">
+<span style="color:#8b949e">Start: </span><span class="leaf">A(5) B(2) R(2) C(1) D(1)</span>
+
+<span style="color:#8b949e">Round 1: Combine C(1)+D(1) → </span><span class="node">CD(2)</span>
+<span style="color:#8b949e">Nodes: </span><span class="leaf">A(5) B(2) R(2) CD(2)</span>
+
+<span style="color:#8b949e">Round 2: Combine B(2)+R(2) → </span><span class="node">BR(4)</span>
+<span style="color:#8b949e">Nodes: </span><span class="leaf">A(5) BR(4) CD(2)</span>
+
+<span style="color:#8b949e">Round 3: Combine CD(2)+BR(4) → </span><span class="node">BRCD(6)</span>
+<span style="color:#8b949e">Nodes: </span><span class="leaf">A(5) BRCD(6)</span>
+
+<span style="color:#8b949e">Round 4: Combine A(5)+BRCD(6) → </span><span class="node">ROOT(11)</span>
+
+Tree structure:
+              <span class="node">[11]</span>
+             /      \
+         <span class="leaf">A(5)</span>      <span class="node">[6]</span>
+      <span class="code">  0         1 </span>       /     \
+                   <span class="node">[4]</span>     <span class="leaf">C(1) D(1)</span>
+               <span class="code">   10    11</span>  /  \   <span class="code">110  111</span>
+                   /     \
+                <span class="leaf">B(2)</span>   <span class="leaf">R(2)</span>
+              <span class="code">  100     101</span>
+        </div>
+        <p style="font-size:.875rem;margin:.75rem 0 .5rem">Step 3: Assign codes (left branch = 0, right branch = 1)</p>
+        <table class="styled-table" style="max-width:400px;margin:.5rem 0">
+          <thead><tr><th>Char</th><th>Freq</th><th>Huffman Code</th><th>Bits</th></tr></thead>
+          <tbody>
+            <tr><td>A</td><td>5</td><td>0</td><td>1</td></tr>
+            <tr><td>B</td><td>2</td><td>100</td><td>3</td></tr>
+            <tr><td>R</td><td>2</td><td>101</td><td>3</td></tr>
+            <tr><td>C</td><td>1</td><td>110</td><td>3</td></tr>
+            <tr><td>D</td><td>1</td><td>111</td><td>3</td></tr>
+          </tbody>
+        </table>
+        <p style="font-size:.875rem;margin:.5rem 0">Encoded "ABRACADABRA" = <code style="font-family:monospace">0 100 101 0 110 0 111 0 100 101 0</code></p>
+        <p style="font-size:.875rem">Total bits: 23 bits. With ASCII (8 bits/char): 88 bits. Saving = 65 bits.</p>
+        <div class="answer">Huffman code requires <strong>23 bits</strong> vs 88 bits for ASCII — a <strong>73.9% reduction</strong></div>
+      </div>
+
+      <div class="callout exam">
+        <span class="callout-icon">📝</span>
+        <div><strong>Cambridge exam tip — Huffman trees:</strong><br>
+        The exam often asks you to: (1) build the tree from a frequency table, (2) read off codes, and (3) decode a bit string. When building the tree: always break ties consistently (use alphabetical order or the order given). When decoding, start at the root and follow left (0) or right (1) for each bit until you reach a leaf — that's one character. Then return to the root.</div>
+      </div>
+
+      <div class="practice">
+        <div class="pq-title">✏ Practice Question — Build a Huffman Tree</div>
+        <p>The following frequencies have been recorded for characters in a file:</p>
+        <table class="styled-table" style="max-width:300px">
+          <thead><tr><th>Character</th><th>Frequency</th></tr></thead>
+          <tbody>
+            <tr><td>E</td><td>8</td></tr>
+            <tr><td>T</td><td>5</td></tr>
+            <tr><td>A</td><td>4</td></tr>
+            <tr><td>O</td><td>3</td></tr>
+            <tr><td>I</td><td>2</td></tr>
+            <tr><td>N</td><td>1</td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:.75rem"><strong>(a)</strong> Build the Huffman tree. <strong>(b)</strong> State the Huffman code for each character. <strong>(c)</strong> Encode the word "OATEN". <strong>(d)</strong> Calculate the total bits needed vs a 3-bit fixed code.</p>
+        <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+        <div class="answer-reveal">
+          Frequencies: E=8, T=5, A=4, O=3, I=2, N=1<br><br>
+          <strong>Building the tree:</strong><br>
+          R1: I(2)+N(1) → IN(3). Nodes: E(8) T(5) A(4) O(3) IN(3)<br>
+          R2: O(3)+IN(3) → OIN(6). Nodes: E(8) T(5) A(4) OIN(6)<br>
+          R3: A(4)+T(5) → AT(9). Nodes: E(8) AT(9) OIN(6)<br>
+          R4: E(8)+OIN(6) → EOIN(14). Nodes: AT(9) EOIN(14)<br>
+          R5: AT(9)+EOIN(14) → ROOT(23)<br><br>
+          <strong>(b)</strong> Sample codes (left=0, right=1):<br>
+          A: 00, T: 01, E: 10, O: 110, I: 1110, N: 1111<br><br>
+          <strong>(c)</strong> "OATEN" = 110 + 00 + 01 + 10 + 1111 = <strong>110000110 1111</strong> = 13 bits<br><br>
+          <strong>(d)</strong> Fixed 3-bit code for 23 total characters = 23 × 3 = 69 bits.<br>
+          Huffman: E(8×2=16) + T(5×2=10) + A(4×2=8) + O(3×3=9) + I(2×4=8) + N(1×4=4) = <strong>55 bits</strong>.<br>
+          Saving: 69 − 55 = 14 bits.
+        </div>
+      </div>
+
+      <h3>8.3 Lossy Compression</h3>
+      <p>Lossy compression removes data permanently — the original cannot be perfectly reconstructed. However, it targets data that is <em>less perceptible</em> to human senses:</p>
+      <ul>
+        <li><strong>Images (JPEG):</strong> Groups nearby pixels of similar colour together. Reduces high-frequency detail in areas where the eye is less sensitive. More aggressive compression = more visible "artefacts" (blurring, blocking).</li>
+        <li><strong>Audio (MP3/AAC):</strong> Removes frequencies outside the range of normal human hearing, and uses <em>perceptual masking</em> to remove sounds that would be inaudible because they occur at the same time as louder sounds.</li>
+        <li><strong>Video (MP4/H.264):</strong> Stores only the differences between consecutive frames rather than each full frame.</li>
+      </ul>
+    </div>
+
+    <!-- ════════════════════════════════════════
+         EXAM PRACTICE
+    ════════════════════════════════════════ -->
+    <div class="lesson-section" id="exam-practice" style="border-left:5px solid #c62828">
+      <h2><span class="section-num" style="background:#c62828">📝</span> Exam Practice — Mixed Questions</h2>
+
+      <div class="callout exam">
+        <span class="callout-icon">📝</span>
+        <span>These questions are written in Cambridge 9618 Paper 1 style. Show all working for full marks.</span>
+      </div>
+
+      <!-- Q1 -->
+      <div class="practice" style="margin-top:1.25rem">
+        <div class="pq-title">Question 1 [6 marks]</div>
+        <p><strong>(a)</strong> [1] Convert the binary number <code>10111001</code> to denary.</p>
+        <p><strong>(b)</strong> [2] Convert the denary number 200 to 8-bit two's complement binary. You must show your working.</p>
+        <p><strong>(c)</strong> [2] Add the following 8-bit binary numbers: <code>01110110</code> + <code>01100101</code>. Give your answer in binary and state whether overflow has occurred.</p>
+        <p><strong>(d)</strong> [1] What is the denary value of the hexadecimal number <code>C4</code>?</p>
+        <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+        <div class="answer-reveal">
+          <strong>(a)</strong> 128+32+16+8+1 = <strong>185</strong> [1]<br><br>
+          <strong>(b)</strong> 200 is positive, so two's complement = standard binary.<br>
+          200 in binary: 200÷2=100r0, 100÷2=50r0, 50÷2=25r0, 25÷2=12r1, 12÷2=6r0, 6÷2=3r0, 3÷2=1r1, 1÷2=0r1<br>
+          Answer: <strong>11001000</strong> [2]<br><br>
+          <strong>(c)</strong> 01110110 (118) + 01100101 (101) = 118+101 = 219<br>
+          219 &lt; 256, so no overflow.<br>
+          01110110 + 01100101 = <strong>11011011</strong>, no overflow. [2]<br><br>
+          <strong>(d)</strong> C = 12, 4 = 4. (12×16) + (4×1) = 192 + 4 = <strong>196</strong> [1]
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="practice">
+        <div class="pq-title">Question 2 [6 marks]</div>
+        <p>A digital camera takes photographs with a resolution of 4000 × 3000 pixels using 24-bit colour.</p>
+        <p><strong>(a)</strong> [1] Calculate the number of different colours that can be represented with a 24-bit colour depth.</p>
+        <p><strong>(b)</strong> [3] Calculate the uncompressed file size of one photograph. Give your answer in megabytes (MB), showing all working. (1 MB = 2²⁰ bytes)</p>
+        <p><strong>(c)</strong> [2] The photographer applies JPEG compression which reduces the file to 2.5 MB. State the type of compression used and explain why the original photograph cannot be reconstructed from the compressed file.</p>
+        <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+        <div class="answer-reveal">
+          <strong>(a)</strong> 2<sup>24</sup> = <strong>16,777,216</strong> colours [1]<br><br>
+          <strong>(b)</strong> Total pixels = 4000 × 3000 = 12,000,000 [1]<br>
+          Total bits = 12,000,000 × 24 = 288,000,000 bits [1]<br>
+          Total bytes = 288,000,000 ÷ 8 = 36,000,000 bytes<br>
+          In MB = 36,000,000 ÷ 1,048,576 ≈ <strong>34.3 MB</strong> [1]<br><br>
+          <strong>(c)</strong> JPEG uses <strong>lossy</strong> compression [1].<br>
+          Lossy compression permanently discards data that is less perceptible to the human eye (e.g. fine detail in areas of uniform colour). Since this data has been deleted, it is no longer available to reconstruct the original image [1].
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="practice">
+        <div class="pq-title">Question 3 [7 marks]</div>
+        <p>A file contains only five different characters. Their frequencies are shown below:</p>
+        <table class="styled-table" style="max-width:280px;margin:.5rem 0">
+          <thead><tr><th>Character</th><th>Frequency</th></tr></thead>
+          <tbody>
+            <tr><td>P</td><td>12</td></tr>
+            <tr><td>Q</td><td>7</td></tr>
+            <tr><td>R</td><td>5</td></tr>
+            <tr><td>S</td><td>3</td></tr>
+            <tr><td>T</td><td>1</td></tr>
+          </tbody>
+        </table>
+        <p><strong>(a)</strong> [4] Construct a Huffman tree for these characters. Show each step of the construction process.</p>
+        <p><strong>(b)</strong> [2] Using your tree, state the Huffman code for each character.</p>
+        <p><strong>(c)</strong> [1] Calculate the total number of bits required to encode the entire file using the Huffman codes you found in (b).</p>
+        <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+        <div class="answer-reveal">
+          <strong>(a)</strong> Total = 28 characters [1]<br>
+          R1: S(3)+T(1) → ST(4). Nodes: P(12) Q(7) R(5) ST(4)<br>
+          R2: R(5)+ST(4) → RST(9). Nodes: P(12) Q(7) RST(9)<br>
+          R3: Q(7)+RST(9) → QRST(16). Nodes: P(12) QRST(16)<br>
+          R4: P(12)+QRST(16) → ROOT(28) [3 steps = 3 marks]<br><br>
+          <strong>(b)</strong> (left=0, right=1):<br>
+          P: 0 (1 bit)<br>
+          Q: 10 (2 bits)<br>
+          R: 110 (3 bits)<br>
+          S: 1110 (4 bits)<br>
+          T: 1111 (4 bits) [2]<br><br>
+          <strong>(c)</strong> P: 12×1=12, Q: 7×2=14, R: 5×3=15, S: 3×4=12, T: 1×4=4<br>
+          Total = 12+14+15+12+4 = <strong>57 bits</strong> [1]<br>
+          (Compare: 3-bit fixed code would need 28×3 = 84 bits — Huffman saves 27 bits)
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Summary checklist -->
+    <div class="lesson-section" style="border-left:5px solid var(--accent)">
+      <h2><span class="section-num" style="background:var(--accent)">✓</span> Topic Summary Checklist</h2>
+      <p>Tick these off as you become confident with each skill:</p>
+      <ul class="checklist">
+        <li>Convert binary ↔ denary (both directions, with working)</li>
+        <li>Convert binary ↔ hexadecimal (group into nibbles)</li>
+        <li>Convert hex ↔ denary using place values</li>
+        <li>Perform binary addition and identify overflow correctly</li>
+        <li>Find the two's complement of a negative number</li>
+        <li>Interpret a two's complement bit pattern as a signed integer</li>
+        <li>State what BCD is and when it is used</li>
+        <li>Explain ASCII and Unicode, and state the difference</li>
+        <li>Calculate image file size given dimensions and colour depth</li>
+        <li>Calculate audio file size given sample rate, bit depth, duration, and channels</li>
+        <li>Explain RLE and apply it to a sequence of values</li>
+        <li>Build a Huffman tree from a frequency table (step by step)</li>
+        <li>Assign Huffman codes and encode/decode a message</li>
+        <li>Compare lossless vs lossy compression and give appropriate use cases</li>
+      </ul>
+    </div>
+
+  </main>
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <div class="sidebar-box">
+      <h3>Contents</h3>
+      <ul class="toc-list">
+        <li><a href="#number-bases" class="active">1. Number Bases</a>
+          <ul>
+            <li><a href="#number-bases" class="sub">1.1 Binary</a></li>
+            <li><a href="#number-bases" class="sub">1.2 Hexadecimal</a></li>
+          </ul>
+        </li>
+        <li><a href="#arithmetic">2. Binary Arithmetic</a>
+          <ul>
+            <li><a href="#arithmetic" class="sub">Addition</a></li>
+            <li><a href="#arithmetic" class="sub">Overflow</a></li>
+          </ul>
+        </li>
+        <li><a href="#twos-complement">3. Two's Complement</a></li>
+        <li><a href="#bcd">4. BCD</a></li>
+        <li><a href="#characters">5. Characters</a>
+          <ul>
+            <li><a href="#characters" class="sub">ASCII</a></li>
+            <li><a href="#characters" class="sub">Unicode</a></li>
+          </ul>
+        </li>
+        <li><a href="#images">6. Images</a>
+          <ul>
+            <li><a href="#images" class="sub">Resolution &amp; Colour Depth</a></li>
+            <li><a href="#images" class="sub">File Size Calculation</a></li>
+          </ul>
+        </li>
+        <li><a href="#sound">7. Sound</a>
+          <ul>
+            <li><a href="#sound" class="sub">Sampling</a></li>
+            <li><a href="#sound" class="sub">File Size Calculation</a></li>
+          </ul>
+        </li>
+        <li><a href="#compression">8. Compression</a>
+          <ul>
+            <li><a href="#compression" class="sub">RLE</a></li>
+            <li><a href="#compression" class="sub">Huffman Coding</a></li>
+            <li><a href="#compression" class="sub">Lossy</a></li>
+          </ul>
+        </li>
+        <li><a href="#exam-practice" style="color:#c62828;font-weight:700">📝 Exam Practice</a></li>
+      </ul>
+    </div>
+
+    <div class="sidebar-box">
+      <h3>Key Formulas</h3>
+      <div style="font-size:.8rem;font-family:monospace;line-height:1.9;color:var(--text)">
+        <div><strong>Image size (bytes):</strong></div>
+        <div style="color:var(--accent);margin-bottom:.4rem">W × H × depth ÷ 8</div>
+        <div><strong>Audio size (bytes):</strong></div>
+        <div style="color:var(--accent);margin-bottom:.4rem">SR × depth × dur × ch ÷ 8</div>
+        <div><strong>Two's complement range:</strong></div>
+        <div style="color:var(--accent);margin-bottom:.4rem">−2<sup>n−1</sup> to 2<sup>n−1</sup>−1</div>
+        <div><strong>Colour count:</strong></div>
+        <div style="color:var(--accent)">2<sup>colour_depth</sup></div>
+      </div>
+    </div>
+
+    <div class="sidebar-box">
+      <h3>Quick Reference</h3>
+      <table style="font-size:.78rem;width:100%;border-collapse:collapse">
+        <tr><td style="padding:.2rem .4rem;font-weight:700">1 byte</td><td style="padding:.2rem .4rem;color:var(--text-muted)">8 bits</td></tr>
+        <tr><td style="padding:.2rem .4rem;font-weight:700">1 KiB</td><td style="padding:.2rem .4rem;color:var(--text-muted)">1024 bytes = 2¹⁰</td></tr>
+        <tr><td style="padding:.2rem .4rem;font-weight:700">1 MiB</td><td style="padding:.2rem .4rem;color:var(--text-muted)">1,048,576 bytes = 2²⁰</td></tr>
+        <tr><td style="padding:.2rem .4rem;font-weight:700">ASCII 'A'</td><td style="padding:.2rem .4rem;color:var(--text-muted)">65 / 41h</td></tr>
+        <tr><td style="padding:.2rem .4rem;font-weight:700">ASCII 'a'</td><td style="padding:.2rem .4rem;color:var(--text-muted)">97 / 61h</td></tr>
+        <tr><td style="padding:.2rem .4rem;font-weight:700">ASCII '0'</td><td style="padding:.2rem .4rem;color:var(--text-muted)">48 / 30h</td></tr>
+        <tr><td style="padding:.2rem .4rem;font-weight:700">CD audio</td><td style="padding:.2rem .4rem;color:var(--text-muted)">44,100 Hz, 16-bit</td></tr>
+        <tr><td style="padding:.2rem .4rem;font-weight:700">24-bit colour</td><td style="padding:.2rem .4rem;color:var(--text-muted)">16,777,216 colours</td></tr>
+      </table>
+    </div>
+
+    <div class="sidebar-box" style="border-left:4px solid #c62828">
+      <h3 style="color:#c62828">Common Mistakes</h3>
+      <ul style="font-size:.78rem;padding-left:1.1rem;color:var(--text)">
+        <li style="margin:.3rem 0">Forgetting to ÷ 8 to convert bits → bytes</li>
+        <li style="margin:.3rem 0">Using 1000 instead of 1024 for KB/MB</li>
+        <li style="margin:.3rem 0">Not reading two's complement remainders bottom-to-top</li>
+        <li style="margin:.3rem 0">Confusing validation (checking data is reasonable) with verification (checking data was entered correctly)</li>
+        <li style="margin:.3rem 0">Stating lossy compression has "no" data loss</li>
+        <li style="margin:.3rem 0">Building Huffman tree incorrectly — always combine the TWO lowest nodes</li>
+      </ul>
+    </div>
+
+    <a href="index.html" style="display:block;text-align:center;background:var(--primary);color:#fff;border-radius:var(--radius-sm);padding:.75rem;font-weight:700;font-size:.875rem;text-decoration:none;margin-top:.5rem">
+      ← Back to All Topics
+    </a>
+  </aside>
+
+</div><!-- /lesson-wrap -->
+
+<footer style="background:var(--surface);border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;font-size:0.8rem;color:var(--text-muted)">
+  Cambridge International AS &amp; A Level Computer Science 9618 — Topic 1: Information Representation &nbsp;|&nbsp;
+  Not affiliated with Cambridge Assessment International Education.
+</footer>
+
+<script src="script.js"></script>
+<script>
+  // Active section highlighting in sidebar TOC
+  const sections = document.querySelectorAll('.lesson-section[id]');
+  const navLinks = document.querySelectorAll('.toc-list a, .page-nav a');
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(a => {
+          a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+
+  // Reveal buttons
+  document.querySelectorAll('.reveal-btn').forEach(btn => {
+    btn.textContent = 'Show Answer';
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Topic 2: Communication &amp; Internet Technologies — CS 9618</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .page-nav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 64px;
+      z-index: 90;
+      overflow-x: auto;
+    }
+    .page-nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      gap: 0;
+    }
+    .page-nav a {
+      display: block;
+      padding: 0.75rem 1.1rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-decoration: none;
+      white-space: nowrap;
+      border-bottom: 3px solid transparent;
+      transition: color .2s, border-color .2s;
+    }
+    .page-nav a:hover, .page-nav a.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+    .lesson-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem 4rem;
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 2.5rem;
+      align-items: start;
+    }
+    @media(max-width:900px){ .lesson-wrap { grid-template-columns: 1fr; } .sidebar { display: none; } }
+
+    .sidebar { position: sticky; top: 120px; }
+    .sidebar-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow);
+    }
+    .sidebar-box h3 { font-size: 0.85rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; }
+    .toc-list { list-style: none; }
+    .toc-list li { padding: 0.2rem 0; }
+    .toc-list a { font-size: 0.82rem; color: var(--text-muted); text-decoration: none; display: block; padding: 0.25rem 0.5rem; border-radius: 4px; transition: background .15s, color .15s; }
+    .toc-list a:hover { background: var(--surface2); color: var(--primary); }
+    .toc-list a.active { background: var(--accent-light); color: var(--primary); font-weight: 600; }
+    .toc-list .sub { padding-left: 1rem; }
+
+    .lesson-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem 2.25rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow);
+      scroll-margin-top: 130px;
+    }
+    .lesson-section h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .section-num {
+      background: var(--primary);
+      color: #fff;
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; font-weight: 800;
+      flex-shrink: 0;
+    }
+    .lesson-section h3 { font-size: 1.1rem; font-weight: 700; margin: 1.75rem 0 0.75rem; padding-bottom: 0.4rem; border-bottom: 2px solid var(--border); color: var(--text); }
+    .lesson-section h4 { font-size: 0.95rem; font-weight: 700; margin: 1.25rem 0 0.5rem; color: var(--primary-light); }
+    .lesson-section p { font-size: 0.9rem; line-height: 1.75; color: var(--text); margin-bottom: 0.75rem; }
+    .lesson-section ul, .lesson-section ol { padding-left: 1.5rem; margin-bottom: 0.75rem; }
+    .lesson-section li { font-size: 0.9rem; line-height: 1.75; color: var(--text); }
+
+    .worked {
+      background: linear-gradient(135deg, #e8f4fd, #f0f8ff);
+      border: 1px solid #90caf9;
+      border-left: 5px solid #1565c0;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 1.25rem 1.5rem;
+      margin: 1rem 0;
+    }
+    [data-theme="dark"] .worked { background: #0d1f35; border-color: #1565c0; }
+    .worked .worked-title { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: #1565c0; margin-bottom: 0.6rem; }
+    [data-theme="dark"] .worked .worked-title { color: #64b5f6; }
+    .worked p, .worked li { font-size: 0.875rem; color: var(--text); }
+    .worked .step { display: flex; gap: 0.75rem; margin: 0.4rem 0; align-items: flex-start; }
+    .worked .step-num { background: #1565c0; color: #fff; min-width: 22px; height: 22px; border-radius: 50%; font-size: 0.72rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+    .worked .step-text { font-size: 0.875rem; line-height: 1.6; }
+    .worked .answer { margin-top: 0.75rem; padding: 0.6rem 1rem; background: #1565c0; color: #fff; border-radius: var(--radius-sm); font-weight: 700; font-size: 0.9rem; }
+
+    .practice {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-left: 5px solid #2e7d32;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 1.25rem 1.5rem;
+      margin: 1rem 0;
+    }
+    .practice .pq-title { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: #2e7d32; margin-bottom: 0.6rem; }
+    .practice p, .practice li { font-size: 0.875rem; }
+    .practice .reveal-btn { background: #2e7d32; color: #fff; border: none; border-radius: 6px; padding: 0.4rem 1rem; font-size: 0.8rem; font-weight: 700; cursor: pointer; margin-top: 0.75rem; transition: background .2s; }
+    .practice .reveal-btn:hover { background: #1b5e20; }
+    .practice .answer-reveal { display: none; margin-top: 0.75rem; padding: 0.75rem 1rem; background: #e8f5e9; border-radius: var(--radius-sm); font-size: 0.875rem; }
+    [data-theme="dark"] .practice .answer-reveal { background: #1b2e1c; color: #c8e6c9; }
+    .practice .answer-reveal.open { display: block; }
+
+    .formula { background: var(--surface2); border: 2px dashed var(--accent); border-radius: var(--radius-sm); padding: 1rem 1.5rem; text-align: center; margin: 0.75rem 0; font-size: 1rem; font-family: 'Consolas', monospace; color: var(--text); }
+    .formula .formula-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); margin-bottom: 0.4rem; font-family: 'Segoe UI', sans-serif; }
+
+    .key-term { background: linear-gradient(transparent 60%, rgba(0,172,193,0.2) 60%); font-weight: 700; }
+
+    .objectives-list { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 0.5rem; }
+    .objectives-list li { font-size: 0.85rem; display: flex; align-items: flex-start; gap: 0.5rem; padding: 0.4rem 0; color: var(--text); }
+    .objectives-list li::before { content: '✦'; color: var(--accent); flex-shrink: 0; }
+
+    .breadcrumb { display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+    .breadcrumb a { color: var(--primary-light); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+
+    .checklist { list-style: none; padding: 0; }
+    .checklist li { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.35rem 0; font-size: 0.875rem; color: var(--text); }
+    .checklist li::before { content: '☐'; color: var(--primary-light); font-size: 1rem; flex-shrink: 0; }
+
+    /* ── Topology diagrams ── */
+    .topology-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 1rem; margin: 0.75rem 0; }
+    .topology-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem; text-align: center; }
+    .topology-card .topo-name { font-weight: 800; font-size: 0.9rem; color: var(--primary); margin-bottom: 0.5rem; }
+    .topology-card svg { display: block; margin: 0 auto 0.5rem; }
+    .topology-card ul { text-align: left; font-size: 0.78rem; list-style: none; padding: 0; }
+    .topology-card ul li { padding: 0.15rem 0; color: var(--text-muted); }
+    .topology-card ul li::before { content: ''; }
+    .topology-card .pros li::before { content: '✓ '; color: #2e7d32; }
+    .topology-card .cons li::before { content: '✗ '; color: #c62828; }
+
+    /* ── Packet switching diagram ── */
+    .packet-demo {
+      background: #0d1117;
+      border-radius: var(--radius-sm);
+      padding: 1.25rem 1.5rem;
+      font-family: monospace;
+      font-size: 0.82rem;
+      color: #c9d1d9;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      line-height: 1.9;
+    }
+    .pkt { color: #ffa657; font-weight: 700; }
+    .pkt-hdr { color: #79c0ff; }
+    .pkt-data { color: #7ee787; }
+    .pkt-trl { color: #d2a8ff; }
+    .pkt-route { color: #ff7b72; }
+
+    /* ── OSI / TCP layers ── */
+    .layer-stack { display: flex; flex-direction: column; gap: 3px; margin: 0.75rem 0; max-width: 560px; }
+    .layer-row { display: flex; align-items: stretch; border-radius: 6px; overflow: hidden; min-height: 44px; }
+    .layer-num { width: 36px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; color: #fff; flex-shrink: 0; }
+    .layer-name { flex: 1; display: flex; align-items: center; padding: 0.4rem 0.75rem; font-weight: 700; font-size: 0.85rem; color: #fff; }
+    .layer-desc { flex: 2; display: flex; align-items: center; padding: 0.4rem 0.75rem; font-size: 0.8rem; background: var(--surface2); color: var(--text); border-left: 1px solid var(--border); }
+    .layer-proto { flex: 1.5; display: flex; align-items: center; padding: 0.4rem 0.75rem; font-size: 0.75rem; color: var(--text-muted); border-left: 1px solid var(--border); font-family: monospace; }
+
+    /* IP address visual */
+    .ip-visual { display: flex; gap: 2px; align-items: center; margin: 0.5rem 0; flex-wrap: wrap; }
+    .ip-octet { background: var(--primary); color: #fff; border-radius: 6px; padding: 0.4rem 0.6rem; font-family: monospace; font-weight: 700; font-size: 0.95rem; text-align: center; min-width: 50px; }
+    .ip-dot { font-size: 1.2rem; font-weight: 700; color: var(--text-muted); }
+    .ip-label { font-size: 0.7rem; color: var(--text-muted); text-align: center; margin-top: 2px; }
+
+    /* Error detection grid */
+    .parity-grid { border-collapse: collapse; margin: 0.75rem 0; font-family: monospace; }
+    .parity-grid th { background: var(--primary); color: #fff; padding: 0.5rem 0.75rem; font-size: 0.82rem; }
+    .parity-grid td { border: 1px solid var(--border); text-align: center; padding: 0.5rem 0.75rem; font-size: 0.9rem; }
+    .parity-grid .pbit { color: #c62828; font-weight: 800; }
+    .parity-grid .pbit-ok { color: #2e7d32; font-weight: 800; }
+    .parity-grid tr:nth-child(even) td { background: var(--surface2); }
+
+    /* Hardware card grid */
+    .hw-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 0.75rem; margin: 0.75rem 0; }
+    .hw-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.9rem 1rem; }
+    .hw-card .hw-name { font-weight: 800; font-size: 0.88rem; color: var(--primary); margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem; }
+    .hw-card .hw-icon { font-size: 1.1rem; }
+    .hw-card p { font-size: 0.78rem; color: var(--text-muted); margin: 0; line-height: 1.5; }
+
+    /* DNS walkthrough */
+    .dns-steps { display: flex; flex-direction: column; gap: 0.5rem; margin: 0.75rem 0; }
+    .dns-step { display: flex; gap: 0.75rem; align-items: flex-start; }
+    .dns-num { background: var(--accent); color: #fff; min-width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 800; flex-shrink: 0; }
+    .dns-text { font-size: 0.875rem; line-height: 1.6; padding-top: 2px; }
+
+    /* Transmission comparison */
+    .trans-compare { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 0.75rem 0; }
+    @media(max-width:600px){ .trans-compare { grid-template-columns: 1fr; } }
+    .trans-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem; }
+    .trans-card h4 { font-size: 0.875rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--primary); }
+    .trans-card ul { font-size: 0.8rem; padding-left: 1.2rem; color: var(--text); }
+    .trans-card li { line-height: 1.7; }
+
+    /* Waveform bit diagram */
+    .bit-wave { background: #0d1117; border-radius: var(--radius-sm); padding: 0.75rem 1rem; overflow-x: auto; margin: 0.75rem 0; }
+    .bit-wave svg { display: block; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a class="logo" href="index.html">
+      <div class="logo-icon">💻</div>
+      <div>
+        <div class="logo-text">CS 9618</div>
+        <div class="logo-sub">Cambridge AS &amp; A Level</div>
+      </div>
+    </a>
+    <div class="header-actions">
+      <button class="btn-icon" id="theme-btn" title="Toggle theme">🌙</button>
+    </div>
+  </div>
+</header>
+
+<nav class="page-nav" aria-label="Sections">
+  <div class="page-nav-inner">
+    <a href="#data-transmission" class="active">1. Data Transmission</a>
+    <a href="#error-detection">2. Error Detection</a>
+    <a href="#network-hardware">3. Network Hardware</a>
+    <a href="#topologies">4. Topologies</a>
+    <a href="#client-server">5. Client-Server</a>
+    <a href="#internet">6. Internet &amp; TCP/IP</a>
+    <a href="#protocols">7. Protocols</a>
+    <a href="#security">8. Security</a>
+    <a href="#exam-practice">📝 Exam Practice</a>
+  </div>
+</nav>
+
+<div class="lesson-wrap">
+<main>
+
+  <div class="breadcrumb">
+    <a href="index.html">Home</a>
+    <span>›</span>
+    <a href="index.html#tab-as">Paper 1 — Theory</a>
+    <span>›</span>
+    <strong style="color:var(--text)">Topic 2: Communication &amp; Internet Technologies</strong>
+  </div>
+
+  <!-- Hero -->
+  <div class="lesson-section" style="background:linear-gradient(135deg,#1b5e20,#2e7d32,#43a047);color:#fff;border:none">
+    <div style="display:flex;align-items:flex-start;gap:1.25rem">
+      <div style="font-size:3rem;flex-shrink:0">🌐</div>
+      <div>
+        <div style="font-size:0.75rem;font-weight:700;opacity:.7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:0.3rem">Paper 1 · Topic 2</div>
+        <h1 style="font-size:1.9rem;font-weight:900;margin-bottom:0.5rem;color:#fff">Communication &amp; Internet Technologies</h1>
+        <p style="opacity:.85;font-size:0.95rem;max-width:620px;margin-bottom:1rem;color:#fff">How data moves between devices — from raw bit transmission and error checking, through network topologies and hardware, to the protocols that make the modern Internet work.</p>
+        <div style="display:flex;gap:0.6rem;flex-wrap:wrap">
+          <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">Paper 1 · AS &amp; A Level</span>
+          <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">~15% of Paper 1 marks</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Objectives -->
+  <div class="lesson-section">
+    <h2><span class="section-num">✦</span> Learning Objectives</h2>
+    <p>By the end of this topic you should be able to:</p>
+    <ul class="objectives-list">
+      <li>Distinguish serial from parallel, and synchronous from asynchronous transmission</li>
+      <li>Define bit rate, baud rate, bandwidth, and latency</li>
+      <li>Explain the relationship between bit rate and baud rate</li>
+      <li>Apply parity, checksum, and echo checking for error detection</li>
+      <li>Describe the role of key network hardware devices</li>
+      <li>Draw, describe, and compare bus, star, ring, and mesh topologies</li>
+      <li>Compare client–server and peer-to-peer network models</li>
+      <li>Describe the TCP/IP four-layer model and the role of each layer</li>
+      <li>Explain IPv4 and IPv6 addressing, subnetting, and DNS</li>
+      <li>Explain how packet switching works</li>
+      <li>Describe the purpose of HTTP, FTP, SMTP, POP3, and IMAP</li>
+      <li>Describe the role of firewalls and proxy servers</li>
+    </ul>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 1: DATA TRANSMISSION           -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="data-transmission">
+    <h2><span class="section-num">1</span> Data Transmission</h2>
+
+    <p>When data moves between devices it must travel as a physical signal — an electrical voltage change in a wire, a pulse of light in fibre, or a radio wave. Understanding how bits are sent reliably is the foundation of networking.</p>
+
+    <h3>1.1 Serial vs Parallel Transmission</h3>
+
+    <div class="trans-compare">
+      <div class="trans-card">
+        <h4>🔗 Serial Transmission</h4>
+        <ul>
+          <li>Bits sent <strong>one at a time</strong> down a single wire</li>
+          <li>Slower throughput for the same clock speed</li>
+          <li>No timing skew between bits</li>
+          <li>Reliable over long distances</li>
+          <li>Lower cost — fewer wires</li>
+          <li><em>Examples:</em> USB, SATA, Ethernet, HDMI</li>
+        </ul>
+      </div>
+      <div class="trans-card">
+        <h4>🔀 Parallel Transmission</h4>
+        <ul>
+          <li>Multiple bits sent <strong>simultaneously</strong> on multiple wires</li>
+          <li>Higher throughput at same clock speed</li>
+          <li><strong>Skew problem:</strong> bits arrive at slightly different times</li>
+          <li>Only reliable over short distances</li>
+          <li>Higher cost — many wires required</li>
+          <li><em>Examples:</em> Internal CPU buses, old printer ports</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="bit-wave">
+      <svg viewBox="0 0 560 100" width="540" height="100">
+        <!-- Serial label -->
+        <text x="4" y="14" fill="#8b949e" font-size="10">Serial (1 wire):</text>
+        <text x="4" y="55" fill="#8b949e" font-size="10">Parallel (4 wires):</text>
+        <!-- Serial waveform -->
+        <polyline points="80,25 100,25 100,10 120,10 120,25 140,25 140,10 160,10 160,25 180,25 180,10 200,10 200,25 220,25 220,10 240,10 240,25" fill="none" stroke="#00acc1" stroke-width="2"/>
+        <text x="85" y="9" fill="#ffa657" font-size="8">1</text>
+        <text x="105" y="9" fill="#ffa657" font-size="8">0</text>
+        <text x="125" y="9" fill="#ffa657" font-size="8">1</text>
+        <text x="145" y="9" fill="#ffa657" font-size="8">1</text>
+        <text x="165" y="9" fill="#ffa657" font-size="8">0</text>
+        <text x="185" y="9" fill="#ffa657" font-size="8">1</text>
+        <text x="205" y="9" fill="#ffa657" font-size="8">0</text>
+        <text x="225" y="9" fill="#ffa657" font-size="8">0</text>
+        <!-- Parallel wires -->
+        <polyline points="80,58 240,58" fill="none" stroke="#7ee787" stroke-width="2"/>
+        <polyline points="80,66 240,66" fill="none" stroke="#79c0ff" stroke-width="2"/>
+        <polyline points="80,74 240,74" fill="none" stroke="#d2a8ff" stroke-width="2"/>
+        <polyline points="80,82 240,82" fill="none" stroke="#ffa657" stroke-width="2"/>
+        <text x="248" y="61" fill="#7ee787" font-size="8">bit 0</text>
+        <text x="248" y="69" fill="#79c0ff" font-size="8">bit 1</text>
+        <text x="248" y="77" fill="#d2a8ff" font-size="8">bit 2</text>
+        <text x="248" y="85" fill="#ffa657" font-size="8">bit 3</text>
+        <text x="300" y="70" fill="#8b949e" font-size="9">4 bits sent simultaneously</text>
+        <text x="300" y="83" fill="#ff7b72" font-size="9">⚠ skew risk at long distance</text>
+      </svg>
+    </div>
+
+    <div class="callout info">
+      <span class="callout-icon">ℹ️</span>
+      <span><strong>Why has serial overtaken parallel?</strong> Modern serial buses (USB 3, PCIe, SATA) run at such high clock speeds that they out-perform parallel buses despite sending one bit at a time. Skew limits parallel buses to short distances; serial has no such problem.</span>
+    </div>
+
+    <h3>1.2 Synchronous vs Asynchronous Transmission</h3>
+
+    <table class="styled-table">
+      <thead><tr><th></th><th>Synchronous</th><th>Asynchronous</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Clock</strong></td><td>Sender and receiver share a common clock signal</td><td>No shared clock — timing negotiated per character</td></tr>
+        <tr><td><strong>Data flow</strong></td><td>Continuous stream of data blocks</td><td>Individual characters sent independently</td></tr>
+        <tr><td><strong>Framing</strong></td><td>Start/end of block identified by control characters</td><td>Each character framed by start bit (0) and stop bit(s) (1)</td></tr>
+        <tr><td><strong>Efficiency</strong></td><td>High — minimal overhead</td><td>Lower — every character carries 2–3 extra framing bits</td></tr>
+        <tr><td><strong>Complexity</strong></td><td>Higher — clock synchronisation needed</td><td>Simpler — both sides use agreed baud rate</td></tr>
+        <tr><td><strong>Use</strong></td><td>High-speed links: Ethernet, Fibre Channel</td><td>Low-speed links: serial ports (RS-232), keyboards</td></tr>
+      </tbody>
+    </table>
+
+    <h4>Asynchronous frame format:</h4>
+    <div class="packet-demo">
+<span style="color:#8b949e">[ </span><span class="pkt-hdr">START</span><span style="color:#8b949e"> ] [ </span><span class="pkt-data">D7 D6 D5 D4 D3 D2 D1 D0</span><span style="color:#8b949e"> ] [ </span><span class="pkt">PARITY</span><span style="color:#8b949e"> ] [ </span><span class="pkt-trl">STOP</span><span style="color:#8b949e"> ]</span>
+  <span style="color:#8b949e">  0              8 data bits               P             1</span>
+    </div>
+
+    <h3>1.3 Key Transmission Terms</h3>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="term">Bit Rate</div>
+        <div class="def">The number of <em>bits</em> transmitted per second (bps). The actual data throughput. Higher = faster transfer.</div>
+      </div>
+      <div class="concept-card">
+        <div class="term">Baud Rate</div>
+        <div class="def">The number of <em>signal changes</em> (symbols) per second. One symbol can carry more than one bit if multiple signal levels are used.</div>
+      </div>
+      <div class="concept-card">
+        <div class="term">Bandwidth</div>
+        <div class="def">The maximum data transfer rate of a channel, measured in bps (or Mbps, Gbps). Determined by the physical medium.</div>
+      </div>
+      <div class="concept-card">
+        <div class="term">Latency</div>
+        <div class="def">The delay between a signal being sent and received. Measured in milliseconds. Affected by distance, medium, and intermediate devices.</div>
+      </div>
+      <div class="concept-card">
+        <div class="term">Simplex</div>
+        <div class="def">Data flows in <strong>one direction only</strong>. Example: TV broadcast, keyboard → computer.</div>
+      </div>
+      <div class="concept-card">
+        <div class="term">Half-Duplex</div>
+        <div class="def">Data flows in <strong>both directions but not simultaneously</strong>. One party must wait. Example: walkie-talkie, Wi-Fi.</div>
+      </div>
+      <div class="concept-card">
+        <div class="term">Full-Duplex</div>
+        <div class="def">Data flows in <strong>both directions simultaneously</strong>. Example: telephone call, most Ethernet connections.</div>
+      </div>
+    </div>
+
+    <div class="formula">
+      <div class="formula-title">Bit Rate vs Baud Rate</div>
+      Bit Rate = Baud Rate × Bits per Symbol
+      <br>
+      <small style="color:var(--text-muted)">If each symbol represents 4 signal levels (2 bits), and baud rate = 1000: bit rate = 1000 × 2 = 2000 bps</small>
+    </div>
+
+    <div class="worked">
+      <div class="worked-title">✎ Worked Example — Bit rate calculation</div>
+      <div class="step"><span class="step-num">Q</span><span class="step-text">A modem uses 8 distinct signal levels per symbol and a baud rate of 4800. What is the bit rate?</span></div>
+      <div class="step"><span class="step-num">1</span><span class="step-text">Each symbol has 8 levels. Bits per symbol = log₂(8) = <strong>3 bits per symbol</strong></span></div>
+      <div class="step"><span class="step-num">2</span><span class="step-text">Bit rate = 4800 × 3 = <strong>14,400 bps</strong></span></div>
+      <div class="answer">Bit rate = <strong>14,400 bps (14.4 kbps)</strong></div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">✏ Practice Questions</div>
+      <p><strong>(a)</strong> Explain the difference between bit rate and baud rate.<br>
+         <strong>(b)</strong> A channel uses 16 distinct signal levels. If the baud rate is 2400, calculate the bit rate.<br>
+         <strong>(c)</strong> State <em>two</em> reasons why serial transmission is preferred over parallel for long-distance communication.</p>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+      <div class="answer-reveal">
+        <strong>(a)</strong> Bit rate is the number of <em>bits</em> transmitted per second; baud rate is the number of <em>signal changes</em> (symbols) per second. Bit rate ≥ baud rate when each symbol encodes multiple bits.<br><br>
+        <strong>(b)</strong> log₂(16) = 4 bits per symbol. Bit rate = 2400 × 4 = <strong>9600 bps</strong>.<br><br>
+        <strong>(c)</strong> Any two: (1) No timing skew — all bits travel on one wire so arrive in order. (2) Cheaper — fewer wires needed. (3) Less interference/crosstalk between wires.
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 2: ERROR DETECTION             -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="error-detection">
+    <h2><span class="section-num">2</span> Error Detection</h2>
+
+    <p>Noise and interference can corrupt bits during transmission. Error detection methods allow the receiver to recognise (but not always correct) when corruption has occurred.</p>
+
+    <h3>2.1 Parity Checking</h3>
+    <p>A <span class="key-term">parity bit</span> is added to each byte so that the total number of 1s in the group is always even (<strong>even parity</strong>) or always odd (<strong>odd parity</strong>). Both sender and receiver agree in advance which convention to use.</p>
+
+    <h4>Even parity example — each row must have an even number of 1s:</h4>
+    <table class="styled-table parity-grid">
+      <thead>
+        <tr><th>Data (7 bits)</th><th>Count of 1s</th><th>Parity bit added</th><th>Full byte (8 bits)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>1011010</code></td><td>4 (even)</td><td class="pbit-ok">0</td><td><code>1011010<span class="pbit-ok">0</span></code></td></tr>
+        <tr><td><code>1101001</code></td><td>4 (even)</td><td class="pbit-ok">0</td><td><code>1101001<span class="pbit-ok">0</span></code></td></tr>
+        <tr><td><code>0110110</code></td><td>4 (even)</td><td class="pbit-ok">0</td><td><code>0110110<span class="pbit-ok">0</span></code></td></tr>
+        <tr><td><code>1001101</code></td><td>4 (even)</td><td class="pbit-ok">0</td><td><code>1001101<span class="pbit-ok">0</span></code></td></tr>
+        <tr style="background:var(--accent-light)"><td><code>1<span style="color:#c62828;font-weight:700">1</span>11010</code> ← error!</td><td>5 (odd)</td><td colspan="2" style="color:#c62828;font-weight:700">⚠ Parity violation detected!</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <span><strong>Limitation:</strong> Parity can only detect an <em>odd number</em> of bit errors. If two bits flip, the parity count remains even and the error goes undetected. Parity also cannot <em>correct</em> errors — it only flags that something went wrong.</span>
+    </div>
+
+    <h4>Two-dimensional (block) parity:</h4>
+    <p>Parity bits are added for both each row and each column, creating a matrix. This can detect <em>and locate</em> single-bit errors (though still cannot correct them on its own).</p>
+
+    <div class="worked">
+      <div class="worked-title">✎ Worked Example — Determine the even parity bit for 1100101</div>
+      <div class="step"><span class="step-num">1</span><span class="step-text">Count 1s in <code>1100101</code>: there are <strong>4</strong> ones (even)</span></div>
+      <div class="step"><span class="step-num">2</span><span class="step-text">For even parity we need an even total, so parity bit = <strong>0</strong></span></div>
+      <div class="step"><span class="step-num">3</span><span class="step-text">Full byte transmitted: <code>1100101<strong>0</strong></code></span></div>
+      <div class="answer">Parity bit = <strong>0</strong> &nbsp;(total 1s = 4, which is even ✓)</div>
+    </div>
+
+    <h3>2.2 Checksum</h3>
+    <p>A <span class="key-term">checksum</span> is a value computed from a block of data before transmission. The receiver recalculates the checksum from the received data and compares it to the transmitted checksum. If they differ, an error occurred.</p>
+
+    <div class="worked">
+      <div class="worked-title">✎ Worked Example — Simple checksum (mod 256)</div>
+      <div class="step"><span class="step-num">1</span><span class="step-text">Data bytes to send: 72, 101, 108, 108, 111 (the word "Hello")</span></div>
+      <div class="step"><span class="step-num">2</span><span class="step-text">Sum = 72 + 101 + 108 + 108 + 111 = <strong>500</strong></span></div>
+      <div class="step"><span class="step-num">3</span><span class="step-text">Checksum = 500 mod 256 = <strong>244</strong></span></div>
+      <div class="step"><span class="step-num">4</span><span class="step-text">Send: 72, 101, 108, 108, 111, <strong>244</strong></span></div>
+      <div class="step"><span class="step-num">5</span><span class="step-text">Receiver recalculates: 72+101+108+108+111 = 500; 500 mod 256 = 244. Matches → no error detected.</span></div>
+      <div class="answer">Checksum = <strong>244</strong>. If any byte was corrupted, the recalculated checksum would differ.</div>
+    </div>
+
+    <h3>2.3 Echo Checking</h3>
+    <p>The receiver <span class="key-term">echoes back</span> every character it receives to the sender. The sender compares the echo with what it originally sent. If they match, the data was received correctly; if not, the sender retransmits.</p>
+    <ul>
+      <li><strong>Advantage:</strong> Simple to implement; works at the application level</li>
+      <li><strong>Disadvantage:</strong> Doubles the bandwidth used; adds round-trip latency</li>
+    </ul>
+
+    <div class="practice">
+      <div class="pq-title">✏ Practice Questions</div>
+      <p><strong>(a)</strong> A system uses <em>odd parity</em>. What is the parity bit for the data <code>0110011</code>?<br>
+         <strong>(b)</strong> A byte <code>10110101</code> is received. The system uses even parity. State whether an error has been detected and explain why.<br>
+         <strong>(c)</strong> State <em>one</em> advantage of checksum over parity checking.</p>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+      <div class="answer-reveal">
+        <strong>(a)</strong> <code>0110011</code> has four 1s (even). For odd parity we need an odd total → parity bit = <strong>1</strong>. Full byte: <code>01100111</code>.<br><br>
+        <strong>(b)</strong> Count 1s in <code>10110101</code>: 1+1+1+1+1 = 5 ones (odd). Even parity requires an even count. → <strong>An error has been detected</strong> because the number of 1s is odd, violating even parity.<br><br>
+        <strong>(c)</strong> Any one: Checksum can detect multiple-bit errors in a block of data, whereas parity can miss even numbers of errors. / Checksum is applied to an entire block of data, not just a single byte, making it more robust.
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 3: NETWORK HARDWARE            -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="network-hardware">
+    <h2><span class="section-num">3</span> Network Hardware</h2>
+
+    <p>Different devices play specific roles in building and running a network. You need to know what each device does and at which layer of the network model it operates.</p>
+
+    <div class="hw-grid">
+      <div class="hw-card">
+        <div class="hw-name"><span class="hw-icon">🔌</span> NIC</div>
+        <p>Network Interface Card. Gives a device a unique <strong>MAC address</strong>. Converts data to/from electrical or optical signals. Operates at the <strong>Data Link layer</strong>.</p>
+      </div>
+      <div class="hw-card">
+        <div class="hw-name"><span class="hw-icon">🔁</span> Repeater</div>
+        <p>Amplifies/regenerates a signal to extend its range. Operates at the <strong>Physical layer</strong>. Does not inspect data — just boosts the signal.</p>
+      </div>
+      <div class="hw-card">
+        <div class="hw-name"><span class="hw-icon">🌿</span> Hub</div>
+        <p>Connects multiple devices on a LAN. <strong>Broadcasts</strong> every frame to all ports — creates collisions. Largely replaced by switches. Physical layer device.</p>
+      </div>
+      <div class="hw-card">
+        <div class="hw-name"><span class="hw-icon">🔀</span> Switch</div>
+        <p>Like a hub but <strong>forwards frames only to the destination MAC address</strong>. Maintains a MAC address table. Reduces collisions. Data Link layer.</p>
+      </div>
+      <div class="hw-card">
+        <div class="hw-name"><span class="hw-icon">🌐</span> Router</div>
+        <p>Connects different networks. Routes packets using <strong>IP addresses</strong>. Maintains a routing table. Operates at the <strong>Network layer</strong>.</p>
+      </div>
+      <div class="hw-card">
+        <div class="hw-name"><span class="hw-icon">🚪</span> Gateway</div>
+        <p>Connects networks using <strong>different protocols</strong>. Performs protocol translation. Operates at multiple layers. Example: connecting a LAN to the internet via an ISP.</p>
+      </div>
+      <div class="hw-card">
+        <div class="hw-name"><span class="hw-icon">📡</span> Access Point</div>
+        <p>Connects wireless devices to a wired LAN. Extends a wired network wirelessly using <strong>Wi-Fi (IEEE 802.11)</strong>. Acts as a hub for wireless devices.</p>
+      </div>
+      <div class="hw-card">
+        <div class="hw-name"><span class="hw-icon">🔗</span> Bridge</div>
+        <p>Connects two LAN segments at the <strong>Data Link layer</strong>. Filters traffic between segments using MAC addresses. Reduces unnecessary traffic.</p>
+      </div>
+    </div>
+
+    <div class="callout exam">
+      <span class="callout-icon">📝</span>
+      <span><strong>Exam tip — Switch vs Hub vs Router:</strong> The most commonly tested distinction. Switch uses <em>MAC addresses</em> to send frames to the right port. Hub broadcasts to everyone. Router uses <em>IP addresses</em> to forward packets between networks. Remember: switch stays within one network; router connects different networks.</span>
+    </div>
+
+    <h3>Transmission Media</h3>
+    <table class="styled-table">
+      <thead><tr><th>Medium</th><th>Speed</th><th>Max Distance</th><th>Interference</th><th>Cost</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Twisted Pair (copper)</strong></td><td>Up to 10 Gbps</td><td>~100 m (unshielded)</td><td>Susceptible to EMI</td><td>Low</td></tr>
+        <tr><td><strong>Coaxial Cable</strong></td><td>Up to 10 Gbps</td><td>~500 m</td><td>Shielded, less interference</td><td>Medium</td></tr>
+        <tr><td><strong>Fibre Optic</strong></td><td>100+ Gbps</td><td>Km–hundreds of km</td><td>Immune (light, not electrical)</td><td>High</td></tr>
+        <tr><td><strong>Wi-Fi (radio)</strong></td><td>Up to several Gbps</td><td>~100 m indoors</td><td>High — walls, interference</td><td>Low (no cable)</td></tr>
+        <tr><td><strong>Microwave</strong></td><td>High</td><td>Line of sight, km</td><td>Weather-dependent</td><td>Medium</td></tr>
+      </tbody>
+    </table>
+
+    <div class="practice">
+      <div class="pq-title">✏ Practice Questions</div>
+      <p><strong>(a)</strong> Describe <em>two</em> differences between a hub and a switch.<br>
+         <strong>(b)</strong> Explain why a router is needed when connecting a home network to the Internet.<br>
+         <strong>(c)</strong> State <em>two</em> advantages of fibre optic cable over copper twisted pair.</p>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+      <div class="answer-reveal">
+        <strong>(a)</strong> Any two: (1) A switch uses MAC addresses to forward frames to a specific port; a hub broadcasts to all ports. (2) Switches reduce network collisions; hubs cause collisions on the shared medium. (3) Switches are more secure as data only reaches the intended device; hubs send data to all devices.<br><br>
+        <strong>(b)</strong> The home network uses private IP addresses; the Internet uses public IP addresses. A router connects these two different networks by routing packets between them using IP addresses, and performs NAT (Network Address Translation) to map private addresses to the ISP's public address.<br><br>
+        <strong>(c)</strong> Any two: (1) Much faster data transfer speeds. (2) Immune to electromagnetic interference. (3) Data can travel much longer distances without signal degradation. (4) More secure — harder to tap without detection.
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 4: TOPOLOGIES                  -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="topologies">
+    <h2><span class="section-num">4</span> Network Topologies</h2>
+
+    <p>A <span class="key-term">network topology</span> describes the physical or logical arrangement of devices and connections in a network. The Cambridge syllabus requires you to know bus, star, ring, and mesh topologies.</p>
+
+    <div class="topology-grid">
+
+      <!-- Bus -->
+      <div class="topology-card">
+        <div class="topo-name">Bus Topology</div>
+        <svg viewBox="0 0 160 90" width="160" height="90">
+          <line x1="20" y1="50" x2="140" y2="50" stroke="#1565c0" stroke-width="3"/>
+          <rect x="8" y="44" width="12" height="12" rx="2" fill="#1565c0"/>
+          <rect x="136" y="44" width="12" height="12" rx="2" fill="#c62828" title="Terminator"/>
+          <circle cx="50" cy="50" r="3" fill="#ffa657"/>
+          <circle cx="80" cy="50" r="3" fill="#ffa657"/>
+          <circle cx="110" cy="50" r="3" fill="#ffa657"/>
+          <rect x="44" y="28" width="12" height="12" rx="2" fill="#2e7d32"/>
+          <rect x="74" y="28" width="12" height="12" rx="2" fill="#2e7d32"/>
+          <rect x="104" y="28" width="12" height="12" rx="2" fill="#2e7d32"/>
+          <line x1="50" y1="50" x2="50" y2="40" stroke="#8b949e" stroke-width="1"/>
+          <line x1="80" y1="50" x2="80" y2="40" stroke="#8b949e" stroke-width="1"/>
+          <line x1="110" y1="50" x2="110" y2="40" stroke="#8b949e" stroke-width="1"/>
+          <rect x="44" y="62" width="12" height="12" rx="2" fill="#2e7d32"/>
+          <rect x="74" y="62" width="12" height="12" rx="2" fill="#2e7d32"/>
+          <rect x="104" y="62" width="12" height="12" rx="2" fill="#2e7d32"/>
+          <line x1="50" y1="50" x2="50" y2="62" stroke="#8b949e" stroke-width="1"/>
+          <line x1="80" y1="50" x2="80" y2="62" stroke="#8b949e" stroke-width="1"/>
+          <line x1="110" y1="50" x2="110" y2="62" stroke="#8b949e" stroke-width="1"/>
+        </svg>
+        <ul class="pros"><li>Cheap — one cable</li><li>Easy to extend</li></ul>
+        <ul class="cons"><li>Backbone failure = full outage</li><li>Collisions on shared medium</li><li>Terminators required</li><li>Poor scalability</li></ul>
+      </div>
+
+      <!-- Star -->
+      <div class="topology-card">
+        <div class="topo-name">Star Topology</div>
+        <svg viewBox="0 0 160 130" width="160" height="130">
+          <rect x="68" y="54" width="24" height="24" rx="4" fill="#1565c0"/>
+          <text x="80" y="70" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">SW</text>
+          <circle cx="80" cy="20" r="9" fill="#2e7d32"/>
+          <circle cx="140" cy="40" r="9" fill="#2e7d32"/>
+          <circle cx="140" cy="96" r="9" fill="#2e7d32"/>
+          <circle cx="80" cy="116" r="9" fill="#2e7d32"/>
+          <circle cx="20" cy="96" r="9" fill="#2e7d32"/>
+          <circle cx="20" cy="40" r="9" fill="#2e7d32"/>
+          <line x1="80" y1="54" x2="80" y2="29" stroke="#8b949e" stroke-width="1.5"/>
+          <line x1="92" y1="60" x2="131" y2="45" stroke="#8b949e" stroke-width="1.5"/>
+          <line x1="92" y1="70" x2="131" y2="91" stroke="#8b949e" stroke-width="1.5"/>
+          <line x1="80" y1="78" x2="80" y2="107" stroke="#8b949e" stroke-width="1.5"/>
+          <line x1="68" y1="70" x2="29" y2="91" stroke="#8b949e" stroke-width="1.5"/>
+          <line x1="68" y1="60" x2="29" y2="45" stroke="#8b949e" stroke-width="1.5"/>
+        </svg>
+        <ul class="pros"><li>One device fails → others unaffected</li><li>Easy to add devices</li><li>Centralised management</li><li>Good performance</li></ul>
+        <ul class="cons"><li>Central switch failure = full outage</li><li>More cable than bus</li><li>Switch is expensive</li></ul>
+      </div>
+
+      <!-- Ring -->
+      <div class="topology-card">
+        <div class="topo-name">Ring Topology</div>
+        <svg viewBox="0 0 160 130" width="160" height="130">
+          <circle cx="80" cy="65" r="42" fill="none" stroke="#1565c0" stroke-width="2" stroke-dasharray="5 3"/>
+          <circle cx="80" cy="23" r="9" fill="#2e7d32"/>
+          <circle cx="122" cy="44" r="9" fill="#2e7d32"/>
+          <circle cx="122" cy="86" r="9" fill="#2e7d32"/>
+          <circle cx="80" cy="107" r="9" fill="#2e7d32"/>
+          <circle cx="38" cy="86" r="9" fill="#2e7d32"/>
+          <circle cx="38" cy="44" r="9" fill="#2e7d32"/>
+          <text x="80" y="69" text-anchor="middle" fill="#8b949e" font-size="8">token</text>
+          <path d="M 75 62 Q 70 58 74 54" fill="none" stroke="#ffa657" stroke-width="1.5" marker-end="url(#arr)"/>
+        </svg>
+        <ul class="pros"><li>Equal access via token passing</li><li>No collisions</li><li>Predictable performance</li></ul>
+        <ul class="cons"><li>One device failure disrupts ring</li><li>Difficult to add devices</li><li>Slower than star as data passes through every node</li></ul>
+      </div>
+
+      <!-- Mesh -->
+      <div class="topology-card">
+        <div class="topo-name">Mesh Topology</div>
+        <svg viewBox="0 0 160 130" width="160" height="130">
+          <circle cx="30" cy="30" r="9" fill="#2e7d32"/>
+          <circle cx="130" cy="30" r="9" fill="#2e7d32"/>
+          <circle cx="80" cy="65" r="9" fill="#2e7d32"/>
+          <circle cx="30" cy="100" r="9" fill="#2e7d32"/>
+          <circle cx="130" cy="100" r="9" fill="#2e7d32"/>
+          <line x1="30" y1="30" x2="130" y2="30" stroke="#8b949e" stroke-width="1.5"/>
+          <line x1="30" y1="30" x2="80" y2="65" stroke="#8b949e" stroke-width="1.5"/>
+          <line x1="30" y1="30" x2="30" y2="100" stroke="#8b949e" stroke-width="1.5"/>
+          <line x1="30" y1="30" x2="130" y2="100" stroke="#8b949e" stroke-width="1.5"/>
+          <line x1="130" y1="30" x2="80" y2="65" stroke="#8b949e" stroke-width="1.5"/>
+          <line x1="130" y1="30" x2="130" y2="100" stroke="#8b949e" stroke-width="1.5"/>
+          <line x1="130" y1="30" x2="30" y2="100" stroke="#8b949e" stroke-width="1.5"/>
+          <line x1="80" y1="65" x2="30" y2="100" stroke="#8b949e" stroke-width="1.5"/>
+          <line x1="80" y1="65" x2="130" y2="100" stroke="#8b949e" stroke-width="1.5"/>
+          <line x1="30" y1="100" x2="130" y2="100" stroke="#8b949e" stroke-width="1.5"/>
+        </svg>
+        <ul class="pros"><li>Highly resilient — multiple paths</li><li>No single point of failure</li><li>Fault tolerant</li></ul>
+        <ul class="cons"><li>Very expensive — many cables</li><li>Complex to manage</li><li>Partial mesh is a compromise</li></ul>
+      </div>
+
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <span><strong>Physical vs Logical topology:</strong> The <em>physical</em> topology describes how devices are physically connected with cables. The <em>logical</em> topology describes how data actually flows. A network can be physically wired as a star but behave logically as a bus (as in early Ethernet using hubs).</span>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">✏ Practice Questions</div>
+      <p><strong>(a)</strong> A school has 30 computers in a classroom. Describe the <em>star topology</em> and explain why it is more suitable than a bus topology for this classroom network.<br>
+         <strong>(b)</strong> State the topology used by the Internet and explain why it was chosen.<br>
+         <strong>(c)</strong> Explain the role of terminators in a bus topology.</p>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+      <div class="answer-reveal">
+        <strong>(a)</strong> In a star topology, all devices connect to a central switch/hub [1]. Star is more suitable because: if one device fails it does not affect others [1]; easier to add/remove computers without disrupting the network [1]; switch reduces collisions as data is only sent to the destination device [1].<br><br>
+        <strong>(b)</strong> The Internet uses a <strong>mesh (partial mesh)</strong> topology [1]. It was chosen because it provides multiple redundant paths between nodes — if one link or router fails, data can be routed around the failure [1], giving high resilience and fault tolerance [1].<br><br>
+        <strong>(c)</strong> Terminators absorb the signal at each end of the bus cable [1], preventing the electrical signal from reflecting back along the cable which would cause interference/corrupt data [1].
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 5: CLIENT-SERVER vs P2P        -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="client-server">
+    <h2><span class="section-num">5</span> Client–Server vs Peer-to-Peer</h2>
+
+    <table class="styled-table">
+      <thead><tr><th>Feature</th><th>Client–Server</th><th>Peer-to-Peer (P2P)</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Structure</strong></td><td>Dedicated server(s) provide resources; clients request them</td><td>All nodes are equal — act as both client and server</td></tr>
+        <tr><td><strong>Administration</strong></td><td>Centralised — managed by server administrator</td><td>Decentralised — each node manages itself</td></tr>
+        <tr><td><strong>Security</strong></td><td>Easier to enforce — server controls access</td><td>Harder — no central control point</td></tr>
+        <tr><td><strong>Performance</strong></td><td>Server can become a bottleneck under load</td><td>Performance increases as more nodes join (more sources)</td></tr>
+        <tr><td><strong>Reliability</strong></td><td>Single point of failure if server goes down</td><td>Highly resilient — no single failure point</td></tr>
+        <tr><td><strong>Scalability</strong></td><td>Requires more powerful server hardware</td><td>Scales naturally as nodes join</td></tr>
+        <tr><td><strong>Cost</strong></td><td>High — dedicated server hardware + maintenance</td><td>Low — uses existing node hardware</td></tr>
+        <tr><td><strong>Examples</strong></td><td>Web servers, email servers, file servers</td><td>BitTorrent, blockchain networks, early Napster</td></tr>
+      </tbody>
+    </table>
+
+    <div class="practice">
+      <div class="pq-title">✏ Practice Questions</div>
+      <p><strong>(a)</strong> A business has 50 employees who need to share files securely. Recommend either client–server or P2P and justify your answer.<br>
+         <strong>(b)</strong> Explain why P2P file sharing can be difficult to shut down.</p>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+      <div class="answer-reveal">
+        <strong>(a)</strong> <strong>Client–server</strong> [1]. Justification: Access to shared files can be controlled centrally through user authentication on the server [1]; data can be backed up centrally and consistently [1]; easier for an IT administrator to manage 50 users' permissions and audit file access [1].<br><br>
+        <strong>(b)</strong> In P2P there is no central server to shut down [1]. Files are distributed across thousands or millions of nodes worldwide [1]. Removing some nodes does not remove the content — other nodes continue to share it [1].
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 6: INTERNET & TCP/IP           -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="internet">
+    <h2><span class="section-num">6</span> The Internet &amp; TCP/IP</h2>
+
+    <h3>6.1 The TCP/IP Four-Layer Model</h3>
+    <p>The <span class="key-term">TCP/IP model</span> is the practical framework that governs how data is transmitted across the Internet. It has four layers, each with a specific responsibility. As data travels down the layers from sender to receiver, each layer adds a <strong>header</strong> (and sometimes a <strong>trailer</strong>) — this is called <span class="key-term">encapsulation</span>.</p>
+
+    <div class="layer-stack">
+      <div class="layer-row">
+        <div class="layer-num" style="background:#c62828">4</div>
+        <div class="layer-name" style="background:#c62828">Application</div>
+        <div class="layer-desc">Provides services directly to user applications. Formats data for the user.</div>
+        <div class="layer-proto">HTTP, FTP, SMTP, DNS, POP3, IMAP</div>
+      </div>
+      <div class="layer-row">
+        <div class="layer-num" style="background:#e65100">3</div>
+        <div class="layer-name" style="background:#e65100">Transport</div>
+        <div class="layer-desc">End-to-end communication. Segments data, manages flow control and reliability (TCP) or speed (UDP).</div>
+        <div class="layer-proto">TCP, UDP</div>
+      </div>
+      <div class="layer-row">
+        <div class="layer-num" style="background:#1565c0">2</div>
+        <div class="layer-name" style="background:#1565c0">Internet</div>
+        <div class="layer-desc">Logical addressing and routing. Determines best path for packets to travel between networks.</div>
+        <div class="layer-proto">IP, ICMP, ARP</div>
+      </div>
+      <div class="layer-row">
+        <div class="layer-num" style="background:#2e7d32">1</div>
+        <div class="layer-name" style="background:#2e7d32">Link (Network Access)</div>
+        <div class="layer-desc">Physical transmission of data. Handles MAC addressing and actual bit transmission.</div>
+        <div class="layer-proto">Ethernet, Wi-Fi, MAC</div>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <span class="callout-icon">ℹ️</span>
+      <div><strong>Encapsulation process (sending):</strong><br>
+      Application → data | Transport adds TCP header → segment | Internet adds IP header → packet | Link adds frame header+trailer → frame | Physical bits →<br><br>
+      At the receiver, each layer <em>removes</em> its header (decapsulation) before passing data up.</div>
+    </div>
+
+    <h3>6.2 IP Addressing</h3>
+
+    <h4>IPv4 — 32-bit addresses</h4>
+    <div style="margin:.75rem 0">
+      <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:.4rem">Example: 192.168.1.105 — four octets, each 8 bits (0–255)</div>
+      <div class="ip-visual">
+        <div>
+          <div class="ip-octet">192</div>
+          <div class="ip-label">Network</div>
+        </div>
+        <div class="ip-dot">.</div>
+        <div>
+          <div class="ip-octet">168</div>
+          <div class="ip-label">Network</div>
+        </div>
+        <div class="ip-dot">.</div>
+        <div>
+          <div class="ip-octet">1</div>
+          <div class="ip-label">Subnet</div>
+        </div>
+        <div class="ip-dot">.</div>
+        <div>
+          <div class="ip-octet">105</div>
+          <div class="ip-label">Host</div>
+        </div>
+      </div>
+      <p style="font-size:.8rem;color:var(--text-muted)">Subnet mask 255.255.255.0 means the first three octets identify the network; the last octet identifies the host.</p>
+    </div>
+
+    <table class="styled-table" style="margin-top:.75rem">
+      <thead><tr><th></th><th>IPv4</th><th>IPv6</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Length</strong></td><td>32 bits</td><td>128 bits</td></tr>
+        <tr><td><strong>Notation</strong></td><td>Dotted decimal: 192.168.0.1</td><td>Colon-hex: 2001:db8::1</td></tr>
+        <tr><td><strong>Address space</strong></td><td>~4.3 billion (2³²)</td><td>~3.4 × 10³⁸ (2¹²⁸)</td></tr>
+        <tr><td><strong>Header size</strong></td><td>20 bytes (fixed)</td><td>40 bytes (simplified)</td></tr>
+        <tr><td><strong>NAT needed?</strong></td><td>Yes (address exhaustion)</td><td>No — enough for every device</td></tr>
+        <tr><td><strong>Security</strong></td><td>Optional (IPSec)</td><td>Built-in IPSec support</td></tr>
+      </tbody>
+    </table>
+
+    <h3>6.3 Packet Switching</h3>
+    <p>Rather than dedicating a fixed circuit between sender and receiver (as in circuit switching), the Internet uses <span class="key-term">packet switching</span>: data is divided into small <strong>packets</strong>, each routed independently across the network.</p>
+
+    <div class="packet-demo">
+<span style="color:#8b949e">Original message: "CAMBRIDGE" (large file split into packets)</span>
+
+<span class="pkt-hdr">┌─────────────────────────┐</span>
+<span class="pkt-hdr">│  HEADER                 │</span> ← Source IP, Destination IP
+<span class="pkt-hdr">│  Packet 1 of 3          │</span> ← Sequence number
+<span class="pkt-data">│  DATA: "CAM"            │</span> ← Payload (actual data)
+<span class="pkt-trl">│  TRAILER (checksum)     │</span> ← Error detection
+<span class="pkt-trl">└─────────────────────────┘</span>
+
+<span class="pkt-route">Packet 1: A → B → E → F (fastest route at time of sending)</span>
+<span class="pkt-route">Packet 2: A → C → D → F (different route — congestion on B→E)</span>
+<span class="pkt-route">Packet 3: A → B → E → F (original route now clear)</span>
+
+<span style="color:#8b949e">At destination F: packets may arrive out of order</span>
+<span class="pkt-hdr">→ TCP reassembles using sequence numbers: 1+2+3 → "CAMBRIDGE"</span>
+    </div>
+
+    <table class="styled-table" style="margin-top:.75rem">
+      <thead><tr><th></th><th>Packet Switching</th><th>Circuit Switching</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Path</strong></td><td>Packets may take different routes</td><td>Dedicated fixed path for entire session</td></tr>
+        <tr><td><strong>Bandwidth</strong></td><td>Shared — efficient use of resources</td><td>Reserved — wasted if no data is sent</td></tr>
+        <tr><td><strong>Reliability</strong></td><td>Resilient — reroutes around failures</td><td>Fails if any link in circuit goes down</td></tr>
+        <tr><td><strong>Delay</strong></td><td>Variable — packets may queue at routers</td><td>Consistent — fixed path means predictable delay</td></tr>
+        <tr><td><strong>Use</strong></td><td>Internet, email, web browsing</td><td>Traditional telephone networks</td></tr>
+      </tbody>
+    </table>
+
+    <h3>6.4 DNS — Domain Name System</h3>
+    <p>Humans use domain names (e.g. <code>cambridge.org</code>); computers use IP addresses. DNS translates between them.</p>
+
+    <div class="dns-steps">
+      <div class="dns-step"><div class="dns-num">1</div><div class="dns-text">You type <code>cambridge.org</code> in your browser. Your computer checks its local DNS cache — if found, uses that IP immediately.</div></div>
+      <div class="dns-step"><div class="dns-num">2</div><div class="dns-text">If not cached, your computer asks the <strong>Recursive Resolver</strong> (usually run by your ISP or Google/1.1.1.1).</div></div>
+      <div class="dns-step"><div class="dns-num">3</div><div class="dns-text">The resolver asks a <strong>Root Name Server</strong> → directed to the <strong>.org TLD name server</strong>.</div></div>
+      <div class="dns-step"><div class="dns-num">4</div><div class="dns-text">The TLD server directs to the <strong>Authoritative Name Server</strong> for <code>cambridge.org</code>.</div></div>
+      <div class="dns-step"><div class="dns-num">5</div><div class="dns-text">The authoritative server returns the IP address (e.g. <code>131.111.150.25</code>).</div></div>
+      <div class="dns-step"><div class="dns-num">6</div><div class="dns-text">Your browser connects to the IP address. The result is cached locally for next time.</div></div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">✏ Practice Questions</div>
+      <p><strong>(a)</strong> State <em>three</em> advantages of packet switching over circuit switching for internet data transfer.<br>
+         <strong>(b)</strong> Explain the role of the Transport layer in the TCP/IP model when downloading a large file.<br>
+         <strong>(c)</strong> State why IPv6 was introduced and give <em>one</em> technical difference between IPv4 and IPv6.</p>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+      <div class="answer-reveal">
+        <strong>(a)</strong> Any three: (1) Efficient use of bandwidth — multiple users share the same links. (2) Resilient — if a link fails, packets are rerouted automatically. (3) No dedicated connection needed before data can be sent. (4) Scales well — adding more routers increases capacity.<br><br>
+        <strong>(b)</strong> TCP (Transport layer) divides the file into segments and adds sequence numbers to each [1]. It ensures reliable delivery — if a segment is lost or corrupted the receiver sends a negative acknowledgement (NACK) and TCP retransmits the missing segment [1]. At the receiving end, TCP uses the sequence numbers to reassemble the segments in the correct order [1].<br><br>
+        <strong>(c)</strong> IPv6 was introduced because IPv4's ~4.3 billion addresses were nearly exhausted due to the rapid growth of internet-connected devices [1]. Technical difference: IPv4 uses 32-bit addresses (4 billion possible); IPv6 uses 128-bit addresses (~3.4×10³⁸ possible) [1].
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 7: PROTOCOLS                   -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="protocols">
+    <h2><span class="section-num">7</span> Application Protocols</h2>
+
+    <p>A <span class="key-term">protocol</span> is an agreed set of rules that govern how data is formatted and transmitted between devices. Without protocols, devices from different manufacturers could not communicate.</p>
+
+    <table class="styled-table">
+      <thead><tr><th>Protocol</th><th>Port</th><th>Purpose</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><strong>HTTP</strong></td><td>80</td><td>Transfer web pages (HTML, CSS, JS) between web server and browser</td><td>Unencrypted — data visible to attackers</td></tr>
+        <tr><td><strong>HTTPS</strong></td><td>443</td><td>Secure version of HTTP — same purpose but over TLS encryption</td><td>Certificate verifies server identity</td></tr>
+        <tr><td><strong>FTP</strong></td><td>21 (ctrl) / 20 (data)</td><td>Transfer files between client and server; supports upload and download</td><td>Unencrypted — use SFTP or FTPS for security</td></tr>
+        <tr><td><strong>SMTP</strong></td><td>25 / 587</td><td><em>Send</em> email from client to server, and server to server</td><td>Push protocol — one direction only</td></tr>
+        <tr><td><strong>POP3</strong></td><td>110</td><td><em>Retrieve</em> email — downloads to client, deletes from server</td><td>Access from one device only; offline use</td></tr>
+        <tr><td><strong>IMAP</strong></td><td>143</td><td><em>Retrieve</em> email — syncs with server; emails remain on server</td><td>Access from multiple devices; needs internet</td></tr>
+        <tr><td><strong>DNS</strong></td><td>53</td><td>Translate domain names to IP addresses</td><td>UDP for queries, TCP for zone transfers</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Email Protocol Comparison: POP3 vs IMAP</h3>
+
+    <div class="trans-compare">
+      <div class="trans-card">
+        <h4>📥 POP3 (Post Office Protocol v3)</h4>
+        <ul>
+          <li>Downloads emails to local device</li>
+          <li>Emails typically <strong>deleted from server</strong> after download</li>
+          <li>Works offline after download</li>
+          <li>Best for <strong>single-device</strong> access</li>
+          <li>Less server storage needed</li>
+          <li>Risk: if local device lost, emails gone</li>
+        </ul>
+      </div>
+      <div class="trans-card">
+        <h4>🔄 IMAP (Internet Message Access Protocol)</h4>
+        <ul>
+          <li>Emails remain <strong>on the server</strong></li>
+          <li>Local client displays synced copy</li>
+          <li>Requires internet connection to read</li>
+          <li>Best for <strong>multiple-device</strong> access</li>
+          <li>More server storage needed</li>
+          <li>Safe: emails always on server</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout exam">
+      <span class="callout-icon">📝</span>
+      <span><strong>Exam tip — SMTP vs POP3/IMAP:</strong> SMTP is always for <em>sending</em>; POP3/IMAP are for <em>receiving</em>. You need both when configuring an email client. A common exam question asks you to select the correct protocol for a scenario and justify your choice.</span>
+    </div>
+
+    <div class="worked">
+      <div class="worked-title">✎ Worked Example — What happens when you send an email</div>
+      <div class="step"><span class="step-num">1</span><span class="step-text">You compose and send the email in your email client.</span></div>
+      <div class="step"><span class="step-num">2</span><span class="step-text"><strong>SMTP</strong> is used to send the email from your client to your outgoing mail server (e.g. smtp.gmail.com).</span></div>
+      <div class="step"><span class="step-num">3</span><span class="step-text">Your mail server uses <strong>DNS</strong> to look up the recipient's mail server's IP address (the MX record for their domain).</span></div>
+      <div class="step"><span class="step-num">4</span><span class="step-text">Your server uses <strong>SMTP</strong> again to forward the email to the recipient's incoming mail server.</span></div>
+      <div class="step"><span class="step-num">5</span><span class="step-text">The recipient's email client uses <strong>POP3 or IMAP</strong> to retrieve the email from the server.</span></div>
+      <div class="answer">Sending uses SMTP; receiving uses IMAP or POP3. DNS is used to find the recipient's server.</div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">✏ Practice Questions</div>
+      <p><strong>(a)</strong> A user wants to access their email from their laptop, phone, and tablet. Explain whether POP3 or IMAP is more appropriate.<br>
+         <strong>(b)</strong> Explain why protocols are necessary in computer networking.<br>
+         <strong>(c)</strong> State the difference between HTTP and HTTPS.</p>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+      <div class="answer-reveal">
+        <strong>(a)</strong> <strong>IMAP</strong> is more appropriate [1]. With IMAP, emails are stored on the server and synchronised to all devices — reading an email on the phone marks it as read on the laptop too [1]. POP3 would download emails to one device and delete them from the server, meaning other devices could not access them [1].<br><br>
+        <strong>(b)</strong> Protocols define agreed standards for formatting, transmitting, and receiving data [1], so that devices from different manufacturers can communicate reliably [1]. Without protocols, there would be no common language and devices would not be able to interpret each other's data [1].<br><br>
+        <strong>(c)</strong> HTTP transmits data in <em>plaintext</em> — it is unencrypted and can be intercepted. HTTPS uses TLS encryption to protect data in transit [1], and uses a digital certificate to verify the server's identity [1].
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 8: SECURITY                    -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="security">
+    <h2><span class="section-num">8</span> Network Security</h2>
+
+    <p>(In-depth security is covered in Topic 7. Here we focus on the network-level security components.)</p>
+
+    <h3>8.1 Firewalls</h3>
+    <p>A <span class="key-term">firewall</span> monitors and controls incoming and outgoing network traffic based on a set of security rules. It creates a barrier between a trusted internal network and untrusted external networks.</p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="term">Packet Filtering</div>
+        <div class="def">Examines each packet's source IP, destination IP, port number, and protocol. Accepts or drops based on a rule table. Fast but cannot inspect payload content.</div>
+      </div>
+      <div class="concept-card">
+        <div class="term">Stateful Inspection</div>
+        <div class="def">Tracks the state of active connections. Only allows packets that are part of an established, legitimate session. More thorough than simple packet filtering.</div>
+      </div>
+      <div class="concept-card">
+        <div class="term">Application-level (Proxy) Firewall</div>
+        <div class="def">Inspects traffic at the Application layer. Understands specific protocols (HTTP, FTP). Can block specific content or sites. Slowest but most thorough.</div>
+      </div>
+      <div class="concept-card">
+        <div class="term">Firewall Rules</div>
+        <div class="def">Specify what is allowed/denied based on: source IP, destination IP, port, protocol, direction (inbound/outbound). Rules are evaluated top to bottom; first match wins.</div>
+      </div>
+    </div>
+
+    <h3>8.2 Proxy Servers</h3>
+    <p>A <span class="key-term">proxy server</span> acts as an intermediary between clients and the internet. Requests from clients go to the proxy, which makes the request on their behalf.</p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="term">Web Caching</div>
+        <div class="def">Stores copies of frequently-requested web pages. Subsequent requests are served from cache — reduces bandwidth use and speeds up access.</div>
+      </div>
+      <div class="concept-card">
+        <div class="term">Content Filtering</div>
+        <div class="def">Blocks access to specific websites or content categories (e.g. social media, adult content). Used in schools and workplaces.</div>
+      </div>
+      <div class="concept-card">
+        <div class="term">Anonymity</div>
+        <div class="def">External servers see the proxy's IP address, not the client's. Hides internal network structure from the outside world.</div>
+      </div>
+      <div class="concept-card">
+        <div class="term">Access Control</div>
+        <div class="def">Can require authentication before granting internet access. Logs all user activity for auditing.</div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">✏ Practice Questions</div>
+      <p><strong>(a)</strong> Describe <em>two</em> functions of a firewall in a company network.<br>
+         <strong>(b)</strong> A school uses a proxy server. Explain <em>two</em> benefits this provides.<br>
+         <strong>(c)</strong> Describe the difference between a packet-filtering firewall and a stateful inspection firewall.</p>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+      <div class="answer-reveal">
+        <strong>(a)</strong> Any two: (1) Monitors and filters incoming packets — blocks traffic from unauthorised IP addresses or ports. (2) Prevents outgoing connections to known malicious sites. (3) Logs network traffic for security auditing. (4) Creates a boundary between the internal trusted network and the external untrusted internet.<br><br>
+        <strong>(b)</strong> Any two: (1) Content filtering — blocks inappropriate websites, so pupils cannot access unsuitable content [1]. (2) Web caching — stores copies of frequently visited pages, reducing bandwidth usage and speeding up access for all users [1]. (3) Hides internal IP addresses — external sites only see the proxy's IP [1].<br><br>
+        <strong>(c)</strong> Packet filtering examines each packet in isolation — only looks at header information (IP, port, protocol) without tracking connections [1]. Stateful inspection maintains a table of active connections and only allows packets that belong to an established legitimate session [1] — it is more secure because it prevents packets that claim to be part of a connection that was never established.
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- EXAM PRACTICE                          -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="exam-practice" style="border-left:5px solid #c62828">
+    <h2><span class="section-num" style="background:#c62828">📝</span> Exam Practice — Mixed Questions</h2>
+
+    <div class="callout exam">
+      <span class="callout-icon">📝</span>
+      <span>Written in Cambridge 9618 Paper 1 style. Show reasoning for extended-answer questions.</span>
+    </div>
+
+    <!-- Q1 -->
+    <div class="practice" style="margin-top:1.25rem">
+      <div class="pq-title">Question 1 [7 marks]</div>
+      <p><strong>(a)</strong> [1] State the difference between serial and parallel data transmission.</p>
+      <p><strong>(b)</strong> [2] A transmission system uses 4 signal levels per symbol. The baud rate is 3000. Calculate the bit rate.</p>
+      <p><strong>(c)</strong> [2] Data <code>1011010</code> is to be transmitted using even parity. State the parity bit and the complete 8-bit pattern transmitted. Explain how the receiver detects whether an error has occurred.</p>
+      <p><strong>(d)</strong> [2] State <em>two</em> reasons why serial transmission is used for long-distance data communication rather than parallel transmission.</p>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+      <div class="answer-reveal">
+        <strong>(a)</strong> Serial transmits <em>one bit at a time</em> on a single wire; parallel transmits <em>multiple bits simultaneously</em> on multiple wires. [1]<br><br>
+        <strong>(b)</strong> 4 signal levels → log₂(4) = 2 bits per symbol [1]. Bit rate = 3000 × 2 = <strong>6000 bps</strong> [1]<br><br>
+        <strong>(c)</strong> <code>1011010</code> has 4 ones (even) → parity bit = <strong>0</strong>. Full byte: <code>10110100</code> [1].<br>
+        Receiver counts the 1s in the received byte. If the count is odd (not even), a parity violation has occurred and an error is flagged [1].<br><br>
+        <strong>(d)</strong> Any two: (1) No skew problem — all bits on one wire arrive in sequence. (2) Cheaper — fewer wires needed over long distances. (3) Less crosstalk/interference between adjacent wires. [1 each]
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="practice">
+      <div class="pq-title">Question 2 [8 marks]</div>
+      <p>A company is designing a network for a new office building with 80 computers across three floors.</p>
+      <p><strong>(a)</strong> [3] Compare <em>bus</em> and <em>star</em> topologies. In your answer, discuss reliability, performance, and cost.</p>
+      <p><strong>(b)</strong> [2] The company decides on a star topology. Identify the central device that should be used and explain why a switch is preferable to a hub.</p>
+      <p><strong>(c)</strong> [2] The building requires a connection to the Internet. Name the device that connects the company's LAN to the Internet and explain its role.</p>
+      <p><strong>(d)</strong> [1] State the protocol used for accessing web pages securely.</p>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+      <div class="answer-reveal">
+        <strong>(a)</strong> Reliability: In a star, a single device failing does not affect others; in a bus, a break in the backbone affects all devices [1]. Performance: A star with a switch dedicates bandwidth per device, reducing collisions; a bus is a shared medium — more devices = more collisions and lower performance [1]. Cost: Bus uses less cable (cheaper) but requires terminators; star requires more cable and a central switch (more expensive) [1].<br><br>
+        <strong>(b)</strong> Central device: <strong>Switch</strong> [1]. A switch reads the MAC address of each incoming frame and forwards it <em>only</em> to the destination device's port, reducing unnecessary traffic; a hub broadcasts to all ports causing collisions and wasting bandwidth [1].<br><br>
+        <strong>(c)</strong> Device: <strong>Router</strong> [1]. The router connects the company's private LAN (using private IP addresses) to the Internet. It routes packets between the two networks using IP addresses and performs NAT to map private addresses to the company's public IP [1].<br><br>
+        <strong>(d)</strong> <strong>HTTPS</strong> [1]
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="practice">
+      <div class="pq-title">Question 3 [6 marks]</div>
+      <p>A user sends an email from their home computer to a colleague.</p>
+      <p><strong>(a)</strong> [2] Identify the protocol used to <em>send</em> the email and the protocol the colleague would use to <em>receive</em> the email on multiple devices. Justify your choice of receiving protocol.</p>
+      <p><strong>(b)</strong> [2] Explain the role of DNS in the process of sending this email.</p>
+      <p><strong>(c)</strong> [2] The email is transmitted as a series of packets. Describe <em>two</em> pieces of information contained in each packet's header.</p>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='Show Answer'?'Hide Answer':'Show Answer'">Show Answer</button>
+      <div class="answer-reveal">
+        <strong>(a)</strong> Sending: <strong>SMTP</strong> [1]. Receiving: <strong>IMAP</strong> [1] — because IMAP stores emails on the server and synchronises them across multiple devices; POP3 would download and delete from server, meaning only one device could access the emails.<br><br>
+        <strong>(b)</strong> When the email server needs to deliver the message to the recipient's server, it uses DNS to perform a lookup on the recipient's domain name [1] to find the IP address of their mail server (specifically the MX record) [1], so the email can be routed to the correct server.<br><br>
+        <strong>(c)</strong> Any two from: (1) Source IP address — identifies the sending device. (2) Destination IP address — identifies the receiving device. (3) Sequence number — used to reassemble packets in the correct order. (4) Packet number / total packet count. (5) Checksum / error detection value. [1 each]
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Checklist -->
+  <div class="lesson-section" style="border-left:5px solid var(--accent)">
+    <h2><span class="section-num" style="background:var(--accent)">✓</span> Topic Summary Checklist</h2>
+    <ul class="checklist">
+      <li>Explain serial vs parallel transmission and give examples of each</li>
+      <li>Distinguish synchronous from asynchronous transmission</li>
+      <li>Define bit rate, baud rate, bandwidth, and latency</li>
+      <li>Calculate bit rate from baud rate and bits per symbol</li>
+      <li>Apply even and odd parity checking; identify parity errors</li>
+      <li>Describe how checksum and echo checking work</li>
+      <li>Describe the role of: NIC, hub, switch, router, gateway, access point</li>
+      <li>Draw and compare bus, star, ring, and mesh topologies</li>
+      <li>State advantages and disadvantages of each topology</li>
+      <li>Compare client–server and P2P network models</li>
+      <li>Describe the TCP/IP four-layer model and each layer's role</li>
+      <li>Explain encapsulation and decapsulation</li>
+      <li>Describe IPv4 and IPv6, including their format and differences</li>
+      <li>Explain how DNS resolves domain names to IP addresses</li>
+      <li>Explain packet switching and compare it to circuit switching</li>
+      <li>State the purpose of HTTP(S), FTP, SMTP, POP3, and IMAP</li>
+      <li>Compare POP3 and IMAP and choose the appropriate one for a scenario</li>
+      <li>Describe how firewalls and proxy servers protect a network</li>
+    </ul>
+  </div>
+
+</main>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-box">
+    <h3>Contents</h3>
+    <ul class="toc-list">
+      <li><a href="#data-transmission" class="active">1. Data Transmission</a>
+        <ul>
+          <li><a href="#data-transmission" class="sub">Serial vs Parallel</a></li>
+          <li><a href="#data-transmission" class="sub">Sync vs Async</a></li>
+          <li><a href="#data-transmission" class="sub">Bit/Baud Rate</a></li>
+        </ul>
+      </li>
+      <li><a href="#error-detection">2. Error Detection</a>
+        <ul>
+          <li><a href="#error-detection" class="sub">Parity</a></li>
+          <li><a href="#error-detection" class="sub">Checksum</a></li>
+          <li><a href="#error-detection" class="sub">Echo Checking</a></li>
+        </ul>
+      </li>
+      <li><a href="#network-hardware">3. Network Hardware</a></li>
+      <li><a href="#topologies">4. Topologies</a>
+        <ul>
+          <li><a href="#topologies" class="sub">Bus / Star / Ring / Mesh</a></li>
+        </ul>
+      </li>
+      <li><a href="#client-server">5. Client–Server vs P2P</a></li>
+      <li><a href="#internet">6. Internet &amp; TCP/IP</a>
+        <ul>
+          <li><a href="#internet" class="sub">TCP/IP Layers</a></li>
+          <li><a href="#internet" class="sub">IPv4 &amp; IPv6</a></li>
+          <li><a href="#internet" class="sub">Packet Switching</a></li>
+          <li><a href="#internet" class="sub">DNS</a></li>
+        </ul>
+      </li>
+      <li><a href="#protocols">7. Protocols</a>
+        <ul>
+          <li><a href="#protocols" class="sub">HTTP/HTTPS/FTP</a></li>
+          <li><a href="#protocols" class="sub">SMTP/POP3/IMAP</a></li>
+        </ul>
+      </li>
+      <li><a href="#security">8. Security</a>
+        <ul>
+          <li><a href="#security" class="sub">Firewalls</a></li>
+          <li><a href="#security" class="sub">Proxy Servers</a></li>
+        </ul>
+      </li>
+      <li><a href="#exam-practice" style="color:#c62828;font-weight:700">📝 Exam Practice</a></li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>Key Formula</h3>
+    <div style="font-size:.82rem;font-family:monospace;line-height:2;color:var(--text)">
+      <div style="color:var(--accent);font-weight:700">Bit Rate =</div>
+      <div>Baud Rate × Bits/Symbol</div>
+      <div style="color:var(--text-muted);font-size:.75rem;margin-top:.25rem">Bits/symbol = log₂(signal levels)</div>
+    </div>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>Protocol Ports</h3>
+    <table style="font-size:.78rem;width:100%;border-collapse:collapse">
+      <tr><td style="padding:.2rem .4rem;font-weight:700">HTTP</td><td style="color:var(--text-muted)">80</td></tr>
+      <tr><td style="padding:.2rem .4rem;font-weight:700">HTTPS</td><td style="color:var(--text-muted)">443</td></tr>
+      <tr><td style="padding:.2rem .4rem;font-weight:700">FTP</td><td style="color:var(--text-muted)">20 / 21</td></tr>
+      <tr><td style="padding:.2rem .4rem;font-weight:700">SMTP</td><td style="color:var(--text-muted)">25 / 587</td></tr>
+      <tr><td style="padding:.2rem .4rem;font-weight:700">POP3</td><td style="color:var(--text-muted)">110</td></tr>
+      <tr><td style="padding:.2rem .4rem;font-weight:700">IMAP</td><td style="color:var(--text-muted)">143</td></tr>
+      <tr><td style="padding:.2rem .4rem;font-weight:700">DNS</td><td style="color:var(--text-muted)">53</td></tr>
+    </table>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>TCP/IP Layers</h3>
+    <div style="display:flex;flex-direction:column;gap:3px">
+      <div style="background:#c62828;color:#fff;padding:.3rem .6rem;border-radius:4px;font-size:.78rem;font-weight:700">4 · Application — HTTP, FTP, SMTP</div>
+      <div style="background:#e65100;color:#fff;padding:.3rem .6rem;border-radius:4px;font-size:.78rem;font-weight:700">3 · Transport — TCP, UDP</div>
+      <div style="background:#1565c0;color:#fff;padding:.3rem .6rem;border-radius:4px;font-size:.78rem;font-weight:700">2 · Internet — IP, ICMP</div>
+      <div style="background:#2e7d32;color:#fff;padding:.3rem .6rem;border-radius:4px;font-size:.78rem;font-weight:700">1 · Link — Ethernet, Wi-Fi</div>
+    </div>
+  </div>
+
+  <div class="sidebar-box" style="border-left:4px solid #c62828">
+    <h3 style="color:#c62828">Common Mistakes</h3>
+    <ul style="font-size:.78rem;padding-left:1.1rem;color:var(--text)">
+      <li style="margin:.3rem 0">Confusing bit rate (bits/s) with baud rate (symbols/s)</li>
+      <li style="margin:.3rem 0">Saying a switch "broadcasts" — it doesn't, a hub does</li>
+      <li style="margin:.3rem 0">Confusing SMTP (send) with POP3/IMAP (receive)</li>
+      <li style="margin:.3rem 0">Saying parity detects all errors — it misses even-numbered errors</li>
+      <li style="margin:.3rem 0">Confusing router (connects networks, uses IP) with switch (connects devices on same network, uses MAC)</li>
+      <li style="margin:.3rem 0">Saying DNS "converts" URLs — it translates domain names to IP addresses</li>
+    </ul>
+  </div>
+
+  <a href="topic1-information-representation.html" style="display:block;text-align:center;background:var(--surface2);color:var(--primary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.65rem;font-weight:700;font-size:.82rem;text-decoration:none;margin-top:.25rem">
+    ← Topic 1: Information Representation
+  </a>
+  <a href="index.html" style="display:block;text-align:center;background:var(--primary);color:#fff;border-radius:var(--radius-sm);padding:.75rem;font-weight:700;font-size:.875rem;text-decoration:none;margin-top:.5rem">
+    ← Back to All Topics
+  </a>
+</aside>
+
+</div><!-- /lesson-wrap -->
+
+<footer style="background:var(--surface);border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;font-size:0.8rem;color:var(--text-muted)">
+  Cambridge International AS &amp; A Level Computer Science 9618 — Topic 2: Communication &amp; Internet Technologies &nbsp;|&nbsp;
+  Not affiliated with Cambridge Assessment International Education.
+</footer>
+
+<script src="script.js"></script>
+<script>
+  const sections = document.querySelectorAll('.lesson-section[id]');
+  const navLinks = document.querySelectorAll('.toc-list a, .page-nav a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+  document.querySelectorAll('.reveal-btn').forEach(btn => { btn.textContent = 'Show Answer'; });
+</script>
+</body>
+</html>

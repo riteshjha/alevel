@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Topic 4 – Logic Gates & Boolean Algebra | A Level CS 9618</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <style>
+    /* ── page-level layout ── */
+    .page-wrap { display:flex; gap:2rem; align-items:flex-start; max-width:1200px; margin:0 auto; padding:2rem 1.5rem; }
+    .page-main  { flex:1; min-width:0; }
+    .page-sidebar { width:260px; flex-shrink:0; position:sticky; top:5.5rem; }
+
+    /* ── section titles ── */
+    .section-block { margin-bottom:3rem; }
+    .section-block h2 { font-size:1.5rem; color:var(--primary); border-bottom:2px solid var(--primary); padding-bottom:.4rem; margin-bottom:1.2rem; }
+    .section-block h3 { font-size:1.15rem; color:var(--text); margin:1.4rem 0 .6rem; }
+
+    /* ── gate table ── */
+    .gate-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:1rem; margin:1rem 0; }
+    .gate-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1rem; text-align:center; }
+    .gate-card h4 { margin:0 0 .5rem; font-size:.95rem; color:var(--primary); }
+    .gate-card .gate-sym { font-size:2rem; margin-bottom:.4rem; }
+    .gate-card p  { font-size:.82rem; color:var(--text-muted); margin:0; }
+
+    /* ── truth tables ── */
+    .tt-wrap { display:flex; flex-wrap:wrap; gap:1.5rem; margin:1rem 0; }
+    .tt-wrap table { border-collapse:collapse; font-size:.88rem; }
+    .tt-wrap table caption { font-weight:700; font-size:.9rem; color:var(--primary); margin-bottom:.3rem; text-align:center; }
+    .tt-wrap th, .tt-wrap td { border:1px solid var(--border); padding:.3rem .6rem; text-align:center; }
+    .tt-wrap th { background:var(--primary); color:#fff; }
+    .tt-wrap td.hi  { background:#22c55e22; color:#16a34a; font-weight:700; }
+    .tt-wrap td.lo  { background:#ef444422; color:#dc2626; }
+
+    /* ── law box ── */
+    .law-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:.8rem; margin:1rem 0; }
+    .law-item { background:var(--surface); border-left:4px solid var(--accent); border-radius:var(--radius); padding:.7rem 1rem; font-size:.9rem; }
+    .law-item .law-name { font-weight:700; color:var(--primary); font-size:.82rem; margin-bottom:.2rem; }
+    .law-item code { background:var(--bg); padding:.1rem .3rem; border-radius:3px; font-size:.9em; }
+
+    /* ── SVG gates ── */
+    .svg-row { display:flex; flex-wrap:wrap; gap:1.5rem; margin:1rem 0; align-items:flex-start; }
+    .svg-box { text-align:center; }
+    .svg-box svg { display:block; margin:0 auto; }
+    .svg-box p { font-size:.8rem; color:var(--text-muted); margin:.3rem 0 0; }
+
+    /* ── circuit worked example ── */
+    .circuit-wrap { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.2rem; margin:1rem 0; overflow-x:auto; }
+    .circuit-wrap svg { display:block; margin:0 auto; }
+
+    /* ── kmap ── */
+    .kmap-table { border-collapse:collapse; margin:0 auto; }
+    .kmap-table td, .kmap-table th { border:2px solid var(--border); width:44px; height:38px; text-align:center; font-size:.88rem; }
+    .kmap-table th { background:var(--primary); color:#fff; font-size:.78rem; }
+    .kmap-table td.one { background:#22c55e33; font-weight:700; color:#16a34a; }
+    .kmap-table td.zero { background:var(--bg); }
+    .kmap-table td.group1 { outline:3px solid #3b82f6; outline-offset:-2px; }
+    .kmap-table td.group2 { outline:3px solid #f59e0b; outline-offset:-2px; }
+
+    /* ── sidebar cards ── */
+    .sidebar-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1rem; margin-bottom:1rem; font-size:.85rem; }
+    .sidebar-card h4 { color:var(--primary); margin:0 0 .6rem; font-size:.9rem; }
+    .sidebar-card ul { margin:0; padding-left:1.2rem; color:var(--text-muted); }
+    .sidebar-card li { margin:.2rem 0; }
+    .sidebar-card a { color:var(--primary); text-decoration:none; font-weight:600; }
+    .sidebar-card a:hover { text-decoration:underline; }
+
+    .nav-links a { display:block; padding:.25rem 0; color:var(--text-muted); text-decoration:none; font-size:.83rem; border-left:2px solid transparent; padding-left:.6rem; margin:.1rem 0; }
+    .nav-links a:hover, .nav-links a.active { color:var(--primary); border-left-color:var(--primary); }
+
+    /* ── practice box ── */
+    .practice-q { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.2rem 1.4rem; margin:.8rem 0; }
+    .practice-q h4 { margin:0 0 .5rem; font-size:.95rem; color:var(--primary); }
+    .practice-q details summary { cursor:pointer; color:var(--accent); font-weight:600; font-size:.85rem; margin-top:.8rem; }
+    .practice-q details .answer { background:var(--bg); border-left:3px solid var(--accent); padding:.8rem 1rem; margin-top:.5rem; font-size:.87rem; border-radius:0 var(--radius) var(--radius) 0; }
+    .practice-q details .answer p, .practice-q details .answer li { margin:.25rem 0; }
+
+    /* ── hero ── */
+    .topic-hero { background:linear-gradient(135deg,var(--primary) 0%,var(--accent) 100%); color:#fff; padding:2.5rem 1.5rem 2rem; margin-bottom:0; }
+    .topic-hero h1 { font-size:2rem; margin:0 0 .4rem; }
+    .topic-hero p  { margin:0; opacity:.88; font-size:1rem; }
+    .hero-meta { display:flex; gap:1rem; margin-top:1rem; flex-wrap:wrap; }
+    .hero-badge { background:rgba(255,255,255,.2); border-radius:20px; padding:.25rem .9rem; font-size:.8rem; font-weight:600; }
+
+    /* ── callout ── */
+    .callout { border-left:4px solid var(--primary); background:var(--surface); padding:.8rem 1.1rem; border-radius:0 var(--radius) var(--radius) 0; margin:.8rem 0; font-size:.9rem; }
+    .callout.warn { border-color:#f59e0b; }
+    .callout.tip  { border-color:#22c55e; }
+    .callout strong { color:var(--primary); }
+    .callout.warn strong { color:#b45309; }
+    .callout.tip  strong { color:#15803d; }
+
+    /* ── expression step ── */
+    .expr-steps { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1rem 1.2rem; margin:.8rem 0; }
+    .expr-steps .step { display:grid; grid-template-columns:1fr auto; gap:.5rem 1.5rem; font-size:.9rem; padding:.3rem 0; border-bottom:1px solid var(--border); }
+    .expr-steps .step:last-child { border:none; }
+    .expr-steps .step code { font-size:.92em; }
+    .expr-steps .step .rule { color:var(--text-muted); font-size:.8rem; text-align:right; }
+
+    .checklist { list-style:none; padding:0; margin:0; }
+    .checklist li { padding:.25rem 0; font-size:.88rem; color:var(--text); }
+    .checklist li::before { content:"✓ "; color:#22c55e; font-weight:700; }
+
+    @media(max-width:900px){
+      .page-wrap { flex-direction:column; }
+      .page-sidebar { width:100%; position:static; }
+      .tt-wrap { flex-direction:column; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">CS 9618</a>
+    <div class="nav-links-top" style="display:flex;gap:1rem;align-items:center">
+      <a href="index.html" style="color:var(--text-muted);text-decoration:none;font-size:.9rem">← All Topics</a>
+      <button id="theme-btn" class="btn-icon" aria-label="Toggle theme">🌙</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<header class="topic-hero">
+  <h1>Topic 4 – Logic Gates &amp; Boolean Algebra</h1>
+  <p>Gates, truth tables, simplification laws, K-maps, and circuit diagrams.</p>
+  <div class="hero-meta">
+    <span class="hero-badge">Paper 1</span>
+    <span class="hero-badge">AS Level</span>
+    <span class="hero-badge">~3 exam marks / section</span>
+  </div>
+</header>
+
+<!-- ── BODY ── -->
+<div class="page-wrap">
+<main class="page-main">
+
+<!-- ===== 1. LOGIC GATES ===== -->
+<section class="section-block" id="gates">
+  <h2>1. Logic Gates</h2>
+  <p>A <strong>logic gate</strong> is an electronic circuit with one or more binary inputs and a single binary output. The output is fully determined by the inputs according to a Boolean function.</p>
+
+  <div class="gate-grid">
+    <div class="gate-card"><h4>AND</h4><div class="gate-sym">⊓</div><p>Output 1 only when <em>all</em> inputs are 1</p></div>
+    <div class="gate-card"><h4>OR</h4><div class="gate-sym">⊔</div><p>Output 1 when <em>at least one</em> input is 1</p></div>
+    <div class="gate-card"><h4>NOT</h4><div class="gate-sym">¬</div><p>Inverts the input (one input only)</p></div>
+    <div class="gate-card"><h4>NAND</h4><div class="gate-sym">⊼</div><p>AND then invert — universal gate</p></div>
+    <div class="gate-card"><h4>NOR</h4><div class="gate-sym">⊽</div><p>OR then invert — universal gate</p></div>
+    <div class="gate-card"><h4>XOR</h4><div class="gate-sym">⊕</div><p>Output 1 when inputs <em>differ</em></p></div>
+  </div>
+
+  <!-- Gate SVG symbols -->
+  <h3>Gate Symbols (IEEE / ANSI style)</h3>
+  <div class="svg-row">
+
+    <!-- AND -->
+    <div class="svg-box">
+      <svg width="90" height="60" viewBox="0 0 90 60">
+        <line x1="0" y1="18" x2="28" y2="18" stroke="var(--primary)" stroke-width="2"/>
+        <line x1="0" y1="42" x2="28" y2="42" stroke="var(--primary)" stroke-width="2"/>
+        <line x1="28" y1="8" x2="28" y2="52" stroke="var(--primary)" stroke-width="2"/>
+        <line x1="28" y1="8" x2="52" y2="8" stroke="var(--primary)" stroke-width="2"/>
+        <line x1="28" y1="52" x2="52" y2="52" stroke="var(--primary)" stroke-width="2"/>
+        <path d="M52 8 Q80 8 80 30 Q80 52 52 52" fill="none" stroke="var(--primary)" stroke-width="2"/>
+        <line x1="80" y1="30" x2="90" y2="30" stroke="var(--primary)" stroke-width="2"/>
+      </svg>
+      <p>AND</p>
+    </div>
+
+    <!-- OR -->
+    <div class="svg-box">
+      <svg width="90" height="60" viewBox="0 0 90 60">
+        <line x1="0" y1="18" x2="28" y2="18" stroke="var(--primary)" stroke-width="2"/>
+        <line x1="0" y1="42" x2="28" y2="42" stroke="var(--primary)" stroke-width="2"/>
+        <path d="M20 8 Q36 30 20 52" fill="none" stroke="var(--primary)" stroke-width="2"/>
+        <path d="M20 8 Q60 8 78 30 Q60 52 20 52" fill="none" stroke="var(--primary)" stroke-width="2"/>
+        <line x1="78" y1="30" x2="90" y2="30" stroke="var(--primary)" stroke-width="2"/>
+      </svg>
+      <p>OR</p>
+    </div>
+
+    <!-- NOT -->
+    <div class="svg-box">
+      <svg width="80" height="60" viewBox="0 0 80 60">
+        <line x1="0" y1="30" x2="15" y2="30" stroke="var(--primary)" stroke-width="2"/>
+        <polygon points="15,8 15,52 60,30" fill="none" stroke="var(--primary)" stroke-width="2"/>
+        <circle cx="64" cy="30" r="5" fill="none" stroke="var(--primary)" stroke-width="2"/>
+        <line x1="69" y1="30" x2="80" y2="30" stroke="var(--primary)" stroke-width="2"/>
+      </svg>
+      <p>NOT</p>
+    </div>
+
+    <!-- NAND -->
+    <div class="svg-box">
+      <svg width="100" height="60" viewBox="0 0 100 60">
+        <line x1="0" y1="18" x2="28" y2="18" stroke="var(--primary)" stroke-width="2"/>
+        <line x1="0" y1="42" x2="28" y2="42" stroke="var(--primary)" stroke-width="2"/>
+        <line x1="28" y1="8" x2="28" y2="52" stroke="var(--primary)" stroke-width="2"/>
+        <line x1="28" y1="8" x2="52" y2="8" stroke="var(--primary)" stroke-width="2"/>
+        <line x1="28" y1="52" x2="52" y2="52" stroke="var(--primary)" stroke-width="2"/>
+        <path d="M52 8 Q80 8 80 30 Q80 52 52 52" fill="none" stroke="var(--primary)" stroke-width="2"/>
+        <circle cx="84" cy="30" r="4" fill="none" stroke="var(--primary)" stroke-width="2"/>
+        <line x1="88" y1="30" x2="100" y2="30" stroke="var(--primary)" stroke-width="2"/>
+      </svg>
+      <p>NAND</p>
+    </div>
+
+    <!-- NOR -->
+    <div class="svg-box">
+      <svg width="100" height="60" viewBox="0 0 100 60">
+        <line x1="0" y1="18" x2="28" y2="18" stroke="var(--primary)" stroke-width="2"/>
+        <line x1="0" y1="42" x2="28" y2="42" stroke="var(--primary)" stroke-width="2"/>
+        <path d="M20 8 Q36 30 20 52" fill="none" stroke="var(--primary)" stroke-width="2"/>
+        <path d="M20 8 Q60 8 78 30 Q60 52 20 52" fill="none" stroke="var(--primary)" stroke-width="2"/>
+        <circle cx="82" cy="30" r="4" fill="none" stroke="var(--primary)" stroke-width="2"/>
+        <line x1="86" y1="30" x2="100" y2="30" stroke="var(--primary)" stroke-width="2"/>
+      </svg>
+      <p>NOR</p>
+    </div>
+
+    <!-- XOR -->
+    <div class="svg-box">
+      <svg width="100" height="60" viewBox="0 0 100 60">
+        <line x1="0" y1="18" x2="28" y2="18" stroke="var(--primary)" stroke-width="2"/>
+        <line x1="0" y1="42" x2="28" y2="42" stroke="var(--primary)" stroke-width="2"/>
+        <path d="M16 8 Q32 30 16 52" fill="none" stroke="var(--primary)" stroke-width="2"/>
+        <path d="M22 8 Q38 30 22 52" fill="none" stroke="var(--primary)" stroke-width="2"/>
+        <path d="M22 8 Q62 8 80 30 Q62 52 22 52" fill="none" stroke="var(--primary)" stroke-width="2"/>
+        <line x1="80" y1="30" x2="100" y2="30" stroke="var(--primary)" stroke-width="2"/>
+      </svg>
+      <p>XOR</p>
+    </div>
+  </div>
+
+  <div class="callout"><strong>Exam tip:</strong> The bubble (small circle) on the output means <em>invert</em>. NAND = AND + bubble; NOR = OR + bubble. If you forget a symbol, drawing the equivalent gates joined together also earns full marks.</div>
+</section>
+
+<!-- ===== 2. TRUTH TABLES ===== -->
+<section class="section-block" id="truth-tables">
+  <h2>2. Truth Tables</h2>
+  <p>A truth table lists every possible combination of inputs and the corresponding output. With <em>n</em> inputs there are <strong>2<sup>n</sup></strong> rows.</p>
+
+  <div class="tt-wrap">
+
+    <!-- AND -->
+    <table>
+      <caption>AND &nbsp;(A · B)</caption>
+      <thead><tr><th>A</th><th>B</th><th>Q</th></tr></thead>
+      <tbody>
+        <tr><td class="lo">0</td><td class="lo">0</td><td class="lo">0</td></tr>
+        <tr><td class="lo">0</td><td class="hi">1</td><td class="lo">0</td></tr>
+        <tr><td class="hi">1</td><td class="lo">0</td><td class="lo">0</td></tr>
+        <tr><td class="hi">1</td><td class="hi">1</td><td class="hi">1</td></tr>
+      </tbody>
+    </table>
+
+    <!-- OR -->
+    <table>
+      <caption>OR &nbsp;(A + B)</caption>
+      <thead><tr><th>A</th><th>B</th><th>Q</th></tr></thead>
+      <tbody>
+        <tr><td class="lo">0</td><td class="lo">0</td><td class="lo">0</td></tr>
+        <tr><td class="lo">0</td><td class="hi">1</td><td class="hi">1</td></tr>
+        <tr><td class="hi">1</td><td class="lo">0</td><td class="hi">1</td></tr>
+        <tr><td class="hi">1</td><td class="hi">1</td><td class="hi">1</td></tr>
+      </tbody>
+    </table>
+
+    <!-- NOT -->
+    <table>
+      <caption>NOT &nbsp;(Ā)</caption>
+      <thead><tr><th>A</th><th>Q</th></tr></thead>
+      <tbody>
+        <tr><td class="lo">0</td><td class="hi">1</td></tr>
+        <tr><td class="hi">1</td><td class="lo">0</td></tr>
+      </tbody>
+    </table>
+
+    <!-- NAND -->
+    <table>
+      <caption>NAND &nbsp;(A · B)&#773;</caption>
+      <thead><tr><th>A</th><th>B</th><th>Q</th></tr></thead>
+      <tbody>
+        <tr><td class="lo">0</td><td class="lo">0</td><td class="hi">1</td></tr>
+        <tr><td class="lo">0</td><td class="hi">1</td><td class="hi">1</td></tr>
+        <tr><td class="hi">1</td><td class="lo">0</td><td class="hi">1</td></tr>
+        <tr><td class="hi">1</td><td class="hi">1</td><td class="lo">0</td></tr>
+      </tbody>
+    </table>
+
+    <!-- NOR -->
+    <table>
+      <caption>NOR &nbsp;(A + B)&#773;</caption>
+      <thead><tr><th>A</th><th>B</th><th>Q</th></tr></thead>
+      <tbody>
+        <tr><td class="lo">0</td><td class="lo">0</td><td class="hi">1</td></tr>
+        <tr><td class="lo">0</td><td class="hi">1</td><td class="lo">0</td></tr>
+        <tr><td class="hi">1</td><td class="lo">0</td><td class="lo">0</td></tr>
+        <tr><td class="hi">1</td><td class="hi">1</td><td class="lo">0</td></tr>
+      </tbody>
+    </table>
+
+    <!-- XOR -->
+    <table>
+      <caption>XOR &nbsp;(A ⊕ B)</caption>
+      <thead><tr><th>A</th><th>B</th><th>Q</th></tr></thead>
+      <tbody>
+        <tr><td class="lo">0</td><td class="lo">0</td><td class="lo">0</td></tr>
+        <tr><td class="lo">0</td><td class="hi">1</td><td class="hi">1</td></tr>
+        <tr><td class="hi">1</td><td class="lo">0</td><td class="hi">1</td></tr>
+        <tr><td class="hi">1</td><td class="hi">1</td><td class="lo">0</td></tr>
+      </tbody>
+    </table>
+
+  </div>
+
+  <h3>Building a truth table for a complex expression</h3>
+  <p>Work out each gate's sub-expression as its own column, left-to-right. Example: <code>Q = (A + B) · C̄</code></p>
+
+  <div class="tt-wrap">
+    <table>
+      <caption>Q = (A + B) · C̄</caption>
+      <thead><tr><th>A</th><th>B</th><th>C</th><th>A+B</th><th>C̄</th><th>Q</th></tr></thead>
+      <tbody>
+        <tr><td>0</td><td>0</td><td>0</td><td>0</td><td class="hi">1</td><td class="lo">0</td></tr>
+        <tr><td>0</td><td>0</td><td>1</td><td>0</td><td class="lo">0</td><td class="lo">0</td></tr>
+        <tr><td>0</td><td>1</td><td>0</td><td>1</td><td class="hi">1</td><td class="hi">1</td></tr>
+        <tr><td>0</td><td>1</td><td>1</td><td>1</td><td class="lo">0</td><td class="lo">0</td></tr>
+        <tr><td>1</td><td>0</td><td>0</td><td>1</td><td class="hi">1</td><td class="hi">1</td></tr>
+        <tr><td>1</td><td>0</td><td>1</td><td>1</td><td class="lo">0</td><td class="lo">0</td></tr>
+        <tr><td>1</td><td>1</td><td>0</td><td>1</td><td class="hi">1</td><td class="hi">1</td></tr>
+        <tr><td>1</td><td>1</td><td>1</td><td>1</td><td class="lo">0</td><td class="lo">0</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout tip"><strong>Method:</strong> Always add a column for every intermediate result. Markers award marks for correct working columns, even if the final answer contains an error.</div>
+</section>
+
+<!-- ===== 3. BOOLEAN NOTATION ===== -->
+<section class="section-block" id="notation">
+  <h2>3. Boolean Notation</h2>
+
+  <div class="tt-wrap" style="display:block;">
+    <table style="width:100%;max-width:520px;margin:0;">
+      <thead><tr><th>Operation</th><th>Notation</th><th>Alternative</th></tr></thead>
+      <tbody>
+        <tr><td>AND</td><td><code>A · B</code></td><td><code>AB</code> or <code>A AND B</code></td></tr>
+        <tr><td>OR</td><td><code>A + B</code></td><td><code>A OR B</code></td></tr>
+        <tr><td>NOT</td><td><code>Ā</code> or <code>A'</code></td><td><code>NOT A</code></td></tr>
+        <tr><td>NAND</td><td><code>(A · B)'</code></td><td><code>A NAND B</code></td></tr>
+        <tr><td>NOR</td><td><code>(A + B)'</code></td><td><code>A NOR B</code></td></tr>
+        <tr><td>XOR</td><td><code>A ⊕ B</code></td><td><code>A XOR B</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Operator Precedence</h3>
+  <p>Evaluate in this order (highest to lowest):</p>
+  <ol>
+    <li><strong>Parentheses</strong> — innermost first</li>
+    <li><strong>NOT</strong> (Ā)</li>
+    <li><strong>AND</strong> (·)</li>
+    <li><strong>OR</strong> (+)</li>
+  </ol>
+  <div class="callout"><strong>Example:</strong> <code>A + B · C̄</code> means <code>A + (B · (NOT C))</code> — AND before OR.</div>
+</section>
+
+<!-- ===== 4. BOOLEAN ALGEBRA LAWS ===== -->
+<section class="section-block" id="laws">
+  <h2>4. Boolean Algebra Laws</h2>
+  <p>These identities let you simplify expressions without drawing a truth table.</p>
+
+  <h3>Identity &amp; Null Laws</h3>
+  <div class="law-grid">
+    <div class="law-item"><div class="law-name">Identity</div><code>A + 0 = A</code> &nbsp;|&nbsp; <code>A · 1 = A</code></div>
+    <div class="law-item"><div class="law-name">Null / Annihilator</div><code>A + 1 = 1</code> &nbsp;|&nbsp; <code>A · 0 = 0</code></div>
+    <div class="law-item"><div class="law-name">Idempotent</div><code>A + A = A</code> &nbsp;|&nbsp; <code>A · A = A</code></div>
+    <div class="law-item"><div class="law-name">Complement</div><code>A + Ā = 1</code> &nbsp;|&nbsp; <code>A · Ā = 0</code></div>
+    <div class="law-item"><div class="law-name">Double Negation</div><code>Ā̄ = A</code></div>
+  </div>
+
+  <h3>Commutative &amp; Associative</h3>
+  <div class="law-grid">
+    <div class="law-item"><div class="law-name">Commutative</div><code>A + B = B + A</code> &nbsp;|&nbsp; <code>A · B = B · A</code></div>
+    <div class="law-item"><div class="law-name">Associative</div><code>(A+B)+C = A+(B+C)</code><br><code>(AB)C = A(BC)</code></div>
+    <div class="law-item"><div class="law-name">Distributive</div><code>A(B+C) = AB + AC</code><br><code>A+BC = (A+B)(A+C)</code></div>
+  </div>
+
+  <h3>De Morgan's Theorems ★</h3>
+  <div class="law-grid">
+    <div class="law-item" style="border-color:#ef4444;"><div class="law-name" style="color:#ef4444;">De Morgan 1</div><code>(A · B)' = Ā + B̄</code><br><small>NAND = NOR of complements</small></div>
+    <div class="law-item" style="border-color:#ef4444;"><div class="law-name" style="color:#ef4444;">De Morgan 2</div><code>(A + B)' = Ā · B̄</code><br><small>NOR = AND of complements</small></div>
+  </div>
+
+  <div class="callout warn"><strong>Memory trick for De Morgan's:</strong> Break the bar, change the operator. <code>(A·B)' → Ā + B̄</code> (bar breaks, dot becomes plus). <code>(A+B)' → Ā · B̄</code> (bar breaks, plus becomes dot).</div>
+
+  <h3>Absorption Laws</h3>
+  <div class="law-grid">
+    <div class="law-item"><div class="law-name">Absorption 1</div><code>A + AB = A</code></div>
+    <div class="law-item"><div class="law-name">Absorption 2</div><code>A(A + B) = A</code></div>
+    <div class="law-item"><div class="law-name">Useful identity</div><code>A + ĀB = A + B</code></div>
+  </div>
+</section>
+
+<!-- ===== 5. SIMPLIFICATION ===== -->
+<section class="section-block" id="simplification">
+  <h2>5. Simplifying Boolean Expressions</h2>
+  <p>Simplifying reduces the number of gates needed, lowering cost, power, and propagation delay.</p>
+
+  <h3>Worked Example 1</h3>
+  <p>Simplify <code>F = AB + AB̄</code></p>
+  <div class="expr-steps">
+    <div class="step"><code>F = AB + AB̄</code><span class="rule">Given</span></div>
+    <div class="step"><code>= A(B + B̄)</code><span class="rule">Factor out A</span></div>
+    <div class="step"><code>= A · 1</code><span class="rule">Complement law: B + B̄ = 1</span></div>
+    <div class="step"><code>= A</code><span class="rule">Identity law: A · 1 = A</span></div>
+  </div>
+  <div class="callout tip"><strong>Result:</strong> The circuit needs only a wire — no gates at all!</div>
+
+  <h3>Worked Example 2</h3>
+  <p>Simplify <code>F = ABC + ABC̄ + AB̄C</code></p>
+  <div class="expr-steps">
+    <div class="step"><code>= AB(C + C̄) + AB̄C</code><span class="rule">Factor AB from first two terms</span></div>
+    <div class="step"><code>= AB · 1 + AB̄C</code><span class="rule">Complement law</span></div>
+    <div class="step"><code>= AB + AB̄C</code><span class="rule">Identity</span></div>
+    <div class="step"><code>= A(B + B̄C)</code><span class="rule">Factor A</span></div>
+    <div class="step"><code>= A(B + C)</code><span class="rule">Absorption: B + B̄C = B + C</span></div>
+  </div>
+
+  <h3>Worked Example 3 — De Morgan's</h3>
+  <p>Simplify <code>F = (A + B)' · C + A · C</code></p>
+  <div class="expr-steps">
+    <div class="step"><code>= (Ā · B̄) · C + AC</code><span class="rule">De Morgan on (A+B)'</span></div>
+    <div class="step"><code>= ĀB̄C + AC</code><span class="rule">Remove redundant brackets</span></div>
+    <div class="step"><code>= C(ĀB̄ + A)</code><span class="rule">Factor C</span></div>
+    <div class="step"><code>= C(A + B̄)</code><span class="rule">Absorption: ĀB̄ + A = A + B̄</span></div>
+  </div>
+
+  <div class="callout"><strong>Exam strategy:</strong> Show every step with the law name. Even if your final answer is wrong you still score for correct intermediate steps.</div>
+</section>
+
+<!-- ===== 6. LOGIC CIRCUITS ===== -->
+<section class="section-block" id="circuits">
+  <h2>6. Logic Circuit Diagrams</h2>
+  <p>A logic circuit is a diagram connecting gate symbols with lines representing signal wires. You need to:</p>
+  <ul>
+    <li>Draw a circuit from a Boolean expression</li>
+    <li>Write a Boolean expression from a circuit</li>
+    <li>Trace a circuit to produce a truth table</li>
+  </ul>
+
+  <h3>Worked Example — Draw from Expression</h3>
+  <p>Expression: <code>Q = (A · B) + (Ā · C)</code></p>
+
+  <div class="circuit-wrap">
+    <!-- SVG circuit for Q = AB + (NOT A · C) -->
+    <svg width="580" height="200" viewBox="0 0 580 200" style="max-width:100%">
+      <!-- Input labels -->
+      <text x="5" y="58" font-size="14" fill="var(--text)" font-family="monospace">A</text>
+      <text x="5" y="108" font-size="14" fill="var(--text)" font-family="monospace">B</text>
+      <text x="5" y="158" font-size="14" fill="var(--text)" font-family="monospace">C</text>
+
+      <!-- A → AND gate -->
+      <line x1="20" y1="55" x2="100" y2="55" stroke="var(--primary)" stroke-width="1.5"/>
+      <!-- B → AND gate -->
+      <line x1="20" y1="105" x2="100" y2="105" stroke="var(--primary)" stroke-width="1.5"/>
+
+      <!-- AND gate body (top) -->
+      <line x1="100" y1="42" x2="100" y2="68" stroke="var(--primary)" stroke-width="2"/>
+      <line x1="100" y1="42" x2="118" y2="42" stroke="var(--primary)" stroke-width="2"/>
+      <line x1="100" y1="68" x2="118" y2="68" stroke="var(--primary)" stroke-width="2"/>
+      <path d="M118 42 Q145 42 145 55 Q145 68 118 68" fill="none" stroke="var(--primary)" stroke-width="2"/>
+      <line x1="145" y1="55" x2="175" y2="55" stroke="var(--primary)" stroke-width="1.5"/>
+      <text x="108" y="60" font-size="10" fill="var(--text-muted)" font-family="monospace">AND</text>
+
+      <!-- A → NOT gate -->
+      <line x1="20" y1="55" x2="20" y2="130" stroke="var(--primary)" stroke-width="1.5"/>
+      <line x1="20" y1="130" x2="200" y2="130" stroke="var(--primary)" stroke-width="1.5"/>
+
+      <!-- NOT gate on A -->
+      <line x1="60" y1="55" x2="60" y2="128" stroke="var(--primary)" stroke-width="1.5"/>
+      <!-- Tap from A wire -->
+      <circle cx="60" cy="55" r="3" fill="var(--primary)"/>
+      <line x1="60" y1="128" x2="75" y2="128" stroke="var(--primary)" stroke-width="1.5"/>
+      <polygon points="75,118 75,138 100,128" fill="none" stroke="var(--primary)" stroke-width="2"/>
+      <circle cx="104" cy="128" r="4" fill="none" stroke="var(--primary)" stroke-width="2"/>
+      <line x1="108" y1="128" x2="200" y2="128" stroke="var(--primary)" stroke-width="1.5"/>
+      <text x="78" y="132" font-size="10" fill="var(--text-muted)" font-family="monospace">NOT</text>
+
+      <!-- C → AND gate 2 -->
+      <line x1="20" y1="155" x2="200" y2="155" stroke="var(--primary)" stroke-width="1.5"/>
+
+      <!-- AND gate (bottom) -->
+      <line x1="200" y1="118" x2="200" y2="143" stroke="var(--primary)" stroke-width="2"/>
+      <line x1="200" y1="118" x2="218" y2="118" stroke="var(--primary)" stroke-width="2"/>
+      <line x1="200" y1="143" x2="218" y2="143" stroke="var(--primary)" stroke-width="2"/>
+      <path d="M218 118 Q245 118 245 130 Q245 143 218 143" fill="none" stroke="var(--primary)" stroke-width="2"/>
+      <line x1="245" y1="130" x2="310" y2="130" stroke="var(--primary)" stroke-width="1.5"/>
+      <text x="208" y="134" font-size="10" fill="var(--text-muted)" font-family="monospace">AND</text>
+
+      <!-- Wire from top AND down to OR -->
+      <line x1="175" y1="55" x2="310" y2="55" stroke="var(--primary)" stroke-width="1.5"/>
+      <line x1="310" y1="55" x2="310" y2="87" stroke="var(--primary)" stroke-width="1.5"/>
+      <line x1="310" y1="130" x2="310" y2="113" stroke="var(--primary)" stroke-width="1.5"/>
+
+      <!-- OR gate -->
+      <path d="M300 82 Q316 100 300 118" fill="none" stroke="var(--primary)" stroke-width="2"/>
+      <path d="M300 82 Q340 82 358 100 Q340 118 300 118" fill="none" stroke="var(--primary)" stroke-width="2"/>
+      <line x1="358" y1="100" x2="400" y2="100" stroke="var(--primary)" stroke-width="1.5"/>
+      <text x="320" y="104" font-size="10" fill="var(--text-muted)" font-family="monospace">OR</text>
+
+      <!-- Output Q -->
+      <text x="406" y="104" font-size="14" fill="var(--text)" font-family="monospace">Q</text>
+    </svg>
+  </div>
+  <p style="font-size:.85rem;color:var(--text-muted);text-align:center">Circuit for Q = (A · B) + (Ā · C) &nbsp;— note the junction dot on A feeding both AND and NOT</p>
+
+  <div class="callout warn"><strong>Junction dots:</strong> A filled dot (•) on crossing wires means they are <em>connected</em>. No dot means wires cross but are <em>not</em> connected. Always draw dots at branch points.</div>
+
+  <h3>Reading an Expression from a Circuit</h3>
+  <p>Start at the output gate and work backwards, substituting each gate's inputs:</p>
+  <ol>
+    <li>Label each gate's output with its function (e.g. <code>G1 = A · B</code>)</li>
+    <li>At the final gate, write the full expression using the labelled sub-expressions</li>
+    <li>Simplify if asked</li>
+  </ol>
+
+  <h3>Half Adder</h3>
+  <p>A <strong>half adder</strong> adds two 1-bit numbers to give a <em>Sum</em> and a <em>Carry</em> output. It is a key application of logic gates in arithmetic circuits.</p>
+  <div class="tt-wrap">
+    <table>
+      <caption>Half Adder</caption>
+      <thead><tr><th>A</th><th>B</th><th>Sum (S)</th><th>Carry (C)</th></tr></thead>
+      <tbody>
+        <tr><td>0</td><td>0</td><td class="lo">0</td><td class="lo">0</td></tr>
+        <tr><td>0</td><td>1</td><td class="hi">1</td><td class="lo">0</td></tr>
+        <tr><td>1</td><td>0</td><td class="hi">1</td><td class="lo">0</td></tr>
+        <tr><td>1</td><td>1</td><td class="lo">0</td><td class="hi">1</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p><code>S = A ⊕ B</code> &nbsp;(XOR) &nbsp;&nbsp;&nbsp; <code>C = A · B</code> &nbsp;(AND)</p>
+  <p>Two half adders joined together (with the carry-ins combined via an OR gate) form a <strong>full adder</strong>, which can handle a carry-in from a previous stage, allowing multi-bit addition.</p>
+</section>
+
+<!-- ===== 7. KARNAUGH MAPS ===== -->
+<section class="section-block" id="kmaps">
+  <h2>7. Karnaugh Maps (K-maps)</h2>
+  <p>A K-map is a visual tool for simplifying Boolean expressions. Adjacent cells differ by exactly one variable (Grey code ordering). Grouping 1s in powers of 2 eliminates variables.</p>
+
+  <div class="callout"><strong>Why K-maps?</strong> Algebraic simplification requires intuition and can miss the minimum form. K-maps give a systematic method that always finds the minimal Sum of Products (SOP).</div>
+
+  <h3>2-Variable K-map</h3>
+  <div style="overflow-x:auto;margin:1rem 0">
+    <table class="kmap-table">
+      <thead>
+        <tr><th></th><th>B=0</th><th>B=1</th></tr>
+      </thead>
+      <tbody>
+        <tr><th>A=0</th><td>m₀</td><td>m₁</td></tr>
+        <tr><th>A=1</th><td>m₂</td><td>m₃</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>3-Variable K-map</h3>
+  <div style="overflow-x:auto;margin:1rem 0">
+    <table class="kmap-table">
+      <thead>
+        <tr><th>A \ BC</th><th>00</th><th>01</th><th>11</th><th>10</th></tr>
+      </thead>
+      <tbody>
+        <tr><th>0</th><td>m₀</td><td>m₁</td><td>m₃</td><td>m₂</td></tr>
+        <tr><th>1</th><td>m₄</td><td>m₅</td><td>m₇</td><td>m₆</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:.85rem;color:var(--text-muted)">Note: columns go 00→01→11→10 (Grey code). Column 11 and column 10 are also adjacent to column 00 (the map wraps).</p>
+
+  <h3>Worked K-map Example</h3>
+  <p>Given the truth table below, simplify using a K-map:</p>
+
+  <div class="tt-wrap">
+    <table>
+      <caption>F(A,B,C)</caption>
+      <thead><tr><th>A</th><th>B</th><th>C</th><th>F</th></tr></thead>
+      <tbody>
+        <tr><td>0</td><td>0</td><td>0</td><td class="lo">0</td></tr>
+        <tr><td>0</td><td>0</td><td>1</td><td class="hi">1</td></tr>
+        <tr><td>0</td><td>1</td><td>0</td><td class="lo">0</td></tr>
+        <tr><td>0</td><td>1</td><td>1</td><td class="hi">1</td></tr>
+        <tr><td>1</td><td>0</td><td>0</td><td class="lo">0</td></tr>
+        <tr><td>1</td><td>0</td><td>1</td><td class="hi">1</td></tr>
+        <tr><td>1</td><td>1</td><td>0</td><td class="lo">0</td></tr>
+        <tr><td>1</td><td>1</td><td>1</td><td class="hi">1</td></tr>
+      </tbody>
+    </table>
+
+    <!-- K-map with groups shown -->
+    <div>
+      <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:.4rem;">K-map (minterms 1,3,5,7 are 1):</p>
+      <table class="kmap-table">
+        <thead>
+          <tr><th>A \ BC</th><th>00</th><th>01</th><th>11</th><th>10</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>0</th>
+            <td class="zero">0</td>
+            <td class="one group1">1</td>
+            <td class="one group1">1</td>
+            <td class="zero">0</td>
+          </tr>
+          <tr>
+            <th>1</th>
+            <td class="zero">0</td>
+            <td class="one group1">1</td>
+            <td class="one group1">1</td>
+            <td class="zero">0</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="font-size:.82rem;color:var(--text-muted);margin-top:.5rem">Blue group covers all four 1s (column BC=01 and BC=11).</p>
+    </div>
+  </div>
+
+  <p>All four 1s form a single group of 4. The column header changes from 01→11, so B varies — B is <em>eliminated</em>. A also varies across rows — A is eliminated. Only <strong>C stays constant at 1</strong>.</p>
+  <div class="expr-steps">
+    <div class="step"><code>F = C</code><span class="rule">Group of 4, only C=1 invariant</span></div>
+  </div>
+
+  <h3>K-map Rules</h3>
+  <div class="law-grid">
+    <div class="law-item"><div class="law-name">Group size</div>Must be a power of 2: 1, 2, 4, 8…</div>
+    <div class="law-item"><div class="law-name">Shape</div>Groups must be rectangular (no diagonals)</div>
+    <div class="law-item"><div class="law-name">Wrap-around</div>Edges of the K-map are adjacent (it wraps)</div>
+    <div class="law-item"><div class="law-name">Largest first</div>Always make groups as large as possible</div>
+    <div class="law-item"><div class="law-name">Overlap</div>Groups can overlap — a 1 can be in multiple groups</div>
+    <div class="law-item"><div class="law-name">Don't-cares</div>X (don't-care) can be 0 or 1 — use them to grow groups</div>
+  </div>
+
+  <div class="callout"><strong>Reading the simplified term:</strong> For a group, identify which variables are <em>constant</em> across all cells. If a constant variable is 1, include it uncomplemented; if 0, include it complemented. Variables that change are eliminated.</div>
+</section>
+
+<!-- ===== 8. UNIVERSAL GATES ===== -->
+<section class="section-block" id="universal">
+  <h2>8. NAND &amp; NOR as Universal Gates</h2>
+  <p>Any Boolean function can be built using only NAND gates (or only NOR gates). This is useful because a single gate type simplifies manufacturing.</p>
+
+  <h3>Building AND, OR, NOT from NAND</h3>
+  <div class="tt-wrap" style="display:block">
+    <table style="width:100%;max-width:500px">
+      <thead><tr><th>Gate needed</th><th>NAND equivalent</th></tr></thead>
+      <tbody>
+        <tr><td>NOT A</td><td>NAND(A, A)</td></tr>
+        <tr><td>A AND B</td><td>NAND( NAND(A,B), NAND(A,B) )</td></tr>
+        <tr><td>A OR B</td><td>NAND( NAND(A,A), NAND(B,B) )</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Building AND, OR, NOT from NOR</h3>
+  <div class="tt-wrap" style="display:block">
+    <table style="width:100%;max-width:500px">
+      <thead><tr><th>Gate needed</th><th>NOR equivalent</th></tr></thead>
+      <tbody>
+        <tr><td>NOT A</td><td>NOR(A, A)</td></tr>
+        <tr><td>A OR B</td><td>NOR( NOR(A,B), NOR(A,B) )</td></tr>
+        <tr><td>A AND B</td><td>NOR( NOR(A,A), NOR(B,B) )</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout tip"><strong>Proof that NAND gives NOT:</strong> NAND(A,A) outputs (A·A)' = A' (using idempotent then complement). One gate, one input duplicated.</div>
+</section>
+
+<!-- ===== 9. PRACTICE QUESTIONS ===== -->
+<section class="section-block" id="practice">
+  <h2>9. Practice Questions</h2>
+
+  <div class="practice-q">
+    <h4>Question 1 [4 marks]</h4>
+    <p>Complete the truth table for the Boolean expression <code>F = (A ⊕ B) · C̄</code>.</p>
+    <div class="tt-wrap">
+      <table>
+        <thead><tr><th>A</th><th>B</th><th>C</th><th>A⊕B</th><th>C̄</th><th>F</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td>0</td><td>0</td><td> </td><td> </td><td> </td></tr>
+          <tr><td>0</td><td>0</td><td>1</td><td> </td><td> </td><td> </td></tr>
+          <tr><td>0</td><td>1</td><td>0</td><td> </td><td> </td><td> </td></tr>
+          <tr><td>0</td><td>1</td><td>1</td><td> </td><td> </td><td> </td></tr>
+          <tr><td>1</td><td>0</td><td>0</td><td> </td><td> </td><td> </td></tr>
+          <tr><td>1</td><td>0</td><td>1</td><td> </td><td> </td><td> </td></tr>
+          <tr><td>1</td><td>1</td><td>0</td><td> </td><td> </td><td> </td></tr>
+          <tr><td>1</td><td>1</td><td>1</td><td> </td><td> </td><td> </td></tr>
+        </tbody>
+      </table>
+    </div>
+    <details>
+      <summary>Show mark scheme</summary>
+      <div class="answer">
+        <p><strong>1 mark per correct column (A⊕B, C̄, F):</strong></p>
+        <div class="tt-wrap">
+          <table>
+            <thead><tr><th>A</th><th>B</th><th>C</th><th>A⊕B</th><th>C̄</th><th>F</th></tr></thead>
+            <tbody>
+              <tr><td>0</td><td>0</td><td>0</td><td class="lo">0</td><td class="hi">1</td><td class="lo">0</td></tr>
+              <tr><td>0</td><td>0</td><td>1</td><td class="lo">0</td><td class="lo">0</td><td class="lo">0</td></tr>
+              <tr><td>0</td><td>1</td><td>0</td><td class="hi">1</td><td class="hi">1</td><td class="hi">1</td></tr>
+              <tr><td>0</td><td>1</td><td>1</td><td class="hi">1</td><td class="lo">0</td><td class="lo">0</td></tr>
+              <tr><td>1</td><td>0</td><td>0</td><td class="hi">1</td><td class="hi">1</td><td class="hi">1</td></tr>
+              <tr><td>1</td><td>0</td><td>1</td><td class="hi">1</td><td class="lo">0</td><td class="lo">0</td></tr>
+              <tr><td>1</td><td>1</td><td>0</td><td class="lo">0</td><td class="hi">1</td><td class="lo">0</td></tr>
+              <tr><td>1</td><td>1</td><td>1</td><td class="lo">0</td><td class="lo">0</td><td class="lo">0</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <div class="practice-q">
+    <h4>Question 2 [5 marks]</h4>
+    <p>(a) Use Boolean algebra to simplify: <code>F = ĀBC + ABC + AB̄C</code> &nbsp;&nbsp;[3]</p>
+    <p>(b) State one advantage of simplifying a Boolean expression before building the circuit. &nbsp;&nbsp;[1]</p>
+    <p>(c) State the law used when <code>A + Ā = 1</code>. &nbsp;&nbsp;[1]</p>
+    <details>
+      <summary>Show mark scheme</summary>
+      <div class="answer">
+        <p><strong>(a)</strong></p>
+        <p>F = ĀBC + ABC + AB̄C</p>
+        <p>= BC(Ā + A) + AB̄C &nbsp;&nbsp;[factor BC]</p>
+        <p>= BC · 1 + AB̄C &nbsp;&nbsp;[complement law]</p>
+        <p>= BC + AB̄C &nbsp;&nbsp;[identity]</p>
+        <p>= C(B + AB̄) &nbsp;&nbsp;[factor C]</p>
+        <p>= C(B + A) &nbsp;&nbsp;[absorption: B + AB̄ = B + A]</p>
+        <p><strong>F = C(A + B)</strong></p>
+        <p>Award 1 mark each for: correct factoring; correct application of complement law; correct final simplified form.</p>
+        <p><strong>(b)</strong> Any ONE of: fewer gates needed / reduces cost / reduces power consumption / reduces propagation delay / smaller circuit area</p>
+        <p><strong>(c)</strong> Complement law</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="practice-q">
+    <h4>Question 3 [6 marks]</h4>
+    <p>The Boolean expression for a logic circuit is: <code>F = (A + B) · (Ā + C)</code></p>
+    <p>(a) Draw the logic circuit for this expression. &nbsp;&nbsp;[3]</p>
+    <p>(b) Apply De Morgan's theorem to expand and then simplify the expression as far as possible. &nbsp;&nbsp;[3]</p>
+    <details>
+      <summary>Show mark scheme</summary>
+      <div class="answer">
+        <p><strong>(a) Circuit features (1 mark each):</strong></p>
+        <ul>
+          <li>NOT gate with input A producing Ā</li>
+          <li>OR gate 1: inputs A and B; OR gate 2: inputs Ā and C</li>
+          <li>AND gate combining both OR outputs to give F — correct connections</li>
+        </ul>
+        <p><strong>(b)</strong></p>
+        <p>F = (A + B)(Ā + C)</p>
+        <p>= AĀ + AC + ĀB + BC &nbsp;&nbsp;[expand (distributive)]</p>
+        <p>= 0 + AC + ĀB + BC &nbsp;&nbsp;[complement: AĀ = 0]</p>
+        <p>= AC + ĀB + BC</p>
+        <p>Now use consensus: BC = ABC + ĀBC; note AC absorbs ABC and ĀB absorbs ĀBC:</p>
+        <p><strong>F = AC + ĀB</strong> &nbsp;&nbsp;[1 mark expand, 1 mark eliminate AĀ, 1 mark correct final form]</p>
+      </div>
+    </details>
+  </div>
+
+</section>
+
+<!-- ===== SUMMARY ===== -->
+<section class="section-block" id="summary">
+  <h2>Summary Checklist</h2>
+  <ul class="checklist">
+    <li>Recall the function and symbol of AND, OR, NOT, NAND, NOR, XOR</li>
+    <li>Write and complete truth tables for any combination of gates</li>
+    <li>Use Boolean notation including De Morgan's bar notation</li>
+    <li>Apply all Boolean algebra laws including De Morgan's theorems</li>
+    <li>Simplify Boolean expressions step-by-step showing law names</li>
+    <li>Draw a logic circuit diagram from a Boolean expression</li>
+    <li>Derive a Boolean expression from a logic circuit diagram</li>
+    <li>Use a K-map to find the minimal SOP expression</li>
+    <li>Explain that NAND and NOR are universal gates</li>
+    <li>Describe the half adder (XOR for sum, AND for carry)</li>
+  </ul>
+</section>
+
+</main>
+
+<!-- ── SIDEBAR ── -->
+<aside class="page-sidebar">
+  <div class="sidebar-card">
+    <h4>On this page</h4>
+    <nav class="nav-links">
+      <a href="#gates">1. Logic Gates</a>
+      <a href="#truth-tables">2. Truth Tables</a>
+      <a href="#notation">3. Boolean Notation</a>
+      <a href="#laws">4. Algebra Laws</a>
+      <a href="#simplification">5. Simplification</a>
+      <a href="#circuits">6. Logic Circuits</a>
+      <a href="#kmaps">7. Karnaugh Maps</a>
+      <a href="#universal">8. Universal Gates</a>
+      <a href="#practice">9. Practice Questions</a>
+      <a href="#summary">Summary</a>
+    </nav>
+  </div>
+
+  <div class="sidebar-card">
+    <h4>Key Boolean Laws</h4>
+    <ul>
+      <li><code>A·0=0</code>, <code>A+1=1</code></li>
+      <li><code>A·1=A</code>, <code>A+0=A</code></li>
+      <li><code>A·A=A</code>, <code>A+A=A</code></li>
+      <li><code>A·Ā=0</code>, <code>A+Ā=1</code></li>
+      <li><code>Ā̄=A</code></li>
+      <li><strong>De M.:</strong> <code>(AB)'=Ā+B̄</code></li>
+      <li><strong>De M.:</strong> <code>(A+B)'=ĀB̄</code></li>
+    </ul>
+  </div>
+
+  <div class="sidebar-card">
+    <h4>Gate Quick Ref</h4>
+    <ul>
+      <li><strong>AND:</strong> all 1 → 1</li>
+      <li><strong>OR:</strong> any 1 → 1</li>
+      <li><strong>NOT:</strong> invert</li>
+      <li><strong>NAND:</strong> AND + invert</li>
+      <li><strong>NOR:</strong> OR + invert</li>
+      <li><strong>XOR:</strong> different → 1</li>
+    </ul>
+  </div>
+
+  <div class="sidebar-card">
+    <h4>Common Exam Mistakes</h4>
+    <ul>
+      <li>Forgetting to show law names when simplifying</li>
+      <li>Wrong Grey code order in K-map columns (must be 00,01,11,10)</li>
+      <li>Diagonal groups in K-maps (invalid — must be rectangular)</li>
+      <li>Missing junction dots on circuit diagrams</li>
+      <li>Applying De Morgan's incorrectly — must break the entire bar at once</li>
+    </ul>
+  </div>
+
+  <div class="sidebar-card">
+    <h4>Other Topics</h4>
+    <a href="topic1-information-representation.html">← Topic 1</a><br>
+    <a href="topic2-communication-internet.html">← Topic 2</a><br>
+    <a href="topic3-hardware-virtual-machines.html">← Topic 3</a><br>
+    <a href="index.html">All Topics →</a>
+  </div>
+</aside>
+
+</div><!-- end page-wrap -->
+
+<script src="script.js"></script>
+<script>
+  // Sidebar active highlight on scroll
+  const sections = document.querySelectorAll('.section-block');
+  const navLinks = document.querySelectorAll('.nav-links a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(a => a.classList.remove('active'));
+        const link = document.querySelector(`.nav-links a[href="#${entry.target.id}"]`);
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -60% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
