@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Topic 8: Ethics &amp; Ownership — CS 9618</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .page-nav { background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:64px; z-index:90; overflow-x:auto; }
+    .page-nav-inner { max-width:1100px; margin:0 auto; padding:0 2rem; display:flex; gap:0; }
+    .page-nav a { display:block; padding:.75rem 1.1rem; font-size:.82rem; font-weight:600; color:var(--text-muted); text-decoration:none; white-space:nowrap; border-bottom:3px solid transparent; transition:color .2s,border-color .2s; }
+    .page-nav a:hover,.page-nav a.active { color:var(--primary); border-bottom-color:var(--primary); }
+
+    .lesson-wrap { max-width:1100px; margin:0 auto; padding:2.5rem 2rem 4rem; display:grid; grid-template-columns:1fr 280px; gap:2.5rem; align-items:start; }
+    @media(max-width:900px){ .lesson-wrap{grid-template-columns:1fr} .sidebar{display:none} }
+
+    .sidebar { position:sticky; top:120px; }
+    .sidebar-box { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; margin-bottom:1rem; box-shadow:var(--shadow); }
+    .sidebar-box h3 { font-size:.85rem; font-weight:700; margin-bottom:.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; }
+    .toc-list { list-style:none; }
+    .toc-list li { padding:.2rem 0; }
+    .toc-list a { font-size:.82rem; color:var(--text-muted); text-decoration:none; display:block; padding:.25rem .5rem; border-radius:4px; transition:background .15s,color .15s; }
+    .toc-list a:hover { background:var(--surface2); color:var(--primary); }
+    .toc-list a.active { background:var(--accent-light); color:var(--primary); font-weight:600; }
+
+    .lesson-section { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:2rem 2.25rem; margin-bottom:2rem; box-shadow:var(--shadow); scroll-margin-top:130px; }
+    .lesson-section h2 { font-size:1.5rem; font-weight:800; color:var(--primary); margin-bottom:.4rem; display:flex; align-items:center; gap:.6rem; }
+    .section-num { background:var(--primary); color:#fff; width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:.9rem; font-weight:800; flex-shrink:0; }
+    .lesson-section h3 { font-size:1.1rem; font-weight:700; margin:1.75rem 0 .75rem; padding-bottom:.4rem; border-bottom:2px solid var(--border); color:var(--text); }
+    .lesson-section h4 { font-size:.95rem; font-weight:700; margin:1.25rem 0 .5rem; color:var(--primary-light); }
+    .lesson-section p { font-size:.9rem; line-height:1.75; color:var(--text); margin-bottom:.75rem; }
+    .lesson-section ul,.lesson-section ol { padding-left:1.5rem; margin-bottom:.75rem; }
+    .lesson-section li { font-size:.9rem; line-height:1.75; color:var(--text); }
+
+    /* Worked example */
+    .worked { background:linear-gradient(135deg,#f3e5f5,#fce4ec); border:1px solid #ce93d8; border-left:5px solid #6a1b9a; border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:1.25rem 1.5rem; margin:1rem 0; }
+    [data-theme="dark"] .worked { background:#1a0028; border-color:#6a1b9a; }
+    .worked .worked-title { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#6a1b9a; margin-bottom:.6rem; }
+    [data-theme="dark"] .worked .worked-title { color:#ce93d8; }
+    .worked p,.worked li { font-size:.875rem; color:var(--text); }
+    .worked .step { display:flex; gap:.75rem; margin:.4rem 0; align-items:flex-start; }
+    .worked .step-num { background:#6a1b9a; color:#fff; min-width:22px; height:22px; border-radius:50%; font-size:.72rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+    .worked .step-text { font-size:.875rem; line-height:1.6; }
+
+    /* Practice question */
+    .practice { background:var(--surface2); border:1px solid var(--border); border-left:5px solid #2e7d32; border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:1.25rem 1.5rem; margin:1rem 0; }
+    .practice .pq-title { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#2e7d32; margin-bottom:.6rem; }
+    .practice p,.practice li { font-size:.875rem; }
+    .practice .reveal-btn { background:#2e7d32; color:#fff; border:none; border-radius:6px; padding:.4rem 1rem; font-size:.8rem; font-weight:700; cursor:pointer; margin-top:.75rem; transition:background .2s; }
+    .practice .reveal-btn:hover { background:#1b5e20; }
+    .practice .answer-reveal { display:none; margin-top:.75rem; padding:.75rem 1rem; background:#e8f5e9; border-radius:var(--radius-sm); font-size:.875rem; }
+    [data-theme="dark"] .practice .answer-reveal { background:#1b2e1c; color:#c8e6c9; }
+    .practice .answer-reveal.open { display:block; }
+
+    /* Callouts */
+    .callout { background:var(--surface2); border-left:4px solid var(--accent); border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:.85rem 1.1rem; margin:.75rem 0; font-size:.875rem; color:var(--text); }
+    .callout.warn { border-color:#f59e0b; }
+    .callout.tip  { border-color:#22c55e; }
+    .callout.exam { border-color:#7c3aed; }
+
+    /* Key term */
+    .key-term { background:linear-gradient(transparent 60%,rgba(106,27,154,.15) 60%); font-weight:700; }
+
+    /* Objectives & breadcrumb */
+    .objectives-list { list-style:none; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:.5rem; }
+    .objectives-list li { font-size:.85rem; display:flex; align-items:flex-start; gap:.5rem; padding:.4rem 0; color:var(--text); }
+    .objectives-list li::before { content:'✦'; color:var(--accent); flex-shrink:0; }
+    .breadcrumb { display:flex; align-items:center; gap:.4rem; font-size:.82rem; color:var(--text-muted); margin-bottom:1.5rem; }
+    .breadcrumb a { color:var(--primary-light); text-decoration:none; }
+    .breadcrumb a:hover { text-decoration:underline; }
+
+    /* Checklist */
+    .checklist { list-style:none; padding:0; }
+    .checklist li { display:flex; align-items:flex-start; gap:.6rem; padding:.35rem 0; font-size:.875rem; color:var(--text); }
+    .checklist li::before { content:'☐'; color:var(--primary-light); font-size:1rem; flex-shrink:0; }
+
+    /* Licence cards */
+    .licence-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:.75rem; margin:.75rem 0; }
+    .licence-card { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:.9rem 1rem; border-top:4px solid var(--primary); }
+    .licence-card h4 { font-size:.88rem; font-weight:800; color:var(--primary); margin:0 0 .4rem; }
+    .licence-card p { font-size:.78rem; color:var(--text); margin:0; line-height:1.55; }
+
+    /* Ethics issue cards */
+    .ethics-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:.75rem; margin:.75rem 0; }
+    .ethics-card { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:.9rem 1rem; }
+    .ethics-card .ec-icon { font-size:1.4rem; margin-bottom:.3rem; }
+    .ethics-card h4 { font-size:.88rem; font-weight:800; color:var(--primary); margin:0 0 .35rem; }
+    .ethics-card ul { font-size:.78rem; color:var(--text-muted); padding-left:1.1rem; margin:0; line-height:1.55; }
+
+    /* Comparison table */
+    .plain-table { width:100%; border-collapse:collapse; font-size:.875rem; margin:.75rem 0; }
+    .plain-table th { background:var(--primary); color:#fff; padding:.45rem .8rem; text-align:left; }
+    .plain-table td { border:1px solid var(--border); padding:.4rem .8rem; color:var(--text); vertical-align:top; }
+    .plain-table tr:nth-child(even) td { background:var(--surface2); }
+
+    /* GDPR principles list */
+    .gdpr-list { list-style:none; padding:0; counter-reset:gdpr; }
+    .gdpr-list li { counter-increment:gdpr; display:flex; gap:.75rem; padding:.5rem 0; border-bottom:1px solid var(--border); font-size:.875rem; color:var(--text); }
+    .gdpr-list li:last-child { border-bottom:none; }
+    .gdpr-list li::before { content:counter(gdpr); background:var(--primary); color:#fff; min-width:24px; height:24px; border-radius:50%; font-size:.75rem; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .gdpr-list strong { color:var(--primary-light); }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="header-inner">
+    <a class="logo" href="index.html">
+      <div class="logo-icon">💻</div>
+      <div>
+        <div class="logo-text">CS 9618</div>
+        <div class="logo-sub">Cambridge AS &amp; A Level</div>
+      </div>
+    </a>
+    <div class="header-actions">
+      <button class="btn-icon" id="theme-btn" title="Toggle theme">🌙</button>
+    </div>
+  </div>
+</header>
+
+<!-- Section nav -->
+<nav class="page-nav" aria-label="Sections">
+  <div class="page-nav-inner">
+    <a href="#ip-law" class="active">1. IP &amp; Law</a>
+    <a href="#licensing">2. Licensing</a>
+    <a href="#data-protection">3. Data Protection</a>
+    <a href="#privacy">4. Privacy</a>
+    <a href="#ai-ethics">5. AI Ethics</a>
+    <a href="#impact">6. Social Impact</a>
+    <a href="#exam-practice">📝 Exam Practice</a>
+  </div>
+</nav>
+
+<div class="lesson-wrap">
+<main>
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="index.html">Home</a>
+    <span>›</span>
+    <a href="index.html#tab-as">Paper 1 — Theory</a>
+    <span>›</span>
+    <strong style="color:var(--text)">Topic 8: Ethics &amp; Ownership</strong>
+  </div>
+
+  <!-- Hero -->
+  <div class="lesson-section" style="background:linear-gradient(135deg,#1b5e20,#2e7d32,#388e3c);color:#fff;border:none">
+    <div style="display:flex;align-items:flex-start;gap:1.25rem">
+      <div style="font-size:3rem;flex-shrink:0">⚖️</div>
+      <div>
+        <div style="font-size:.75rem;font-weight:700;opacity:.7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem">Paper 1 · Topic 8</div>
+        <h1 style="font-size:1.9rem;font-weight:900;margin-bottom:.5rem;color:#fff">Ethics &amp; Ownership</h1>
+        <p style="opacity:.85;font-size:.95rem;max-width:620px;margin-bottom:1rem;color:#fff">Intellectual property, software licensing, data protection legislation, privacy, ethical issues in AI, and the wider social impact of computing.</p>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+          <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">Paper 1 · AS &amp; A Level</span>
+          <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">~8% of Paper 1 marks</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Learning objectives -->
+  <div class="lesson-section">
+    <h2><span class="section-num">✦</span> Learning Objectives</h2>
+    <p>By the end of this topic you should be able to:</p>
+    <ul class="objectives-list">
+      <li>Define copyright, patent, and trademark and distinguish between them</li>
+      <li>Describe different software licensing models and their implications</li>
+      <li>Compare open-source and proprietary software</li>
+      <li>State the key principles of data protection legislation (GDPR)</li>
+      <li>Describe the rights of data subjects under GDPR</li>
+      <li>Discuss privacy issues arising from technology (surveillance, social media)</li>
+      <li>Explain ethical concerns in AI: bias, transparency, accountability</li>
+      <li>Discuss the social and economic impact of computing on employment</li>
+      <li>Describe environmental and health impacts of computing</li>
+    </ul>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 1: IP & LAW                    -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="ip-law">
+    <h2><span class="section-num">1</span> Intellectual Property &amp; Law</h2>
+
+    <p><span class="key-term">Intellectual Property (IP)</span> refers to creations of the mind — software, music, written works, inventions, brand names — that are protected by law to give creators economic rights over their work.</p>
+
+    <h3>Forms of IP Protection</h3>
+    <table class="plain-table">
+      <thead><tr><th>Protection</th><th>What it covers</th><th>How obtained</th><th>Duration</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Copyright</strong></td>
+          <td>Original creative works: software code, music, books, images, films</td>
+          <td>Automatic — no registration needed</td>
+          <td>Typically life of author + 70 years</td>
+        </tr>
+        <tr>
+          <td><strong>Patent</strong></td>
+          <td>New inventions and technical processes (e.g. algorithms, hardware designs)</td>
+          <td>Must be registered with a patent office; must be novel and non-obvious</td>
+          <td>Up to 20 years from filing date</td>
+        </tr>
+        <tr>
+          <td><strong>Trademark</strong></td>
+          <td>Brand names, logos, slogans that identify a company's goods or services</td>
+          <td>Can be registered (™ → ®) or established through use</td>
+          <td>Indefinite, provided it is renewed and used</td>
+        </tr>
+        <tr>
+          <td><strong>Trade Secret</strong></td>
+          <td>Confidential business information (e.g. source code, formulas, processes)</td>
+          <td>Maintained through confidentiality agreements (NDAs), no registration</td>
+          <td>Indefinite while kept secret</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Copyright in Software</h3>
+    <p>When a developer writes code, copyright arises automatically. This gives the copyright holder the exclusive right to:</p>
+    <ul>
+      <li>Copy and distribute the software</li>
+      <li>Modify or create derivative works</li>
+      <li>Sell or licence the software to others</li>
+    </ul>
+    <p>Users must agree to a licence before using software — even "free" software has a licence that governs what is permitted.</p>
+
+    <h3>Computer Misuse</h3>
+    <p>Legislation such as the <strong>Computer Misuse Act 1990</strong> (UK) makes it a criminal offence to:</p>
+    <ul>
+      <li>Gain unauthorised access to computer material</li>
+      <li>Access with intent to commit further offences</li>
+      <li>Unauthorised modification of computer material (e.g. installing malware, deleting files)</li>
+    </ul>
+
+    <div class="callout exam">
+      <strong>Exam tip:</strong> Know the difference between copyright (automatic, creative works) and patents (registered, inventions). Many students confuse them. Software is protected by copyright, not patent, in most jurisdictions.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 2: LICENSING                   -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="licensing">
+    <h2><span class="section-num">2</span> Software Licensing</h2>
+
+    <p>A <span class="key-term">software licence</span> is a legal agreement specifying how software may be used, copied, modified, and distributed. Owning a copy of software does not mean you own the software itself — you licence it.</p>
+
+    <div class="licence-grid">
+      <div class="licence-card">
+        <h4>Proprietary / Commercial</h4>
+        <p>Source code is private. Users pay for a licence to use it. Modification and redistribution are prohibited without permission. Examples: Microsoft Windows, Adobe Photoshop.</p>
+      </div>
+      <div class="licence-card">
+        <h4>Open Source</h4>
+        <p>Source code is freely available. Anyone can view, modify, and redistribute under the terms of the open-source licence. Examples: Linux, Python, Firefox.</p>
+      </div>
+      <div class="licence-card">
+        <h4>Freeware</h4>
+        <p>Free to use at no cost, but source code is not provided and the software cannot be modified. Examples: VLC, 7-Zip (binary-only distribution).</p>
+      </div>
+      <div class="licence-card">
+        <h4>Shareware</h4>
+        <p>Trial version is free; users pay to unlock full features or remove restrictions. Examples: WinRAR, many mobile apps (freemium model).</p>
+      </div>
+      <div class="licence-card">
+        <h4>Public Domain</h4>
+        <p>No copyright restrictions — anyone can use, modify, or sell without restriction. Either copyright has expired or was explicitly waived by the author.</p>
+      </div>
+      <div class="licence-card">
+        <h4>Creative Commons</h4>
+        <p>A family of licences for creative works offering various combinations of permissions: attribution required, no commercial use, share-alike (derivatives must use same licence), no derivatives.</p>
+      </div>
+    </div>
+
+    <h3>Open Source Licences</h3>
+    <table class="plain-table">
+      <thead><tr><th>Licence</th><th>Key Terms</th></tr></thead>
+      <tbody>
+        <tr><td><strong>GPL (GNU General Public Licence)</strong></td><td>Copyleft — any derivative work must also be released under GPL ("viral" licence). Ensures software remains open.</td></tr>
+        <tr><td><strong>MIT Licence</strong></td><td>Very permissive — can use, modify, and distribute in proprietary products, as long as the original copyright notice is included.</td></tr>
+        <tr><td><strong>Apache 2.0</strong></td><td>Permissive like MIT but also provides an explicit patent licence grant and requires preservation of notices.</td></tr>
+        <tr><td><strong>BSD Licences</strong></td><td>Permissive family. 2-clause BSD is similar to MIT. 3-clause adds a non-endorsement clause.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Open Source vs Proprietary</h3>
+    <table class="plain-table">
+      <thead><tr><th>Feature</th><th>Open Source</th><th>Proprietary</th></tr></thead>
+      <tbody>
+        <tr><td>Source code access</td><td>Freely available</td><td>Hidden from users</td></tr>
+        <tr><td>Cost</td><td>Usually free (though support may cost)</td><td>Licence fee typically required</td></tr>
+        <tr><td>Modification</td><td>Permitted under licence terms</td><td>Not permitted without permission</td></tr>
+        <tr><td>Support</td><td>Community forums, documentation</td><td>Official vendor support</td></tr>
+        <tr><td>Security auditing</td><td>Anyone can inspect for vulnerabilities</td><td>Only the vendor can audit code</td></tr>
+        <tr><td>Reliability</td><td>Varies; may lack polish</td><td>Typically well-tested before release</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout tip">
+      <strong>Freeware ≠ Open Source:</strong> Freeware is free to use, but the source code is not available and you cannot modify it. Open-source software may or may not have a monetary cost, but the source code is always available.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 3: DATA PROTECTION             -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="data-protection">
+    <h2><span class="section-num">3</span> Data Protection Legislation</h2>
+
+    <p><span class="key-term">Personal data</span> is any information that identifies or can identify a living individual — name, email, IP address, biometrics, location. Legislation governs how organisations collect, store, and use it.</p>
+
+    <h3>GDPR Principles</h3>
+    <p>The <span class="key-term">General Data Protection Regulation (GDPR)</span> sets out seven key principles. Personal data must be:</p>
+
+    <ol class="gdpr-list">
+      <li><strong>Lawful, fair, and transparent</strong> — processed on a legal basis with clear notice to the individual</li>
+      <li><strong>Purpose limitation</strong> — collected for specified, explicit purposes and not processed further in incompatible ways</li>
+      <li><strong>Data minimisation</strong> — only the data actually needed for the stated purpose should be collected</li>
+      <li><strong>Accuracy</strong> — kept up to date; inaccurate data must be corrected or erased without delay</li>
+      <li><strong>Storage limitation</strong> — not kept longer than necessary; retention periods should be defined</li>
+      <li><strong>Integrity and confidentiality</strong> — processed securely using appropriate technical and organisational measures</li>
+      <li><strong>Accountability</strong> — the data controller is responsible for compliance and must be able to demonstrate it</li>
+    </ol>
+
+    <h3>Rights of Data Subjects</h3>
+    <table class="plain-table">
+      <thead><tr><th>Right</th><th>What it means</th></tr></thead>
+      <tbody>
+        <tr><td>Right of access</td><td>Request a copy of all personal data held about you (Subject Access Request)</td></tr>
+        <tr><td>Right to rectification</td><td>Have inaccurate or incomplete data corrected</td></tr>
+        <tr><td>Right to erasure</td><td>"Right to be forgotten" — request deletion of personal data when it is no longer necessary</td></tr>
+        <tr><td>Right to data portability</td><td>Receive your data in a structured, machine-readable format and transfer it to another controller</td></tr>
+        <tr><td>Right to restrict processing</td><td>Pause processing while accuracy or legality is disputed</td></tr>
+        <tr><td>Right to object</td><td>Object to processing for direct marketing or based on legitimate interests</td></tr>
+        <tr><td>Rights re: automated decisions</td><td>Not be subject to solely automated decisions with significant legal or similarly significant effects</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Roles Under GDPR</h3>
+    <div class="worked">
+      <div class="worked-title">Key Roles</div>
+      <p><strong>Data Controller:</strong> The organisation that determines the purposes and means of processing personal data. Legally responsible for GDPR compliance. Example: a hospital that holds patient records.</p>
+      <p style="margin-top:.5rem"><strong>Data Processor:</strong> Processes data on behalf of the controller — must act only on the controller's instructions. Example: a cloud storage provider used by the hospital.</p>
+      <p style="margin-top:.5rem"><strong>Data Subject:</strong> The living individual whose personal data is being processed. Example: the patient.</p>
+    </div>
+
+    <div class="callout exam">
+      <strong>Exam tip:</strong> You may be asked to identify whether an action complies with GDPR. Key markers: Is there a lawful basis? Is only necessary data collected? Is it stored only as long as needed? Can the subject exercise their rights?
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 4: PRIVACY                     -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="privacy">
+    <h2><span class="section-num">4</span> Privacy in the Digital Age</h2>
+
+    <p>Technology has dramatically expanded the ability to collect, store, and analyse personal data, raising serious privacy concerns.</p>
+
+    <h3>Surveillance Technologies</h3>
+    <table class="plain-table">
+      <thead><tr><th>Technology</th><th>Privacy Concern</th></tr></thead>
+      <tbody>
+        <tr><td>CCTV / facial recognition</td><td>Mass identification of individuals in public spaces without consent; chilling effect on freedom of assembly</td></tr>
+        <tr><td>Internet tracking (cookies, fingerprinting)</td><td>Websites build detailed profiles of browsing behaviour across the web for targeted advertising</td></tr>
+        <tr><td>Location data (GPS, mobile)</td><td>Continuous tracking of physical movements; sold to data brokers or accessed by governments</td></tr>
+        <tr><td>Smart home devices</td><td>Always-on microphones / cameras in homes; data sent to cloud servers; potential for unauthorised access</td></tr>
+        <tr><td>Social media profiling</td><td>Aggregation of posts, likes, location check-ins to infer personal attributes (political views, mental health, relationships)</td></tr>
+        <tr><td>Workplace monitoring</td><td>Employer surveillance of emails, keystrokes, screenshots; blurs boundary between professional and personal</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Anonymisation vs Pseudonymisation</h3>
+    <p>Organisations often claim to protect privacy by transforming data:</p>
+    <ul>
+      <li><strong>Anonymisation:</strong> Personal identifiers are permanently removed so the individual can no longer be identified. Truly anonymised data falls outside GDPR scope. Difficult to achieve in practice — re-identification attacks are possible.</li>
+      <li><strong>Pseudonymisation:</strong> Direct identifiers are replaced with a pseudonym (e.g. an ID number). The link to the real person still exists (held separately). Still personal data under GDPR but treated as lower risk.</li>
+    </ul>
+
+    <div class="callout warn">
+      <strong>Re-identification risk:</strong> Even supposedly anonymised datasets can be re-identified by combining them with other publicly available data. For example, combining anonymised medical records with publicly available birth and postcode data can re-identify individuals.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 5: AI ETHICS                   -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="ai-ethics">
+    <h2><span class="section-num">5</span> Ethical Issues in AI</h2>
+
+    <p>As AI systems make increasingly consequential decisions, ethical concerns have become central to computer science.</p>
+
+    <h3>Bias in AI Systems</h3>
+    <p><span class="key-term">Algorithmic bias</span> occurs when an AI system produces systematically unfair outcomes for certain groups. This typically originates from:</p>
+    <ul>
+      <li><strong>Biased training data:</strong> If historical data reflects human prejudices, the model learns those prejudices. Example: a hiring algorithm trained on historical hiring decisions that favoured men will continue to favour men.</li>
+      <li><strong>Non-representative datasets:</strong> If training data under-represents certain groups, the model performs poorly for them. Example: facial recognition systems with higher error rates for darker skin tones.</li>
+      <li><strong>Feedback loops:</strong> AI decisions influence future data (e.g. predictive policing directs officers to certain areas, generating more arrests there, which are fed back to train the model).</li>
+    </ul>
+
+    <h3>Transparency and Explainability</h3>
+    <p>Many AI models — particularly deep neural networks — are <span class="key-term">black boxes</span>: their internal decision-making process cannot easily be inspected or explained.</p>
+    <ul>
+      <li><strong>Problem:</strong> If an algorithm rejects a loan application or a job application, the applicant has a right to know why (under GDPR's rights regarding automated decisions). A black-box model cannot provide that explanation.</li>
+      <li><strong>Explainable AI (XAI):</strong> Research area focused on building models whose reasoning can be understood by humans. Trade-off: more explainable models are often less accurate.</li>
+    </ul>
+
+    <h3>Accountability</h3>
+    <p>When an AI system causes harm, who is responsible?</p>
+    <ul>
+      <li>The developer who built the algorithm?</li>
+      <li>The organisation that deployed it?</li>
+      <li>The user who relied on its decision?</li>
+    </ul>
+    <p>Current legal frameworks were not designed with AI in mind. The EU AI Act (2024) begins to address liability by classifying AI systems by risk level and imposing obligations on high-risk applications (healthcare, policing, hiring).</p>
+
+    <h3>Autonomous Weapons &amp; Critical Systems</h3>
+    <p>AI in life-or-death decisions raises profound ethical questions:</p>
+    <ul>
+      <li><strong>Autonomous weapons:</strong> Systems that can select and engage targets without human intervention. Debate: should machines decide who to kill?</li>
+      <li><strong>Medical diagnosis:</strong> AI can match or exceed radiologists at detecting certain cancers — but errors can be fatal. Who is liable if the AI is wrong?</li>
+      <li><strong>Self-driving vehicles:</strong> Trolley-problem scenarios — how should an autonomous car make decisions when a collision is unavoidable?</li>
+    </ul>
+
+    <div class="callout exam">
+      <strong>Exam tip:</strong> Ethics questions often ask you to "discuss" or "evaluate." You must present both sides — advantages and disadvantages or ethical concerns vs benefits — before reaching a balanced conclusion. Don't just list points; explain the reasoning.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 6: SOCIAL IMPACT               -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="impact">
+    <h2><span class="section-num">6</span> Social &amp; Environmental Impact</h2>
+
+    <div class="ethics-grid">
+      <div class="ethics-card">
+        <div class="ec-icon">💼</div>
+        <h4>Employment</h4>
+        <ul>
+          <li>Automation replacing routine manual and cognitive jobs</li>
+          <li>New tech roles created (AI engineer, data scientist)</li>
+          <li>Gig economy: flexible but insecure work</li>
+          <li>Risk of widening inequality between skilled and unskilled workers</li>
+        </ul>
+      </div>
+      <div class="ethics-card">
+        <div class="ec-icon">🌍</div>
+        <h4>Digital Divide</h4>
+        <ul>
+          <li>Unequal access to technology between wealthy and developing nations</li>
+          <li>Rural vs urban internet access gap</li>
+          <li>Those without digital skills excluded from services, jobs, education</li>
+          <li>Risk of entrenching existing social inequalities</li>
+        </ul>
+      </div>
+      <div class="ethics-card">
+        <div class="ec-icon">♻️</div>
+        <h4>Environmental Impact</h4>
+        <ul>
+          <li>Data centres consume ~1–2% of global electricity</li>
+          <li>Training large AI models emits significant CO₂</li>
+          <li>E-waste from obsolete hardware contains toxic materials</li>
+          <li>Mining rare earth metals for devices causes environmental damage</li>
+        </ul>
+      </div>
+      <div class="ethics-card">
+        <div class="ec-icon">🧠</div>
+        <h4>Health &amp; Wellbeing</h4>
+        <ul>
+          <li>Repetitive strain injuries from prolonged computer use</li>
+          <li>Eye strain, poor posture from screen time</li>
+          <li>Social media linked to anxiety and depression, especially in teenagers</li>
+          <li>Addictive design patterns in apps and games</li>
+        </ul>
+      </div>
+      <div class="ethics-card">
+        <div class="ec-icon">📰</div>
+        <h4>Misinformation</h4>
+        <ul>
+          <li>Social media enables rapid spread of false information</li>
+          <li>Deepfakes: AI-generated fake video/audio</li>
+          <li>Filter bubbles: algorithms show content that reinforces existing beliefs</li>
+          <li>Difficult to distinguish authentic from synthetic content</li>
+        </ul>
+      </div>
+      <div class="ethics-card">
+        <div class="ec-icon">🔓</div>
+        <h4>Freedom &amp; Censorship</h4>
+        <ul>
+          <li>Governments using the Internet to suppress dissent</li>
+          <li>Internet filtering and content blocking</li>
+          <li>Tech companies as de facto arbiters of speech</li>
+          <li>Tension between free expression and protection from harm</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Balancing Benefits and Risks</h3>
+    <p>Exam questions often ask you to evaluate the impact of a technology. Use this framework:</p>
+    <table class="plain-table">
+      <thead><tr><th>Dimension</th><th>Question to ask</th></tr></thead>
+      <tbody>
+        <tr><td>Who benefits?</td><td>Is the benefit widespread or concentrated in a few?</td></tr>
+        <tr><td>Who is harmed?</td><td>Are the harmed groups already vulnerable or marginalised?</td></tr>
+        <tr><td>Reversibility</td><td>Can the harm be undone, or is it permanent?</td></tr>
+        <tr><td>Consent</td><td>Did those affected agree to the risks?</td></tr>
+        <tr><td>Alternatives</td><td>Could the same benefit be achieved with less harm?</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- EXAM PRACTICE                          -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="exam-practice">
+    <h2><span class="section-num">📝</span> Exam Practice</h2>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question 1 — 3 marks</div>
+      <p>Distinguish between copyright and patent as forms of intellectual property protection. Give one example of each in the context of computing.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Copyright</strong> automatically protects original creative works (e.g. software source code, documentation, graphics) from being copied without permission. It arises at the moment of creation without registration. Duration is typically the author's life plus 70 years. <em>Example:</em> the source code of a video game is automatically protected by copyright.</p>
+        <p><strong>Patent</strong> protects new inventions and must be registered with a patent office. The invention must be novel and non-obvious. Duration is up to 20 years. <em>Example:</em> a novel hardware compression algorithm could be patented.</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question 2 — 4 marks</div>
+      <p>A company is developing software and must choose between releasing it as open source under the GPL or as proprietary software. Discuss two advantages and two disadvantages of choosing the open-source GPL approach.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Advantages:</strong></p>
+        <ul>
+          <li>The community can contribute improvements and bug fixes, reducing development costs and potentially improving quality faster than a single team could.</li>
+          <li>Security researchers worldwide can audit the source code for vulnerabilities — "many eyes" make bugs easier to find (Linus's Law).</li>
+        </ul>
+        <p><strong>Disadvantages:</strong></p>
+        <ul>
+          <li>The GPL's copyleft clause means any derivative work must also be released under GPL — the company cannot include the code in proprietary products, limiting commercial opportunities.</li>
+          <li>Without a revenue stream from licence fees, funding ongoing development and providing official technical support is more difficult.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question 3 — 5 marks</div>
+      <p>State five of the seven GDPR data protection principles and, for each, give a practical example of how an organisation might comply with it.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p>Any five from:</p>
+        <ul>
+          <li><strong>Lawful, fair, transparent:</strong> A website displays a clear privacy notice before collecting email addresses and obtains explicit consent.</li>
+          <li><strong>Purpose limitation:</strong> A company collects customer delivery addresses only for order fulfilment, not for selling to marketing firms.</li>
+          <li><strong>Data minimisation:</strong> A job application form asks only for relevant qualifications and contact details, not for date of birth or marital status.</li>
+          <li><strong>Accuracy:</strong> A bank provides customers with an online portal to update their contact details and regularly prompts them to review their information.</li>
+          <li><strong>Storage limitation:</strong> A school deletes student records 7 years after they leave, as defined in its retention schedule.</li>
+          <li><strong>Integrity and confidentiality:</strong> Patient records are encrypted at rest and access is restricted to authorised clinical staff via role-based access control.</li>
+          <li><strong>Accountability:</strong> An organisation appoints a Data Protection Officer (DPO) and maintains records of all processing activities.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question 4 — 6 marks</div>
+      <p>Discuss the ethical issues arising from the use of AI in recruitment decisions. Your answer should consider both the potential benefits and the ethical concerns.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Benefits:</strong></p>
+        <ul>
+          <li>Can process large numbers of CVs quickly and consistently, reducing the time and cost of screening.</li>
+          <li>If designed carefully, could reduce human bias (e.g. unconscious bias based on name or address) by focusing on objective criteria.</li>
+          <li>Frees human recruiters to focus on higher-value tasks such as interviews and cultural fit assessment.</li>
+        </ul>
+        <p><strong>Ethical concerns:</strong></p>
+        <ul>
+          <li><strong>Algorithmic bias:</strong> If trained on historical hiring data that reflects past discrimination (e.g. more male engineers hired), the system will perpetuate or amplify that bias.</li>
+          <li><strong>Lack of transparency:</strong> Candidates rejected by a black-box AI system cannot understand why, making it difficult to appeal or improve their application. GDPR grants the right to an explanation for automated decisions.</li>
+          <li><strong>Accountability gap:</strong> It is unclear who is responsible when an AI causes a discriminatory hiring decision — the developer, the employer, or the system itself?</li>
+          <li><strong>Reduced diversity:</strong> Optimising for similarity to existing employees risks homogenising the workforce and excluding candidates from non-traditional backgrounds.</li>
+        </ul>
+        <p><strong>Conclusion:</strong> AI in recruitment can be efficient and consistent, but without careful design, bias audits, and human oversight, it risks embedding and scaling existing inequalities. Regulation and transparency are essential safeguards.</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question 5 — 2 marks</div>
+      <p>Explain the difference between anonymisation and pseudonymisation of personal data.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Anonymisation</strong> permanently removes all identifying information so that individuals can no longer be identified from the data. Truly anonymised data is no longer personal data and falls outside GDPR.</p>
+        <p><strong>Pseudonymisation</strong> replaces direct identifiers (e.g. names) with a code or pseudonym. The individual can still be re-identified using the mapping key held separately. It is still personal data under GDPR but is considered lower risk.</p>
+      </div>
+    </div>
+
+    <h3>Revision Checklist</h3>
+    <ul class="checklist">
+      <li>I can define copyright, patent, trademark, and trade secret and say how they differ</li>
+      <li>I can describe at least five software licensing models with examples</li>
+      <li>I can compare open-source and proprietary software (at least 3 points each)</li>
+      <li>I can state all seven GDPR principles and give an example for each</li>
+      <li>I can list at least five rights of data subjects under GDPR</li>
+      <li>I can distinguish between data controller and data processor</li>
+      <li>I can describe at least four privacy concerns raised by modern technology</li>
+      <li>I can explain the difference between anonymisation and pseudonymisation</li>
+      <li>I can explain what algorithmic bias is, where it comes from, and give an example</li>
+      <li>I can discuss the lack of transparency in AI and why it matters (GDPR link)</li>
+      <li>I can discuss at least three wider social/environmental impacts of computing</li>
+      <li>I can write balanced "discuss" answers presenting both benefits and concerns</li>
+    </ul>
+  </div>
+
+</main>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+
+  <div class="sidebar-box">
+    <h3>Contents</h3>
+    <ul class="toc-list">
+      <li><a href="#ip-law">1. IP &amp; Law</a></li>
+      <li><a href="#licensing">2. Licensing</a></li>
+      <li><a href="#data-protection">3. Data Protection</a></li>
+      <li><a href="#privacy">4. Privacy</a></li>
+      <li><a href="#ai-ethics">5. AI Ethics</a></li>
+      <li><a href="#impact">6. Social Impact</a></li>
+      <li><a href="#exam-practice">📝 Exam Practice</a></li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>IP Quick Reference</h3>
+    <ul style="font-size:.78rem;padding-left:1.1rem;color:var(--text)">
+      <li style="margin:.25rem 0"><strong>Copyright:</strong> automatic, creative works</li>
+      <li style="margin:.25rem 0"><strong>Patent:</strong> registered, inventions, 20 yr</li>
+      <li style="margin:.25rem 0"><strong>Trademark:</strong> registered, brand identity</li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>GDPR 7 Principles</h3>
+    <ol style="font-size:.78rem;padding-left:1.2rem;color:var(--text);margin:0">
+      <li style="margin:.2rem 0">Lawful, fair &amp; transparent</li>
+      <li style="margin:.2rem 0">Purpose limitation</li>
+      <li style="margin:.2rem 0">Data minimisation</li>
+      <li style="margin:.2rem 0">Accuracy</li>
+      <li style="margin:.2rem 0">Storage limitation</li>
+      <li style="margin:.2rem 0">Integrity &amp; confidentiality</li>
+      <li style="margin:.2rem 0">Accountability</li>
+    </ol>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>Licensing Summary</h3>
+    <ul style="font-size:.78rem;padding-left:1.1rem;color:var(--text)">
+      <li style="margin:.25rem 0"><strong>Proprietary:</strong> closed source, paid</li>
+      <li style="margin:.25rem 0"><strong>Open source:</strong> source available (GPL/MIT)</li>
+      <li style="margin:.25rem 0"><strong>Freeware:</strong> free, no source</li>
+      <li style="margin:.25rem 0"><strong>Shareware:</strong> trial, pay for full</li>
+      <li style="margin:.25rem 0"><strong>Public domain:</strong> no restrictions</li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box" style="border-left:4px solid #6a1b9a">
+    <h3 style="color:#6a1b9a">Common Mistakes</h3>
+    <ul style="font-size:.78rem;padding-left:1.1rem;color:var(--text)">
+      <li style="margin:.3rem 0">Saying freeware = open source — freeware has no source code access</li>
+      <li style="margin:.3rem 0">Confusing copyright (automatic) with patent (registered)</li>
+      <li style="margin:.3rem 0">Saying GDPR only applies to EU companies — it applies to any organisation processing EU residents' data</li>
+      <li style="margin:.3rem 0">One-sided answers on "discuss" questions — always give both sides</li>
+      <li style="margin:.3rem 0">Saying anonymised data is the same as pseudonymised — anonymisation is irreversible</li>
+    </ul>
+  </div>
+
+  <a href="topic7-security-privacy.html" style="display:block;text-align:center;background:var(--surface2);color:var(--primary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.65rem;font-weight:700;font-size:.82rem;text-decoration:none;margin-top:.25rem">
+    ← Topic 7: Security &amp; Privacy
+  </a>
+  <a href="index.html" style="display:block;text-align:center;background:var(--primary);color:#fff;border-radius:var(--radius-sm);padding:.75rem;font-weight:700;font-size:.875rem;text-decoration:none;margin-top:.5rem">
+    ← Back to All Topics
+  </a>
+
+</aside>
+
+</div><!-- /lesson-wrap -->
+
+<footer style="background:var(--surface);border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;font-size:.8rem;color:var(--text-muted)">
+  Cambridge International AS &amp; A Level Computer Science 9618 — Topic 8: Ethics &amp; Ownership &nbsp;|&nbsp;
+  Not affiliated with Cambridge Assessment International Education.
+</footer>
+
+<script src="script.js"></script>
+<script>
+  const sections = document.querySelectorAll('.lesson-section[id]');
+  const navLinks = document.querySelectorAll('.toc-list a, .page-nav a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+  document.querySelectorAll('.reveal-btn').forEach(btn => { btn.textContent = 'Show Answer'; });
+</script>
+</body>
+</html>
