@@ -106,7 +106,7 @@
     <div class="topic-grid">
 
       <!-- 1. Information Representation -->
-      <a href="topic1-information-representation.html" style="text-decoration:none;display:block" class="topic-card" data-detail="info-rep">
+      <a href="topic1-information-representation.html" style="text-decoration:none;display:block" class="topic-card">
         <div class="card-header">
           <div class="card-icon chip-blue">🔢</div>
           <div>
@@ -125,7 +125,7 @@
       </a>
 
       <!-- 2. Communication -->
-      <a href="topic2-communication-internet.html" style="text-decoration:none;display:block" class="topic-card" data-detail="communication">
+      <a href="topic2-communication-internet.html" style="text-decoration:none;display:block" class="topic-card">
         <div class="card-header">
           <div class="card-icon chip-green">🌐</div>
           <div>
@@ -144,7 +144,7 @@
       </a>
 
       <!-- 3. Hardware & VMs -->
-      <a href="topic3-hardware-virtual-machines.html" style="text-decoration:none;display:block" class="topic-card" data-detail="hardware-vm">
+      <a href="topic3-hardware-virtual-machines.html" style="text-decoration:none;display:block" class="topic-card">
         <div class="card-header">
           <div class="card-icon chip-purple">🖥️</div>
           <div>
@@ -163,7 +163,7 @@
       </a>
 
       <!-- 4. Logic Gates -->
-      <a href="topic4-logic-gates.html" style="text-decoration:none;display:block" class="topic-card" data-detail="logic">
+      <a href="topic4-logic-gates.html" style="text-decoration:none;display:block" class="topic-card">
         <div class="card-header">
           <div class="card-icon chip-orange">⚡</div>
           <div>
@@ -182,7 +182,7 @@
       </a>
 
       <!-- 5. Processor Fundamentals -->
-      <a href="topic5-processor-fundamentals.html" style="text-decoration:none;display:block" class="topic-card" data-detail="processor">
+      <a href="topic5-processor-fundamentals.html" style="text-decoration:none;display:block" class="topic-card">
         <div class="card-header">
           <div class="card-icon chip-red">⚙️</div>
           <div>
@@ -201,7 +201,7 @@
       </a>
 
       <!-- 6. System Software -->
-      <a href="topic6-system-software.html" style="text-decoration:none;display:block" class="topic-card" data-detail="system-sw">
+      <a href="topic6-system-software.html" style="text-decoration:none;display:block" class="topic-card">
         <div class="card-header">
           <div class="card-icon chip-teal">🗂️</div>
           <div>
@@ -220,7 +220,7 @@
       </a>
 
       <!-- 7. Security -->
-      <a href="topic7-security-privacy.html" style="text-decoration:none;display:block" class="topic-card" data-detail="security">
+      <a href="topic7-security-privacy.html" style="text-decoration:none;display:block" class="topic-card">
         <div class="card-header">
           <div class="card-icon chip-blue">🔒</div>
           <div>
@@ -239,7 +239,7 @@
       </a>
 
       <!-- 8. Ethics -->
-      <a href="topic8-ethics-ownership.html" style="text-decoration:none;display:block" class="topic-card" data-detail="ethics">
+      <a href="topic8-ethics-ownership.html" style="text-decoration:none;display:block" class="topic-card">
         <div class="card-header">
           <div class="card-icon chip-green">⚖️</div>
           <div>
@@ -258,7 +258,7 @@
       </a>
 
       <!-- 9. Databases -->
-      <a href="topic9-databases.html" style="text-decoration:none;display:block" class="topic-card" data-detail="databases">
+      <a href="topic9-databases.html" style="text-decoration:none;display:block" class="topic-card">
         <div class="card-header">
           <div class="card-icon chip-purple">🗃️</div>
           <div>
@@ -507,664 +507,6 @@
 <!-- ============================================================ -->
 
 <div class="container" style="padding-top:0">
-
-<!-- ======================== INFORMATION REPRESENTATION ======================== -->
-<div class="topic-detail" id="info-rep">
-  <div class="detail-header">
-    <div class="icon">🔢</div>
-    <div>
-      <h2>Information Representation</h2>
-      <p>Topic 1 · Paper 1 · How computers store and process all forms of data</p>
-    </div>
-    <button class="close-detail">✕ Close</button>
-  </div>
-  <div class="detail-body">
-
-    <div class="content-section">
-      <h3>📌 Number Bases</h3>
-      <div class="subtopic-list">
-        <div class="subtopic-item">
-          <h4>Binary (Base 2)</h4>
-          <ul>
-            <li>Digits: 0, 1 — each is a bit</li>
-            <li>8 bits = 1 byte; 1024 bytes = 1 KiB</li>
-            <li>Convert binary → denary: sum of positional values</li>
-            <li>Convert denary → binary: repeated division by 2</li>
-          </ul>
-        </div>
-        <div class="subtopic-item">
-          <h4>Hexadecimal (Base 16)</h4>
-          <ul>
-            <li>Digits: 0–9, A(10)–F(15)</li>
-            <li>1 hex digit = 4 bits (nibble)</li>
-            <li>Used for memory addresses, RGB colours</li>
-            <li>Convert: group binary into 4-bit nibbles</li>
-          </ul>
-        </div>
-        <div class="subtopic-item">
-          <h4>Binary Arithmetic</h4>
-          <ul>
-            <li>Addition: 0+0=0, 0+1=1, 1+1=10 (carry)</li>
-            <li>Overflow: result too large for the word size</li>
-            <li>Subtraction using two's complement</li>
-          </ul>
-        </div>
-        <div class="subtopic-item">
-          <h4>Two's Complement</h4>
-          <ul>
-            <li>Represents negative integers</li>
-            <li>Invert all bits then add 1</li>
-            <li>MSB has negative place value (e.g. –128 in 8-bit)</li>
-            <li>Range for n bits: –2^(n–1) to 2^(n–1)–1</li>
-          </ul>
-        </div>
-      </div>
-      <div class="callout tip">
-        <span class="callout-icon">💡</span>
-        <span><strong>Exam tip:</strong> Always show working when converting between bases. State the place values explicitly.</span>
-      </div>
-    </div>
-
-    <div class="content-section">
-      <h3>🔤 Character Encoding</h3>
-      <div class="concept-grid">
-        <div class="concept-card">
-          <div class="term">ASCII</div>
-          <div class="def">7-bit code (128 characters). Extended ASCII uses 8 bits (256 characters). Covers English letters, digits, punctuation.</div>
-        </div>
-        <div class="concept-card">
-          <div class="term">Unicode</div>
-          <div class="def">Variable-width encoding (UTF-8, UTF-16, UTF-32). Covers 1 million+ characters across all world languages and symbols.</div>
-        </div>
-        <div class="concept-card">
-          <div class="term">Code Point</div>
-          <div class="def">A unique number assigned to each character in Unicode. Written as U+XXXX (e.g. U+0041 = 'A').</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="content-section">
-      <h3>🖼️ Images &amp; Sound</h3>
-      <table class="styled-table">
-        <thead><tr><th>Concept</th><th>Definition</th><th>Effect on File Size</th></tr></thead>
-        <tbody>
-          <tr><td>Pixel</td><td>Smallest addressable element of an image</td><td>—</td></tr>
-          <tr><td>Resolution</td><td>Number of pixels per unit area (ppi/dpi)</td><td>Higher → larger file</td></tr>
-          <tr><td>Colour depth</td><td>Bits used per pixel (e.g. 24-bit = 16M colours)</td><td>Higher → larger file</td></tr>
-          <tr><td>Sample rate</td><td>Sound samples taken per second (Hz/kHz)</td><td>Higher → larger file</td></tr>
-          <tr><td>Bit depth</td><td>Bits per sound sample (precision)</td><td>Higher → larger file</td></tr>
-        </tbody>
-      </table>
-      <p style="font-size:0.875rem; color:var(--text-muted); margin-top:0.5rem"><strong>Image file size (bytes)</strong> = (width × height × colour depth) ÷ 8</p>
-      <p style="font-size:0.875rem; color:var(--text-muted); margin-top:0.25rem"><strong>Audio file size (bytes)</strong> = sample rate × bit depth × duration (s) ÷ 8</p>
-    </div>
-
-    <div class="content-section">
-      <h3>📦 Compression</h3>
-      <div class="concept-grid">
-        <div class="concept-card">
-          <div class="term">Lossy Compression</div>
-          <div class="def">Permanently removes data. Smaller files but quality lost. Used for JPEG images and MP3 audio. Cannot be reversed.</div>
-        </div>
-        <div class="concept-card">
-          <div class="term">Lossless Compression</div>
-          <div class="def">No data lost; original can be fully reconstructed. Used for PNG, ZIP, text files. Examples: RLE, Huffman coding.</div>
-        </div>
-        <div class="concept-card">
-          <div class="term">Run-Length Encoding (RLE)</div>
-          <div class="def">Stores a value and its consecutive repeat count. Best for images with large uniform areas (e.g. BBBBBBB → 7B).</div>
-        </div>
-        <div class="concept-card">
-          <div class="term">Huffman Coding</div>
-          <div class="def">Variable-length codes assigned based on frequency. Most frequent characters get shortest codes. Used in DEFLATE/ZIP.</div>
-        </div>
-      </div>
-      <div class="callout exam">
-        <span class="callout-icon">📝</span>
-        <span><strong>Common exam question:</strong> Build a Huffman tree from given frequencies and encode/decode a message. Practice traversing the tree left (0) and right (1).</span>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ======================== COMMUNICATION ======================== -->
-<div class="topic-detail" id="communication">
-  <div class="detail-header">
-    <div class="icon">🌐</div>
-    <div>
-      <h2>Communication &amp; Internet Technologies</h2>
-      <p>Topic 2 · Paper 1 · Networks, protocols, and the Internet</p>
-    </div>
-    <button class="close-detail">✕ Close</button>
-  </div>
-  <div class="detail-body">
-
-    <div class="content-section">
-      <h3>🔗 Network Fundamentals</h3>
-      <div class="subtopic-list">
-        <div class="subtopic-item">
-          <h4>Network Topologies</h4>
-          <ul>
-            <li><strong>Bus:</strong> single shared backbone, cheap but collisions</li>
-            <li><strong>Star:</strong> central switch/hub, reliable, easy to add nodes</li>
-            <li><strong>Ring:</strong> token passing, equal access, failure propagates</li>
-            <li><strong>Mesh:</strong> multiple paths, resilient, expensive</li>
-          </ul>
-        </div>
-        <div class="subtopic-item">
-          <h4>Transmission Media</h4>
-          <ul>
-            <li>Copper wire (twisted pair, coaxial)</li>
-            <li>Fibre optic — fast, no interference</li>
-            <li>Wi-Fi (IEEE 802.11) — wireless radio waves</li>
-            <li>Bluetooth — short range PAN</li>
-          </ul>
-        </div>
-        <div class="subtopic-item">
-          <h4>Network Hardware</h4>
-          <ul>
-            <li><strong>Switch:</strong> connects LAN devices using MAC addresses</li>
-            <li><strong>Router:</strong> forwards packets between networks using IP</li>
-            <li><strong>NIC:</strong> Network Interface Card — unique MAC address</li>
-            <li><strong>Gateway:</strong> connects networks with different protocols</li>
-          </ul>
-        </div>
-        <div class="subtopic-item">
-          <h4>Client–Server vs P2P</h4>
-          <ul>
-            <li><strong>Client–server:</strong> central server provides resources; easier to manage and secure</li>
-            <li><strong>Peer-to-peer:</strong> all nodes equal; decentralised; harder to secure</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <div class="content-section">
-      <h3>📬 The OSI Model</h3>
-      <table class="styled-table">
-        <thead><tr><th>#</th><th>Layer</th><th>Function</th><th>Example</th></tr></thead>
-        <tbody>
-          <tr><td>7</td><td>Application</td><td>User-facing services</td><td>HTTP, FTP, DNS, SMTP</td></tr>
-          <tr><td>6</td><td>Presentation</td><td>Data formatting, encryption, compression</td><td>SSL/TLS, JPEG</td></tr>
-          <tr><td>5</td><td>Session</td><td>Manage sessions between hosts</td><td>NetBIOS, RPC</td></tr>
-          <tr><td>4</td><td>Transport</td><td>End-to-end delivery, segmentation</td><td>TCP, UDP</td></tr>
-          <tr><td>3</td><td>Network</td><td>Logical addressing &amp; routing</td><td>IP, ICMP</td></tr>
-          <tr><td>2</td><td>Data Link</td><td>MAC addressing, error detection (CRC)</td><td>Ethernet, Wi-Fi</td></tr>
-          <tr><td>1</td><td>Physical</td><td>Bit transmission over medium</td><td>Cables, radio waves</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="content-section">
-      <h3>🌍 Internet Protocols</h3>
-      <div class="concept-grid">
-        <div class="concept-card"><div class="term">TCP/IP</div><div class="def">Transmission Control Protocol / Internet Protocol. TCP ensures reliable, ordered delivery by using acknowledgements and retransmission.</div></div>
-        <div class="concept-card"><div class="term">UDP</div><div class="def">User Datagram Protocol. Connectionless, no acknowledgement. Faster, used for video streaming and gaming where some loss is acceptable.</div></div>
-        <div class="concept-card"><div class="term">HTTP / HTTPS</div><div class="def">HyperText Transfer Protocol. HTTPS adds TLS encryption. Used for web browsing.</div></div>
-        <div class="concept-card"><div class="term">FTP</div><div class="def">File Transfer Protocol — uploading/downloading files between a client and server.</div></div>
-        <div class="concept-card"><div class="term">DNS</div><div class="def">Domain Name System — translates human-readable domain names (google.com) to IP addresses.</div></div>
-        <div class="concept-card"><div class="term">SMTP / IMAP / POP3</div><div class="def">Email protocols. SMTP sends. IMAP syncs mail on server. POP3 downloads and often deletes from server.</div></div>
-      </div>
-    </div>
-
-    <div class="content-section">
-      <h3>🏷️ IP Addressing</h3>
-      <div class="concept-grid">
-        <div class="concept-card"><div class="term">IPv4</div><div class="def">32-bit address (e.g. 192.168.1.1). Written as 4 octets. ~4.3 billion unique addresses.</div></div>
-        <div class="concept-card"><div class="term">IPv6</div><div class="def">128-bit address (e.g. 2001:db8::1). 340 undecillion unique addresses. Handles IPv4 exhaustion.</div></div>
-        <div class="concept-card"><div class="term">Public vs Private IP</div><div class="def">Private IPs (e.g. 192.168.x.x) used within LANs. NAT (Network Address Translation) maps private IPs to a single public IP.</div></div>
-        <div class="concept-card"><div class="term">Subnetting</div><div class="def">Divides a network into smaller sub-networks using a subnet mask (e.g. 255.255.255.0). Improves security and efficiency.</div></div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ======================== HARDWARE & VMs ======================== -->
-<div class="topic-detail" id="hardware-vm">
-  <div class="detail-header">
-    <div class="icon">🖥️</div>
-    <div>
-      <h2>Hardware &amp; Virtual Machines</h2>
-      <p>Topic 3 · Paper 1 · Computer architecture, memory hierarchy, and virtualisation</p>
-    </div>
-    <button class="close-detail">✕ Close</button>
-  </div>
-  <div class="detail-body">
-
-    <div class="content-section">
-      <h3>🏛️ Von Neumann Architecture</h3>
-      <div class="concept-grid">
-        <div class="concept-card"><div class="term">Central Processing Unit (CPU)</div><div class="def">Contains the ALU, Control Unit, and registers. Fetches, decodes, and executes instructions stored in memory.</div></div>
-        <div class="concept-card"><div class="term">Arithmetic Logic Unit (ALU)</div><div class="def">Performs arithmetic (+, –, ×, ÷) and logical operations (AND, OR, NOT, comparisons).</div></div>
-        <div class="concept-card"><div class="term">Control Unit (CU)</div><div class="def">Manages the fetch-decode-execute cycle. Sends control signals to all CPU components.</div></div>
-        <div class="concept-card"><div class="term">Buses</div><div class="def">Address bus (location), data bus (data), control bus (signals). Width of address bus = addressable memory size.</div></div>
-      </div>
-    </div>
-
-    <div class="content-section">
-      <h3>🧠 Memory Hierarchy</h3>
-      <table class="styled-table">
-        <thead><tr><th>Type</th><th>Speed</th><th>Size</th><th>Volatile?</th><th>Use</th></tr></thead>
-        <tbody>
-          <tr><td>Registers</td><td>Fastest</td><td>Bytes</td><td>Yes</td><td>CPU working storage</td></tr>
-          <tr><td>Cache (L1/L2/L3)</td><td>Very fast</td><td>KB–MB</td><td>Yes</td><td>Frequently used instructions</td></tr>
-          <tr><td>RAM</td><td>Fast</td><td>GB</td><td>Yes</td><td>Running programs and OS</td></tr>
-          <tr><td>ROM</td><td>Fast</td><td>KB–MB</td><td>No</td><td>BIOS / firmware</td></tr>
-          <tr><td>SSD</td><td>Medium</td><td>TB</td><td>No</td><td>Permanent storage</td></tr>
-          <tr><td>HDD</td><td>Slow</td><td>TB</td><td>No</td><td>Permanent storage</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="content-section">
-      <h3>☁️ Virtual Machines</h3>
-      <div class="concept-grid">
-        <div class="concept-card"><div class="term">Virtual Machine (VM)</div><div class="def">Software emulation of a complete computer. Runs on a hypervisor on physical hardware. Can run a different OS from the host.</div></div>
-        <div class="concept-card"><div class="term">Hypervisor</div><div class="def">Software layer that manages VMs. Type 1 (bare metal) runs directly on hardware. Type 2 runs on top of a host OS.</div></div>
-        <div class="concept-card"><div class="term">Advantages</div><div class="def">Isolation, portability, efficient hardware use, easy snapshots and rollback, running legacy software.</div></div>
-        <div class="concept-card"><div class="term">Bytecode / JVM</div><div class="def">Java compiles to bytecode which runs on the Java Virtual Machine — a VM that can run on any OS with a JVM installed.</div></div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ======================== LOGIC GATES ======================== -->
-<div class="topic-detail" id="logic">
-  <div class="detail-header">
-    <div class="icon">⚡</div>
-    <div>
-      <h2>Logic Gates &amp; Logic Circuits</h2>
-      <p>Topic 4 · Paper 1 · Boolean logic, truth tables, and digital circuits</p>
-    </div>
-    <button class="close-detail">✕ Close</button>
-  </div>
-  <div class="detail-body">
-
-    <div class="content-section">
-      <h3>🔌 Basic Logic Gates</h3>
-      <table class="styled-table truth-table">
-        <thead><tr><th>Gate</th><th>Symbol</th><th>A</th><th>B</th><th>Output</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td>AND</td><td>A · B</td><td>0</td><td>0</td><td class="t0">0</td><td rowspan="4">Output is 1 only when both inputs are 1</td></tr>
-          <tr><td></td><td></td><td>0</td><td>1</td><td class="t0">0</td></tr>
-          <tr><td></td><td></td><td>1</td><td>0</td><td class="t0">0</td></tr>
-          <tr><td></td><td></td><td>1</td><td>1</td><td class="t1">1</td></tr>
-          <tr><td>OR</td><td>A + B</td><td>0</td><td>0</td><td class="t0">0</td><td rowspan="4">Output is 1 when at least one input is 1</td></tr>
-          <tr><td></td><td></td><td>0</td><td>1</td><td class="t1">1</td></tr>
-          <tr><td></td><td></td><td>1</td><td>0</td><td class="t1">1</td></tr>
-          <tr><td></td><td></td><td>1</td><td>1</td><td class="t1">1</td></tr>
-          <tr><td>NOT</td><td>Ā</td><td>0</td><td>—</td><td class="t1">1</td><td rowspan="2">Inverts the input</td></tr>
-          <tr><td></td><td></td><td>1</td><td>—</td><td class="t0">0</td></tr>
-          <tr><td>XOR</td><td>A ⊕ B</td><td>0</td><td>0</td><td class="t0">0</td><td rowspan="4">Output is 1 when inputs differ</td></tr>
-          <tr><td></td><td></td><td>0</td><td>1</td><td class="t1">1</td></tr>
-          <tr><td></td><td></td><td>1</td><td>0</td><td class="t1">1</td></tr>
-          <tr><td></td><td></td><td>1</td><td>1</td><td class="t0">0</td></tr>
-          <tr><td>NAND</td><td>¬(A·B)</td><td colspan="2">All same as AND</td><td colspan="2"><em>Inverted AND output (universal gate)</em></td></tr>
-          <tr><td>NOR</td><td>¬(A+B)</td><td colspan="2">All same as OR</td><td colspan="2"><em>Inverted OR output (universal gate)</em></td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="content-section">
-      <h3>📐 Boolean Algebra Laws</h3>
-      <div class="concept-grid">
-        <div class="concept-card"><div class="term">Identity Laws</div><div class="def">A · 1 = A &nbsp;&nbsp; A + 0 = A</div></div>
-        <div class="concept-card"><div class="term">Null Laws</div><div class="def">A · 0 = 0 &nbsp;&nbsp; A + 1 = 1</div></div>
-        <div class="concept-card"><div class="term">Idempotent Laws</div><div class="def">A · A = A &nbsp;&nbsp; A + A = A</div></div>
-        <div class="concept-card"><div class="term">Complement Laws</div><div class="def">A · Ā = 0 &nbsp;&nbsp; A + Ā = 1</div></div>
-        <div class="concept-card"><div class="term">De Morgan's Laws</div><div class="def">¬(A · B) = Ā + B̄ &nbsp;&nbsp; ¬(A + B) = Ā · B̄</div></div>
-        <div class="concept-card"><div class="term">Double Negation</div><div class="def">¬(¬A) = A</div></div>
-      </div>
-      <div class="callout exam">
-        <span class="callout-icon">📝</span>
-        <span><strong>Exam tip:</strong> Use De Morgan's laws to simplify NAND/NOR expressions. Always show each simplification step. NAND and NOR are universal gates — any circuit can be built from only NAND or only NOR gates.</span>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ======================== PROCESSOR FUNDAMENTALS ======================== -->
-<div class="topic-detail" id="processor">
-  <div class="detail-header">
-    <div class="icon">⚙️</div>
-    <div>
-      <h2>Processor Fundamentals</h2>
-      <p>Topic 5 · Paper 1 · CPU registers, the FDE cycle, interrupts, and assembly language</p>
-    </div>
-    <button class="close-detail">✕ Close</button>
-  </div>
-  <div class="detail-body">
-
-    <div class="content-section">
-      <h3>🗄️ CPU Registers</h3>
-      <table class="styled-table">
-        <thead><tr><th>Register</th><th>Full Name</th><th>Purpose</th></tr></thead>
-        <tbody>
-          <tr><td>PC</td><td>Program Counter</td><td>Holds address of the next instruction to fetch</td></tr>
-          <tr><td>MAR</td><td>Memory Address Register</td><td>Holds address of memory location being accessed</td></tr>
-          <tr><td>MDR / MBR</td><td>Memory Data/Buffer Register</td><td>Holds data read from or written to memory</td></tr>
-          <tr><td>CIR / IR</td><td>Current Instruction Register</td><td>Holds the current instruction being decoded/executed</td></tr>
-          <tr><td>ACC</td><td>Accumulator</td><td>Holds the result of ALU operations</td></tr>
-          <tr><td>SR</td><td>Status Register</td><td>Holds flags: carry, zero, negative, overflow</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="content-section">
-      <h3>🔄 Fetch-Decode-Execute Cycle</h3>
-      <div class="algo-box">
-        <div class="algo-step">FETCH: MAR ← PC</div>
-        <div class="algo-step">FETCH: PC ← PC + 1 (increment for next instruction)</div>
-        <div class="algo-step">FETCH: MDR ← Memory[MAR] (read instruction)</div>
-        <div class="algo-step">FETCH: CIR ← MDR (copy to instruction register)</div>
-        <div class="algo-step">DECODE: CU decodes opcode and operands in CIR</div>
-        <div class="algo-step">EXECUTE: ALU/CU carries out the instruction</div>
-        <div class="algo-step">→ Repeat from FETCH for next instruction</div>
-      </div>
-    </div>
-
-    <div class="content-section">
-      <h3>⚡ Interrupts</h3>
-      <div class="concept-grid">
-        <div class="concept-card"><div class="term">Interrupt</div><div class="def">A signal to the CPU to suspend the current task and service a more urgent event (e.g. I/O complete, hardware error, timer).</div></div>
-        <div class="concept-card"><div class="term">ISR</div><div class="def">Interrupt Service Routine — the subroutine run in response to an interrupt. Current state is saved to a stack first.</div></div>
-        <div class="concept-card"><div class="term">Priority</div><div class="def">Higher priority interrupts can preempt lower priority ones. Hardware interrupts usually have higher priority than software interrupts.</div></div>
-      </div>
-    </div>
-
-    <div class="content-section">
-      <h3>🖥️ Assembly Language (Cambridge Pseudocode)</h3>
-      <div class="code-block">
-        <span class="code-lang">Assembly (Cambridge)</span>
-<span class="cm">; Load the value at memory address 200 into the accumulator</span>
-<span class="kw">LDD</span> <span class="num">200</span>          <span class="cm">; ACC ← Mem[200]</span>
-<span class="kw">ADD</span> <span class="num">201</span>          <span class="cm">; ACC ← ACC + Mem[201]</span>
-<span class="kw">STO</span> <span class="num">202</span>          <span class="cm">; Mem[202] ← ACC</span>
-
-<span class="kw">LDI</span> <span class="num">42</span>           <span class="cm">; ACC ← 42  (load immediate value)</span>
-<span class="kw">CMP</span> <span class="num">100</span>          <span class="cm">; Compare ACC with 100</span>
-<span class="kw">JPN</span> <span class="str">LOOP</span>         <span class="cm">; Jump to LOOP if negative flag set</span>
-<span class="kw">JPE</span> <span class="str">DONE</span>         <span class="cm">; Jump to DONE if equal flag set</span>
-<span class="kw">JMP</span> <span class="str">START</span>        <span class="cm">; Unconditional jump</span>
-<span class="kw">END</span>               <span class="cm">; Halt execution</span>
-      </div>
-      <div class="callout info">
-        <span class="callout-icon">ℹ️</span>
-        <span>Cambridge 9618 uses a specific instruction set. Key mnemonics: <strong>LDD, LDI, LDX, LDA, STO, STX, ADD, SUB, INC, DEC, CMP, JMP, JPE, JPN, AND, OR, XOR, LSL, LSR, IN, OUT, END</strong>.</span>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ======================== SYSTEM SOFTWARE ======================== -->
-<div class="topic-detail" id="system-sw">
-  <div class="detail-header">
-    <div class="icon">🗂️</div>
-    <div>
-      <h2>System Software</h2>
-      <p>Topic 6 · Paper 1 · Operating systems, translators, and utility programs</p>
-    </div>
-    <button class="close-detail">✕ Close</button>
-  </div>
-  <div class="detail-body">
-
-    <div class="content-section">
-      <h3>💻 Operating System Functions</h3>
-      <div class="subtopic-list">
-        <div class="subtopic-item">
-          <h4>Memory Management</h4>
-          <ul>
-            <li>Allocates RAM to processes</li>
-            <li>Paging: divides memory into fixed-size pages</li>
-            <li>Segmentation: logical variable-size segments</li>
-            <li>Virtual memory: uses disk as extra RAM</li>
-          </ul>
-        </div>
-        <div class="subtopic-item">
-          <h4>Process Management</h4>
-          <ul>
-            <li>Scheduling: round-robin, priority, shortest job first</li>
-            <li>Multitasking: illusion of simultaneous execution</li>
-            <li>Process states: ready, running, blocked/waiting</li>
-            <li>Context switching: saves/restores CPU state</li>
-          </ul>
-        </div>
-        <div class="subtopic-item">
-          <h4>File Management</h4>
-          <ul>
-            <li>Hierarchical directory structure</li>
-            <li>File permissions (read/write/execute)</li>
-            <li>File allocation tables (FAT/NTFS)</li>
-            <li>Access methods: sequential, random</li>
-          </ul>
-        </div>
-        <div class="subtopic-item">
-          <h4>Device Management</h4>
-          <ul>
-            <li>Device drivers: OS ↔ hardware interface</li>
-            <li>I/O spooling: buffering print jobs</li>
-            <li>Interrupt handling</li>
-            <li>Plug and play: auto driver configuration</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <div class="content-section">
-      <h3>🔄 Language Translators</h3>
-      <table class="styled-table">
-        <thead><tr><th>Translator</th><th>Input</th><th>Output</th><th>Key Feature</th></tr></thead>
-        <tbody>
-          <tr><td>Assembler</td><td>Assembly code</td><td>Machine code</td><td>1:1 mapping of mnemonics to opcodes</td></tr>
-          <tr><td>Compiler</td><td>High-level source code</td><td>Machine code file</td><td>Translates whole program before execution; fast at runtime</td></tr>
-          <tr><td>Interpreter</td><td>High-level source code</td><td>Executes line-by-line</td><td>No object file; easier to debug; slower at runtime</td></tr>
-        </tbody>
-      </table>
-      <div class="concept-grid" style="margin-top:1rem">
-        <div class="concept-card"><div class="term">Lexical Analysis</div><div class="def">Tokenises the source code — identifies keywords, identifiers, operators. Removes whitespace and comments.</div></div>
-        <div class="concept-card"><div class="term">Syntax Analysis</div><div class="def">Checks grammar against the language rules using a parse tree. Reports syntax errors.</div></div>
-        <div class="concept-card"><div class="term">Code Generation</div><div class="def">Produces intermediate code then optimises it and generates the final machine code.</div></div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ======================== SECURITY ======================== -->
-<div class="topic-detail" id="security">
-  <div class="detail-header">
-    <div class="icon">🔒</div>
-    <div>
-      <h2>Security, Privacy &amp; Data Integrity</h2>
-      <p>Topic 7 · Paper 1 · Protecting data and ensuring it remains correct</p>
-    </div>
-    <button class="close-detail">✕ Close</button>
-  </div>
-  <div class="detail-body">
-
-    <div class="content-section">
-      <h3>🔐 Encryption</h3>
-      <div class="concept-grid">
-        <div class="concept-card"><div class="term">Symmetric Encryption</div><div class="def">Same key used to encrypt and decrypt. Fast. Problem: securely sharing the key (key exchange problem). Example: AES.</div></div>
-        <div class="concept-card"><div class="term">Asymmetric Encryption</div><div class="def">Public key encrypts; private key decrypts. Solves the key exchange problem. Slower. Example: RSA, used in HTTPS.</div></div>
-        <div class="concept-card"><div class="term">Digital Signature</div><div class="def">Hash of message encrypted with sender's private key. Receiver uses sender's public key to verify. Ensures authenticity and integrity.</div></div>
-        <div class="concept-card"><div class="term">Digital Certificate</div><div class="def">Binds a public key to an identity. Issued by a Certificate Authority (CA). Used in HTTPS (TLS).</div></div>
-        <div class="concept-card"><div class="term">SSL/TLS</div><div class="def">Secure Sockets Layer / Transport Layer Security. Provides encrypted communication over a network. HTTPS uses TLS.</div></div>
-      </div>
-    </div>
-
-    <div class="content-section">
-      <h3>✅ Data Validation &amp; Verification</h3>
-      <table class="styled-table">
-        <thead><tr><th>Check</th><th>Type</th><th>Example</th></tr></thead>
-        <tbody>
-          <tr><td>Range check</td><td>Validation</td><td>Age must be 0–120</td></tr>
-          <tr><td>Type check</td><td>Validation</td><td>Phone number must be digits only</td></tr>
-          <tr><td>Presence check</td><td>Validation</td><td>Name field cannot be empty</td></tr>
-          <tr><td>Format check</td><td>Validation</td><td>Email must match pattern x@x.x</td></tr>
-          <tr><td>Check digit</td><td>Validation</td><td>Last digit of ISBN/barcode computed from others</td></tr>
-          <tr><td>Double entry</td><td>Verification</td><td>Enter password twice and compare</td></tr>
-          <tr><td>Proofreading</td><td>Verification</td><td>Human reads data to check for errors</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="content-section">
-      <h3>🛡️ Network Security</h3>
-      <div class="concept-grid">
-        <div class="concept-card"><div class="term">Firewall</div><div class="def">Hardware or software that filters traffic using rules (port numbers, IP addresses, protocols). Blocks unauthorised access.</div></div>
-        <div class="concept-card"><div class="term">Proxy Server</div><div class="def">Intermediary server. Can filter content, cache web pages, hide internal IP addresses, and provide anonymity.</div></div>
-        <div class="concept-card"><div class="term">VPN</div><div class="def">Virtual Private Network. Creates an encrypted tunnel over the Internet, extending a private network securely.</div></div>
-        <div class="concept-card"><div class="term">Hashing</div><div class="def">One-way function producing a fixed-length digest. Used to store passwords (never store plaintext). Common: SHA-256.</div></div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ======================== ETHICS ======================== -->
-<div class="topic-detail" id="ethics">
-  <div class="detail-header">
-    <div class="icon">⚖️</div>
-    <div>
-      <h2>Ethics &amp; Ownership</h2>
-      <p>Topic 8 · Paper 1 · Legal, ethical, and social issues in computing</p>
-    </div>
-    <button class="close-detail">✕ Close</button>
-  </div>
-  <div class="detail-body">
-
-    <div class="content-section">
-      <h3>📜 Intellectual Property &amp; Licensing</h3>
-      <table class="styled-table">
-        <thead><tr><th>Concept</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td>Copyright</td><td>Automatic legal protection for original work. Prevents copying without permission.</td></tr>
-          <tr><td>Patent</td><td>Registered protection for inventions. Requires registration; limited time (20 years).</td></tr>
-          <tr><td>Trademark</td><td>Protects brand names, logos, and symbols.</td></tr>
-          <tr><td>Open Source</td><td>Source code freely available. Can be modified and redistributed (e.g. Linux). Examples: GPL, MIT licence.</td></tr>
-          <tr><td>Proprietary Software</td><td>Source code kept private. Licensed for use; cannot be modified. Examples: Microsoft Windows.</td></tr>
-          <tr><td>Freeware</td><td>Free to use but not open source — source code remains private.</td></tr>
-          <tr><td>Shareware</td><td>Free trial version; pay to unlock full features.</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="content-section">
-      <h3>🔏 Data Protection</h3>
-      <div class="concept-grid">
-        <div class="concept-card"><div class="term">GDPR Principles</div><div class="def">Data must be lawful, fair, transparent; collected for specific purposes; minimised; accurate; not stored longer than necessary; kept secure.</div></div>
-        <div class="concept-card"><div class="term">Subject Rights</div><div class="def">Right to access, correct, erase ("right to be forgotten"), and port their data. Right to object to automated processing.</div></div>
-        <div class="concept-card"><div class="term">Data Controller</div><div class="def">Decides why and how personal data is processed. Legally responsible for GDPR compliance.</div></div>
-      </div>
-    </div>
-
-    <div class="content-section">
-      <h3>🤖 Ethical Issues in AI &amp; Computing</h3>
-      <div class="subtopic-list">
-        <div class="subtopic-item">
-          <h4>Privacy</h4>
-          <ul>
-            <li>Mass surveillance and data collection</li>
-            <li>Social media profiling and targeting</li>
-            <li>CCTV and facial recognition</li>
-          </ul>
-        </div>
-        <div class="subtopic-item">
-          <h4>Bias in AI</h4>
-          <ul>
-            <li>Training data reflects human biases</li>
-            <li>Discriminatory outcomes in hiring, policing</li>
-            <li>Lack of diversity in AI development teams</li>
-          </ul>
-        </div>
-        <div class="subtopic-item">
-          <h4>Employment Impact</h4>
-          <ul>
-            <li>Automation replacing routine jobs</li>
-            <li>New jobs created in tech sector</li>
-            <li>Digital divide and access inequality</li>
-          </ul>
-        </div>
-        <div class="subtopic-item">
-          <h4>Environmental Impact</h4>
-          <ul>
-            <li>Data centres consume large amounts of power</li>
-            <li>E-waste from obsolete hardware</li>
-            <li>Carbon footprint of AI training</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ======================== DATABASES ======================== -->
-<div class="topic-detail" id="databases">
-  <div class="detail-header">
-    <div class="icon">🗃️</div>
-    <div>
-      <h2>Databases</h2>
-      <p>Topic 9 · Paper 1 · Database design, SQL, and normalisation</p>
-    </div>
-    <button class="close-detail">✕ Close</button>
-  </div>
-  <div class="detail-body">
-
-    <div class="content-section">
-      <h3>📊 Entity-Relationship Diagrams</h3>
-      <div class="concept-grid">
-        <div class="concept-card"><div class="term">Entity</div><div class="def">A real-world object about which data is stored (e.g. Student, Course). Becomes a table in a relational database.</div></div>
-        <div class="concept-card"><div class="term">Attribute</div><div class="def">A property of an entity (e.g. StudentID, Name). Becomes a column in a table.</div></div>
-        <div class="concept-card"><div class="term">Primary Key</div><div class="def">Uniquely identifies each record in a table. Must be unique and non-null. Often an auto-incremented integer.</div></div>
-        <div class="concept-card"><div class="term">Foreign Key</div><div class="def">An attribute in one table that references the primary key in another — creates a relationship between tables.</div></div>
-        <div class="concept-card"><div class="term">Relationships</div><div class="def">One-to-one (1:1), One-to-many (1:M), Many-to-many (M:N — requires a junction/link table).</div></div>
-      </div>
-    </div>
-
-    <div class="content-section">
-      <h3>🔢 Normalisation</h3>
-      <table class="styled-table">
-        <thead><tr><th>Normal Form</th><th>Requirement</th></tr></thead>
-        <tbody>
-          <tr><td><strong>1NF</strong></td><td>Each cell contains a single atomic value; no repeating groups; each row is unique.</td></tr>
-          <tr><td><strong>2NF</strong></td><td>In 1NF + no partial dependencies (non-key attributes depend on the full primary key).</td></tr>
-          <tr><td><strong>3NF</strong></td><td>In 2NF + no transitive dependencies (non-key attributes depend only on the primary key, not on other non-key attributes).</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="content-section">
-      <h3>💻 SQL</h3>
-      <div class="code-block">
-        <span class="code-lang">SQL</span>
-<span class="cm">-- Select with conditions</span>
-<span class="kw">SELECT</span> StudentName, Grade
-<span class="kw">FROM</span> Students
-<span class="kw">WHERE</span> Grade &gt;= <span class="num">70</span>
-<span class="kw">ORDER BY</span> Grade <span class="kw">DESC</span>;
-
-<span class="cm">-- Join two tables</span>
-<span class="kw">SELECT</span> s.StudentName, c.CourseName
-<span class="kw">FROM</span> Students s
-<span class="kw">INNER JOIN</span> Enrolments e <span class="kw">ON</span> s.StudentID = e.StudentID
-<span class="kw">INNER JOIN</span> Courses c <span class="kw">ON</span> e.CourseID = c.CourseID;
-
-<span class="cm">-- Insert, Update, Delete</span>
-<span class="kw">INSERT INTO</span> Students (StudentName, Grade) <span class="kw">VALUES</span> (<span class="str">'Alice'</span>, <span class="num">85</span>);
-<span class="kw">UPDATE</span> Students <span class="kw">SET</span> Grade = <span class="num">90</span> <span class="kw">WHERE</span> StudentID = <span class="num">1</span>;
-<span class="kw">DELETE FROM</span> Students <span class="kw">WHERE</span> StudentID = <span class="num">1</span>;
-      </div>
-    </div>
-
-  </div>
-</div>
 
 <!-- ======================== ALGORITHMS ======================== -->
 <div class="topic-detail" id="algorithms">
