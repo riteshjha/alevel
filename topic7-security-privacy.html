@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Topic 7: Security, Privacy &amp; Data Integrity — CS 9618</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .page-nav { background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:64px; z-index:90; overflow-x:auto; }
+    .page-nav-inner { max-width:1100px; margin:0 auto; padding:0 2rem; display:flex; gap:0; }
+    .page-nav a { display:block; padding:.75rem 1.1rem; font-size:.82rem; font-weight:600; color:var(--text-muted); text-decoration:none; white-space:nowrap; border-bottom:3px solid transparent; transition:color .2s,border-color .2s; }
+    .page-nav a:hover,.page-nav a.active { color:var(--primary); border-bottom-color:var(--primary); }
+
+    .lesson-wrap { max-width:1100px; margin:0 auto; padding:2.5rem 2rem 4rem; display:grid; grid-template-columns:1fr 280px; gap:2.5rem; align-items:start; }
+    @media(max-width:900px){ .lesson-wrap{grid-template-columns:1fr} .sidebar{display:none} }
+
+    .sidebar { position:sticky; top:120px; }
+    .sidebar-box { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; margin-bottom:1rem; box-shadow:var(--shadow); }
+    .sidebar-box h3 { font-size:.85rem; font-weight:700; margin-bottom:.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; }
+    .toc-list { list-style:none; }
+    .toc-list li { padding:.2rem 0; }
+    .toc-list a { font-size:.82rem; color:var(--text-muted); text-decoration:none; display:block; padding:.25rem .5rem; border-radius:4px; transition:background .15s,color .15s; }
+    .toc-list a:hover { background:var(--surface2); color:var(--primary); }
+    .toc-list a.active { background:var(--accent-light); color:var(--primary); font-weight:600; }
+
+    .lesson-section { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:2rem 2.25rem; margin-bottom:2rem; box-shadow:var(--shadow); scroll-margin-top:130px; }
+    .lesson-section h2 { font-size:1.5rem; font-weight:800; color:var(--primary); margin-bottom:.4rem; display:flex; align-items:center; gap:.6rem; }
+    .section-num { background:var(--primary); color:#fff; width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:.9rem; font-weight:800; flex-shrink:0; }
+    .lesson-section h3 { font-size:1.1rem; font-weight:700; margin:1.75rem 0 .75rem; padding-bottom:.4rem; border-bottom:2px solid var(--border); color:var(--text); }
+    .lesson-section h4 { font-size:.95rem; font-weight:700; margin:1.25rem 0 .5rem; color:var(--primary-light); }
+    .lesson-section p { font-size:.9rem; line-height:1.75; color:var(--text); margin-bottom:.75rem; }
+    .lesson-section ul,.lesson-section ol { padding-left:1.5rem; margin-bottom:.75rem; }
+    .lesson-section li { font-size:.9rem; line-height:1.75; color:var(--text); }
+
+    /* Worked example */
+    .worked { background:linear-gradient(135deg,#e3f2fd,#f0f8ff); border:1px solid #90caf9; border-left:5px solid #1565c0; border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:1.25rem 1.5rem; margin:1rem 0; }
+    [data-theme="dark"] .worked { background:#001a2e; border-color:#1565c0; }
+    .worked .worked-title { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#1565c0; margin-bottom:.6rem; }
+    [data-theme="dark"] .worked .worked-title { color:#90caf9; }
+    .worked p,.worked li { font-size:.875rem; color:var(--text); }
+    .worked .step { display:flex; gap:.75rem; margin:.4rem 0; align-items:flex-start; }
+    .worked .step-num { background:#1565c0; color:#fff; min-width:22px; height:22px; border-radius:50%; font-size:.72rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+    .worked .step-text { font-size:.875rem; line-height:1.6; }
+
+    /* Practice question */
+    .practice { background:var(--surface2); border:1px solid var(--border); border-left:5px solid #2e7d32; border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:1.25rem 1.5rem; margin:1rem 0; }
+    .practice .pq-title { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#2e7d32; margin-bottom:.6rem; }
+    .practice p,.practice li { font-size:.875rem; }
+    .practice .reveal-btn { background:#2e7d32; color:#fff; border:none; border-radius:6px; padding:.4rem 1rem; font-size:.8rem; font-weight:700; cursor:pointer; margin-top:.75rem; transition:background .2s; }
+    .practice .reveal-btn:hover { background:#1b5e20; }
+    .practice .answer-reveal { display:none; margin-top:.75rem; padding:.75rem 1rem; background:#e8f5e9; border-radius:var(--radius-sm); font-size:.875rem; }
+    [data-theme="dark"] .practice .answer-reveal { background:#1b2e1c; color:#c8e6c9; }
+    .practice .answer-reveal.open { display:block; }
+
+    /* Callouts */
+    .callout { background:var(--surface2); border-left:4px solid var(--accent); border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:.85rem 1.1rem; margin:.75rem 0; font-size:.875rem; color:var(--text); }
+    .callout.warn { border-color:#f59e0b; }
+    .callout.tip  { border-color:#22c55e; }
+    .callout.exam { border-color:#7c3aed; }
+
+    /* Key term */
+    .key-term { background:linear-gradient(transparent 60%,rgba(21,101,192,.15) 60%); font-weight:700; }
+
+    /* Objectives & breadcrumb */
+    .objectives-list { list-style:none; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:.5rem; }
+    .objectives-list li { font-size:.85rem; display:flex; align-items:flex-start; gap:.5rem; padding:.4rem 0; color:var(--text); }
+    .objectives-list li::before { content:'✦'; color:var(--accent); flex-shrink:0; }
+    .breadcrumb { display:flex; align-items:center; gap:.4rem; font-size:.82rem; color:var(--text-muted); margin-bottom:1.5rem; }
+    .breadcrumb a { color:var(--primary-light); text-decoration:none; }
+    .breadcrumb a:hover { text-decoration:underline; }
+
+    /* Checklist */
+    .checklist { list-style:none; padding:0; }
+    .checklist li { display:flex; align-items:flex-start; gap:.6rem; padding:.35rem 0; font-size:.875rem; color:var(--text); }
+    .checklist li::before { content:'☐'; color:var(--primary-light); font-size:1rem; flex-shrink:0; }
+
+    /* Concept cards grid */
+    .sec-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:.75rem; margin:.75rem 0; }
+    .sec-card { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:.9rem 1rem; }
+    .sec-card .sc-icon { font-size:1.4rem; margin-bottom:.3rem; }
+    .sec-card h4 { font-size:.88rem; font-weight:800; color:var(--primary); margin:0 0 .35rem; }
+    .sec-card p { font-size:.78rem; color:var(--text-muted); margin:0; line-height:1.55; }
+
+    /* Comparison table */
+    .plain-table { width:100%; border-collapse:collapse; font-size:.875rem; margin:.75rem 0; }
+    .plain-table th { background:var(--primary); color:#fff; padding:.45rem .8rem; text-align:left; }
+    .plain-table td { border:1px solid var(--border); padding:.4rem .8rem; color:var(--text); vertical-align:top; }
+    .plain-table tr:nth-child(even) td { background:var(--surface2); }
+
+    /* Encryption flow */
+    .enc-flow { display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; justify-content:center; margin:1rem 0; }
+    .enc-box { background:var(--surface2); border:2px solid var(--primary); border-radius:var(--radius-sm); padding:.55rem 1rem; font-size:.82rem; font-weight:700; color:var(--primary); text-align:center; min-width:100px; }
+    .enc-arrow { color:var(--text-muted); font-size:1.3rem; font-weight:700; }
+    .enc-key { background:linear-gradient(135deg,#fff3e0,#ffe0b2); border:2px dashed #e65100; border-radius:var(--radius-sm); padding:.4rem .8rem; font-size:.78rem; font-weight:700; color:#e65100; text-align:center; }
+    [data-theme="dark"] .enc-key { background:#2a1200; }
+
+    /* Threat cards */
+    .threat-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:.75rem; margin:.75rem 0; }
+    .threat-card { border:1px solid var(--border); border-radius:var(--radius-sm); padding:.9rem 1rem; border-top:4px solid #c62828; }
+    .threat-card h4 { font-size:.88rem; font-weight:800; color:#c62828; margin:0 0 .4rem; }
+    .threat-card p { font-size:.78rem; color:var(--text); margin:0; line-height:1.5; }
+    [data-theme="dark"] .threat-card { border-top-color:#ef9a9a; }
+    [data-theme="dark"] .threat-card h4 { color:#ef9a9a; }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="header-inner">
+    <a class="logo" href="index.html">
+      <div class="logo-icon">💻</div>
+      <div>
+        <div class="logo-text">CS 9618</div>
+        <div class="logo-sub">Cambridge AS &amp; A Level</div>
+      </div>
+    </a>
+    <div class="header-actions">
+      <button class="btn-icon" id="theme-btn" title="Toggle theme">🌙</button>
+    </div>
+  </div>
+</header>
+
+<!-- Section nav -->
+<nav class="page-nav" aria-label="Sections">
+  <div class="page-nav-inner">
+    <a href="#encryption" class="active">1. Encryption</a>
+    <a href="#certificates">2. Certificates &amp; TLS</a>
+    <a href="#threats">3. Threats</a>
+    <a href="#network-security">4. Network Security</a>
+    <a href="#validation">5. Validation &amp; Verification</a>
+    <a href="#hashing">6. Hashing</a>
+    <a href="#exam-practice">📝 Exam Practice</a>
+  </div>
+</nav>
+
+<div class="lesson-wrap">
+<main>
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="index.html">Home</a>
+    <span>›</span>
+    <a href="index.html#tab-as">Paper 1 — Theory</a>
+    <span>›</span>
+    <strong style="color:var(--text)">Topic 7: Security, Privacy &amp; Data Integrity</strong>
+  </div>
+
+  <!-- Hero -->
+  <div class="lesson-section" style="background:linear-gradient(135deg,#0d47a1,#1565c0,#1976d2);color:#fff;border:none">
+    <div style="display:flex;align-items:flex-start;gap:1.25rem">
+      <div style="font-size:3rem;flex-shrink:0">🔒</div>
+      <div>
+        <div style="font-size:.75rem;font-weight:700;opacity:.7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem">Paper 1 · Topic 7</div>
+        <h1 style="font-size:1.9rem;font-weight:900;margin-bottom:.5rem;color:#fff">Security, Privacy &amp; Data Integrity</h1>
+        <p style="opacity:.85;font-size:.95rem;max-width:620px;margin-bottom:1rem;color:#fff">Encryption, digital certificates, SSL/TLS, common threats, firewalls, hashing, and data validation techniques for keeping systems and data secure.</p>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+          <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">Paper 1 · AS &amp; A Level</span>
+          <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">~10% of Paper 1 marks</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Learning objectives -->
+  <div class="lesson-section">
+    <h2><span class="section-num">✦</span> Learning Objectives</h2>
+    <p>By the end of this topic you should be able to:</p>
+    <ul class="objectives-list">
+      <li>Distinguish between symmetric and asymmetric encryption</li>
+      <li>Explain how a digital signature provides authentication and integrity</li>
+      <li>Describe the role of a digital certificate and Certificate Authority</li>
+      <li>Outline the SSL/TLS handshake process</li>
+      <li>Identify common threats: malware, phishing, SQL injection, DDoS</li>
+      <li>Describe how firewalls, proxy servers, and VPNs protect networks</li>
+      <li>Explain validation checks: range, type, presence, format, check digit</li>
+      <li>Distinguish between validation and verification</li>
+      <li>Describe hashing and its role in password storage</li>
+    </ul>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 1: ENCRYPTION                  -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="encryption">
+    <h2><span class="section-num">1</span> Encryption</h2>
+
+    <p><span class="key-term">Encryption</span> converts plaintext into ciphertext using an algorithm and a key, so that only authorised parties can read the original data. It protects data in transit (e.g. over the Internet) and at rest (e.g. on disk).</p>
+
+    <h3>Symmetric Encryption</h3>
+    <p>Both sender and receiver use the <strong>same key</strong> to encrypt and decrypt data.</p>
+
+    <div class="enc-flow">
+      <div class="enc-box">Plaintext</div>
+      <div class="enc-arrow">→</div>
+      <div class="enc-box">Encrypt</div>
+      <div class="enc-arrow">→</div>
+      <div class="enc-box">Ciphertext</div>
+      <div class="enc-arrow">→</div>
+      <div class="enc-box">Decrypt</div>
+      <div class="enc-arrow">→</div>
+      <div class="enc-box">Plaintext</div>
+    </div>
+    <div style="text-align:center;margin-bottom:.75rem"><div class="enc-key">🔑 Same secret key used at both ends</div></div>
+
+    <ul>
+      <li><strong>Example algorithm:</strong> AES (Advanced Encryption Standard)</li>
+      <li><strong>Advantage:</strong> Very fast — suitable for encrypting large volumes of data</li>
+      <li><strong>Disadvantage:</strong> Key distribution problem — how do you securely share the key with the other party?</li>
+    </ul>
+
+    <h3>Asymmetric Encryption</h3>
+    <p>Uses a mathematically linked <strong>key pair</strong>: a public key (shared openly) and a private key (kept secret). Data encrypted with the public key can only be decrypted with the private key.</p>
+
+    <div class="enc-flow">
+      <div class="enc-box">Plaintext</div>
+      <div class="enc-arrow">→</div>
+      <div class="enc-box">Encrypt<br><small>(public key)</small></div>
+      <div class="enc-arrow">→</div>
+      <div class="enc-box">Ciphertext</div>
+      <div class="enc-arrow">→</div>
+      <div class="enc-box">Decrypt<br><small>(private key)</small></div>
+      <div class="enc-arrow">→</div>
+      <div class="enc-box">Plaintext</div>
+    </div>
+
+    <ul>
+      <li><strong>Example algorithm:</strong> RSA</li>
+      <li><strong>Solves key distribution:</strong> Public keys can be shared freely; only the private key can decrypt</li>
+      <li><strong>Disadvantage:</strong> Much slower than symmetric — used only for small amounts of data (e.g. exchanging a symmetric session key)</li>
+      <li><strong>Used in:</strong> HTTPS, email encryption (PGP), secure key exchange</li>
+    </ul>
+
+    <table class="plain-table">
+      <thead><tr><th>Feature</th><th>Symmetric</th><th>Asymmetric</th></tr></thead>
+      <tbody>
+        <tr><td>Keys</td><td>One shared secret key</td><td>Public key + private key pair</td></tr>
+        <tr><td>Speed</td><td>Fast</td><td>Slow</td></tr>
+        <tr><td>Key exchange</td><td>Difficult (key must be shared securely)</td><td>Easy (public key can be published)</td></tr>
+        <tr><td>Use case</td><td>Bulk data encryption</td><td>Secure key exchange, digital signatures</td></tr>
+        <tr><td>Example</td><td>AES</td><td>RSA</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout tip">
+      <strong>How HTTPS combines both:</strong> Asymmetric encryption is used during the TLS handshake to securely exchange a symmetric session key. The rest of the session then uses that faster symmetric key.
+    </div>
+
+    <h3>Digital Signatures</h3>
+    <p>A <span class="key-term">digital signature</span> proves that a message came from a specific sender and has not been altered. It uses <em>asymmetric encryption in reverse</em>: the sender encrypts a hash of the message with their <strong>private key</strong>.</p>
+
+    <div class="worked">
+      <div class="worked-title">How a Digital Signature Works</div>
+      <div class="step"><div class="step-num">1</div><div class="step-text">Sender creates a hash (digest) of the message using a hashing algorithm (e.g. SHA-256).</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Sender encrypts the hash with their <strong>private key</strong> → this is the digital signature.</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Message + signature are sent to the receiver.</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text">Receiver decrypts the signature using the sender's <strong>public key</strong> to recover the original hash.</div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-text">Receiver independently hashes the received message and compares it to the decrypted hash. If they match → message is authentic and unaltered.</div></div>
+    </div>
+
+    <ul>
+      <li><strong>Authenticity:</strong> Only the sender with the private key could have created the signature</li>
+      <li><strong>Integrity:</strong> Any change to the message would produce a different hash — mismatch detected</li>
+      <li><strong>Non-repudiation:</strong> Sender cannot deny sending the message</li>
+    </ul>
+
+    <div class="callout exam">
+      <strong>Exam tip:</strong> Be precise about which key does what. For confidentiality: encrypt with recipient's public key, decrypt with recipient's private key. For a digital signature: sign with sender's private key, verify with sender's public key.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 2: CERTIFICATES & TLS          -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="certificates">
+    <h2><span class="section-num">2</span> Digital Certificates &amp; SSL/TLS</h2>
+
+    <h3>Digital Certificates</h3>
+    <p>A <span class="key-term">digital certificate</span> is an electronic document that binds a public key to an identity (e.g. a website). It is issued and digitally signed by a trusted <span class="key-term">Certificate Authority (CA)</span>.</p>
+
+    <p>A certificate typically contains:</p>
+    <ul>
+      <li>The subject's name (e.g. domain name)</li>
+      <li>The subject's public key</li>
+      <li>The CA's identity and digital signature</li>
+      <li>Validity period (expiry date)</li>
+      <li>Serial number and version</li>
+    </ul>
+
+    <div class="callout tip">
+      <strong>Why certificates matter:</strong> Without certificates, an attacker could present their own public key and pretend to be a trusted website (man-in-the-middle attack). The CA's signature on the certificate proves the public key really belongs to the claimed identity.
+    </div>
+
+    <h3>SSL / TLS</h3>
+    <p><span class="key-term">TLS (Transport Layer Security)</span> — and its predecessor SSL — provides encrypted, authenticated communication over a network. HTTPS uses TLS to secure web traffic.</p>
+
+    <p>The <strong>TLS handshake</strong> (simplified):</p>
+    <div class="worked">
+      <div class="worked-title">TLS Handshake</div>
+      <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Client Hello:</strong> Browser sends supported TLS version and cipher suites.</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Server Hello:</strong> Server responds with chosen cipher suite and sends its digital certificate.</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Certificate verification:</strong> Browser verifies the certificate against trusted CAs. If valid, it trusts the server's public key.</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Key exchange:</strong> Browser uses the server's public key (asymmetric) to securely send a pre-master secret.</div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-text"><strong>Session keys generated:</strong> Both sides derive the same symmetric session key from the pre-master secret.</div></div>
+      <div class="step"><div class="step-num">6</div><div class="step-text"><strong>Secure communication begins:</strong> All further data is encrypted with the symmetric session key.</div></div>
+    </div>
+
+    <div class="callout exam">
+      <strong>Exam tip:</strong> Know that TLS uses asymmetric encryption to exchange the symmetric session key, then switches to faster symmetric encryption for actual data. You may be asked to explain why both types are used.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 3: THREATS                     -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="threats">
+    <h2><span class="section-num">3</span> Threats to Systems &amp; Data</h2>
+
+    <p>Understanding the types of threats helps in selecting appropriate countermeasures.</p>
+
+    <h3>Malware</h3>
+    <div class="threat-grid">
+      <div class="threat-card">
+        <h4>Virus</h4>
+        <p>Attaches itself to legitimate files. Spreads when infected file is executed. Can corrupt data or system files.</p>
+      </div>
+      <div class="threat-card">
+        <h4>Worm</h4>
+        <p>Self-replicates across networks without user action. Consumes bandwidth. Does not need a host file.</p>
+      </div>
+      <div class="threat-card">
+        <h4>Trojan Horse</h4>
+        <p>Disguised as legitimate software. When run, performs malicious actions (e.g. creates backdoor, steals data).</p>
+      </div>
+      <div class="threat-card">
+        <h4>Ransomware</h4>
+        <p>Encrypts victim's files and demands payment for the decryption key. Can destroy businesses.</p>
+      </div>
+      <div class="threat-card">
+        <h4>Spyware</h4>
+        <p>Secretly monitors user activity and collects sensitive data (keystrokes, passwords, browsing history).</p>
+      </div>
+      <div class="threat-card">
+        <h4>Rootkit</h4>
+        <p>Hides deep in the OS, giving attackers persistent privileged access while concealing their presence.</p>
+      </div>
+    </div>
+
+    <h3>Social Engineering</h3>
+    <p><span class="key-term">Social engineering</span> exploits human psychology rather than technical vulnerabilities to gain unauthorised access.</p>
+
+    <table class="plain-table">
+      <thead><tr><th>Attack</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>Phishing</td><td>Fake emails / websites trick users into revealing credentials or downloading malware. Often impersonates trusted organisations.</td></tr>
+        <tr><td>Spear phishing</td><td>Targeted phishing aimed at a specific individual using personalised information to appear credible.</td></tr>
+        <tr><td>Vishing</td><td>Voice phishing — attackers call victims posing as bank or IT support to extract information.</td></tr>
+        <tr><td>Pretexting</td><td>Creating a fabricated scenario (pretext) to gain a victim's trust and extract information.</td></tr>
+        <tr><td>Baiting</td><td>Leaving infected USB drives in public; curiosity leads victims to plug them in.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Technical Attacks</h3>
+    <table class="plain-table">
+      <thead><tr><th>Attack</th><th>Description</th><th>Countermeasure</th></tr></thead>
+      <tbody>
+        <tr><td>SQL Injection</td><td>Malicious SQL code inserted into input fields to manipulate the database (e.g. bypass login, dump data).</td><td>Parameterised queries, input validation</td></tr>
+        <tr><td>DDoS</td><td>Distributed Denial of Service — overwhelming a server with traffic from many compromised machines (botnet).</td><td>Rate limiting, traffic filtering, CDN</td></tr>
+        <tr><td>Man-in-the-Middle</td><td>Attacker secretly intercepts and potentially alters communications between two parties.</td><td>TLS/HTTPS, certificate pinning</td></tr>
+        <tr><td>Brute Force</td><td>Systematically trying all possible passwords until the correct one is found.</td><td>Account lockout, long/complex passwords, MFA</td></tr>
+        <tr><td>Dictionary Attack</td><td>Using a list of common words and passwords to guess credentials. Faster than brute force.</td><td>Password salting, complex password requirements</td></tr>
+        <tr><td>Buffer Overflow</td><td>Writing more data than a buffer can hold, overwriting adjacent memory. Can allow arbitrary code execution.</td><td>Input size validation, safe programming languages</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout warn">
+      <strong>Key distinction:</strong> A virus needs a host file to spread; a worm is self-contained and spreads on its own. A Trojan does not self-replicate — it relies on the user running it.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 4: NETWORK SECURITY            -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="network-security">
+    <h2><span class="section-num">4</span> Network Security Measures</h2>
+
+    <div class="sec-grid">
+      <div class="sec-card">
+        <div class="sc-icon">🔥</div>
+        <h4>Firewall</h4>
+        <p>Hardware or software that monitors and filters network traffic using rules based on IP addresses, port numbers, and protocols. Blocks unauthorised connections.</p>
+      </div>
+      <div class="sec-card">
+        <div class="sc-icon">🔀</div>
+        <h4>Proxy Server</h4>
+        <p>Acts as an intermediary between clients and the Internet. Can filter content, cache web pages, hide internal IP addresses, and provide anonymity.</p>
+      </div>
+      <div class="sec-card">
+        <div class="sc-icon">🔐</div>
+        <h4>VPN</h4>
+        <p>Virtual Private Network creates an encrypted tunnel over a public network. Extends a private network securely, hiding traffic from eavesdroppers.</p>
+      </div>
+      <div class="sec-card">
+        <div class="sc-icon">🔑</div>
+        <h4>Multi-Factor Authentication</h4>
+        <p>Requires two or more verification factors: something you know (password), have (phone/token), or are (biometrics). Greatly reduces account compromise risk.</p>
+      </div>
+      <div class="sec-card">
+        <div class="sc-icon">🛡️</div>
+        <h4>Intrusion Detection System</h4>
+        <p>IDS monitors network traffic for suspicious patterns and alerts administrators. An IPS (prevention system) can also block detected threats automatically.</p>
+      </div>
+      <div class="sec-card">
+        <div class="sc-icon">📡</div>
+        <h4>Access Control Lists</h4>
+        <p>Rules that specify which users or systems are permitted to access resources. Implemented at network level (routers/switches) or OS level (file permissions).</p>
+      </div>
+    </div>
+
+    <h3>Firewall Rules — How They Work</h3>
+    <p>A firewall inspects each packet against an ordered list of rules:</p>
+    <ul>
+      <li><strong>Packet filtering:</strong> Checks source/destination IP, port, and protocol. Stateless — does not track connection state.</li>
+      <li><strong>Stateful inspection:</strong> Tracks the state of active connections. Only allows packets that are part of an established, legitimate session.</li>
+      <li><strong>Application layer (proxy firewall):</strong> Understands specific application protocols (HTTP, FTP) and can filter based on content.</li>
+    </ul>
+
+    <div class="callout tip">
+      <strong>Firewall vs Proxy:</strong> A firewall controls which traffic is allowed; a proxy server relays requests on behalf of clients. A firewall works at the network perimeter; a proxy also provides caching and anonymity.
+    </div>
+
+    <h3>Physical Security</h3>
+    <p>Technical measures alone are insufficient. Physical security controls protect hardware from theft or tampering:</p>
+    <ul>
+      <li>Locked server rooms with badge/biometric access</li>
+      <li>CCTV surveillance</li>
+      <li>Cable locks for workstations</li>
+      <li>Secure disposal of storage media (degaussing, physical destruction)</li>
+    </ul>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 5: VALIDATION & VERIFICATION   -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="validation">
+    <h2><span class="section-num">5</span> Data Validation &amp; Verification</h2>
+
+    <p>These two concepts are often confused. They serve different purposes:</p>
+
+    <table class="plain-table">
+      <thead><tr><th></th><th>Validation</th><th>Verification</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Purpose</strong></td><td>Checks that data is sensible, reasonable, and within expected rules</td><td>Checks that data has been entered correctly — matches the source</td></tr>
+        <tr><td><strong>Who checks</strong></td><td>The computer / software automatically</td><td>A human or a second entry compared by the system</td></tr>
+        <tr><td><strong>Example</strong></td><td>Age must be between 0 and 120</td><td>Enter password twice; system checks both match</td></tr>
+        <tr><td><strong>Limitation</strong></td><td>Cannot check if data is true — a valid age of 25 could still be wrong if the person is actually 30</td><td>Cannot check if the original data is correct — only that it was copied consistently</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Types of Validation Check</h3>
+    <table class="plain-table">
+      <thead><tr><th>Check</th><th>What it tests</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Range check</strong></td><td>Value falls within an acceptable minimum and maximum</td><td>Exam score must be 0–100; month must be 1–12</td></tr>
+        <tr><td><strong>Type check</strong></td><td>Data is the correct data type</td><td>Phone number must contain only digits; name must be a string</td></tr>
+        <tr><td><strong>Presence check</strong></td><td>A required field is not left empty</td><td>Username field cannot be blank on a registration form</td></tr>
+        <tr><td><strong>Format check</strong></td><td>Data matches an expected pattern</td><td>Email must match pattern user@domain.ext; date must be DD/MM/YYYY</td></tr>
+        <tr><td><strong>Length check</strong></td><td>Data has the correct number of characters</td><td>Password must be 8–20 characters; UK postcode has 6–7 characters</td></tr>
+        <tr><td><strong>Check digit</strong></td><td>Calculated digit appended to data to detect input errors</td><td>Last digit of ISBN-13, barcode, credit card number (Luhn algorithm)</td></tr>
+        <tr><td><strong>Lookup check</strong></td><td>Value exists in a predefined list of acceptable values</td><td>Country code must exist in a list of valid country codes</td></tr>
+      </tbody>
+    </table>
+
+    <div class="worked">
+      <div class="worked-title">Check Digit Example — Simple Modulo 11</div>
+      <p>To verify the number 1234567 with check digit:</p>
+      <div class="step"><div class="step-num">1</div><div class="step-text">Multiply digits by weights 7, 6, 5, 4, 3, 2: (1×7)+(2×6)+(3×5)+(4×4)+(5×3)+(6×2) = 7+12+15+16+15+12 = 77</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">77 mod 11 = 0. Check digit = 0 (if remainder = 0) or 11 − remainder otherwise.</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Receiver performs the same calculation; if the result matches the appended check digit, no errors detected.</div></div>
+      <p style="margin-top:.5rem;font-size:.8rem;color:var(--text-muted)">Check digits detect single transposition errors (e.g. 123 entered as 132) but not all errors.</p>
+    </div>
+
+    <h3>Verification Methods</h3>
+    <ul>
+      <li><strong>Double entry:</strong> User types the data twice (e.g. email address, password). System checks both entries match before accepting.</li>
+      <li><strong>Proofreading:</strong> A human reads the entered data against the original source document to spot discrepancies.</li>
+    </ul>
+
+    <div class="callout exam">
+      <strong>Exam tip:</strong> Never say validation "checks data is correct." It only checks data is <em>reasonable and within rules</em>. A valid-looking age of 150 would fail a range check, but a valid age of 45 that is actually wrong would pass — validation cannot detect that.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 6: HASHING                     -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="hashing">
+    <h2><span class="section-num">6</span> Hashing</h2>
+
+    <p>A <span class="key-term">hash function</span> maps data of any size to a fixed-length output called a <em>hash</em>, <em>digest</em>, or <em>fingerprint</em>.</p>
+
+    <h3>Properties of a Good Hash Function</h3>
+    <ul>
+      <li><strong>Deterministic:</strong> The same input always produces the same hash.</li>
+      <li><strong>One-way (pre-image resistant):</strong> Computationally infeasible to reverse a hash to find the original input.</li>
+      <li><strong>Avalanche effect:</strong> A small change in the input produces a completely different hash.</li>
+      <li><strong>Collision resistant:</strong> Computationally infeasible to find two different inputs that produce the same hash.</li>
+      <li><strong>Fixed-length output:</strong> SHA-256 always outputs 256 bits regardless of input size.</li>
+    </ul>
+
+    <h3>Password Storage</h3>
+    <p>Passwords should <strong>never</strong> be stored in plaintext. Instead:</p>
+
+    <div class="worked">
+      <div class="worked-title">Secure Password Storage with Salt</div>
+      <div class="step"><div class="step-num">1</div><div class="step-text">User creates password "mypassword".</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">System generates a random <strong>salt</strong> (e.g. "x7Qp") — unique per user.</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">System computes: hash("mypassword" + "x7Qp") → stores the hash AND the salt.</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text">On login: system retrieves the salt, hashes entered password + salt, compares to stored hash.</div></div>
+    </div>
+
+    <p><strong>Why salt?</strong> Without salting, identical passwords produce identical hashes — attackers can use pre-computed lookup tables (rainbow tables) to reverse common hashes. A unique salt per user defeats rainbow table attacks.</p>
+
+    <h3>Uses of Hashing</h3>
+    <table class="plain-table">
+      <thead><tr><th>Use</th><th>How Hashing Helps</th></tr></thead>
+      <tbody>
+        <tr><td>Password storage</td><td>Store hash (+ salt), not plaintext. Even if the database is stolen, passwords are not exposed.</td></tr>
+        <tr><td>Data integrity</td><td>Hash a file before and after transmission; compare hashes to detect any corruption or tampering.</td></tr>
+        <tr><td>Digital signatures</td><td>Hash the message first (to get a short fixed-length value), then sign the hash with a private key.</td></tr>
+        <tr><td>Blockchain</td><td>Each block contains the hash of the previous block, creating a tamper-evident chain.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout warn">
+      <strong>Hashing ≠ Encryption:</strong> Encryption is reversible (with the correct key). Hashing is a one-way function — you cannot decrypt a hash to get the original data. Never confuse the two in an exam answer.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- EXAM PRACTICE                          -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="exam-practice">
+    <h2><span class="section-num">📝</span> Exam Practice</h2>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question 1 — 4 marks</div>
+      <p>Explain the difference between symmetric and asymmetric encryption. State one advantage of each.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Symmetric:</strong> Both sender and receiver use the same (shared) key to encrypt and decrypt data. <em>Advantage:</em> much faster than asymmetric — suitable for encrypting large amounts of data.</p>
+        <p><strong>Asymmetric:</strong> Uses a key pair — a public key (freely shared) to encrypt and a private key (kept secret) to decrypt. <em>Advantage:</em> Solves the key distribution problem — public keys can be shared openly without compromising security.</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question 2 — 5 marks</div>
+      <p>Describe how a digital signature is created and verified. Your answer should state what is produced at each stage.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Creating:</strong> (1) A hash of the message is computed using a hashing algorithm. (2) The hash is encrypted with the sender's private key — this encrypted hash is the digital signature. (3) The message and the digital signature are sent together.</p>
+        <p><strong>Verifying:</strong> (4) The receiver decrypts the digital signature using the sender's public key to recover the hash. (5) The receiver independently hashes the received message. (6) If the two hashes match, the message is authentic (really from the sender) and has not been altered.</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question 3 — 3 marks</div>
+      <p>State three different types of validation check that could be applied when a user enters a date of birth on a web form. For each, give an example of what it would check.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p>Any three from:</p>
+        <ul>
+          <li><strong>Format check</strong> — date must match the pattern DD/MM/YYYY</li>
+          <li><strong>Range check</strong> — year must be between 1900 and the current year</li>
+          <li><strong>Type check</strong> — entry must contain only digits and separators (not letters)</li>
+          <li><strong>Presence check</strong> — the field cannot be left empty</li>
+          <li><strong>Range check on month</strong> — month value must be 1–12</li>
+          <li><strong>Range check on day</strong> — day value must be 1–31 (or appropriate for the month)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question 4 — 4 marks</div>
+      <p>Explain why passwords should be stored as salted hashes rather than plaintext or unsalted hashes.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Plaintext:</strong> If the database is breached, all passwords are immediately exposed.</p>
+        <p><strong>Unsalted hashes:</strong> An attacker can use pre-computed rainbow tables to look up common hashes and reverse them to find passwords. Users with the same password produce the same hash, making patterns visible.</p>
+        <p><strong>Salted hashes:</strong> A unique random salt is added to each password before hashing. This means even identical passwords produce different hashes. Rainbow tables become useless because they would need to be rebuilt for every possible salt, which is computationally infeasible.</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question 5 — 2 marks</div>
+      <p>State the difference between validation and verification, giving one example of each.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Validation</strong> checks that data is reasonable and meets defined rules (done automatically by the computer). Example: checking that an age value is between 0 and 120.</p>
+        <p><strong>Verification</strong> checks that data has been entered correctly, matching the original source. Example: a user types their email address twice and the system checks both entries are identical.</p>
+      </div>
+    </div>
+
+    <h3>Revision Checklist</h3>
+    <ul class="checklist">
+      <li>I can explain symmetric and asymmetric encryption and compare them</li>
+      <li>I can describe how a digital signature is created and verified, naming the keys used at each step</li>
+      <li>I can explain what a digital certificate contains and why CAs are needed</li>
+      <li>I can outline the TLS handshake at a high level</li>
+      <li>I can distinguish between at least five types of malware</li>
+      <li>I can describe phishing and at least two other social engineering attacks</li>
+      <li>I can explain how SQL injection works and how to prevent it</li>
+      <li>I can describe the function of a firewall and a proxy server</li>
+      <li>I can state at least six types of validation check with examples</li>
+      <li>I can distinguish between validation and verification</li>
+      <li>I can explain what a hash function is, its key properties, and why passwords are salted</li>
+      <li>I can explain the difference between hashing and encryption</li>
+    </ul>
+  </div>
+
+</main>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+
+  <div class="sidebar-box">
+    <h3>Contents</h3>
+    <ul class="toc-list">
+      <li><a href="#encryption">1. Encryption</a></li>
+      <li><a href="#certificates">2. Certificates &amp; TLS</a></li>
+      <li><a href="#threats">3. Threats</a></li>
+      <li><a href="#network-security">4. Network Security</a></li>
+      <li><a href="#validation">5. Validation &amp; Verification</a></li>
+      <li><a href="#hashing">6. Hashing</a></li>
+      <li><a href="#exam-practice">📝 Exam Practice</a></li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>Key Formulae</h3>
+    <ul style="font-size:.78rem;padding-left:1.1rem;color:var(--text)">
+      <li style="margin:.25rem 0">Sign = encrypt(hash, <em>private key</em>)</li>
+      <li style="margin:.25rem 0">Verify = decrypt(sig, <em>public key</em>)</li>
+      <li style="margin:.25rem 0">Store: hash(password + salt)</li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>Encryption Summary</h3>
+    <ul style="font-size:.78rem;padding-left:1.1rem;color:var(--text)">
+      <li style="margin:.25rem 0"><strong>Symmetric:</strong> 1 shared key, fast, AES</li>
+      <li style="margin:.25rem 0"><strong>Asymmetric:</strong> key pair, slow, RSA</li>
+      <li style="margin:.25rem 0"><strong>HTTPS:</strong> asymmetric to share session key → symmetric for data</li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>Validation Checks</h3>
+    <ol style="font-size:.78rem;padding-left:1.2rem;color:var(--text);margin:0">
+      <li style="margin:.2rem 0">Range</li>
+      <li style="margin:.2rem 0">Type</li>
+      <li style="margin:.2rem 0">Presence</li>
+      <li style="margin:.2rem 0">Format</li>
+      <li style="margin:.2rem 0">Length</li>
+      <li style="margin:.2rem 0">Check digit</li>
+      <li style="margin:.2rem 0">Lookup</li>
+    </ol>
+  </div>
+
+  <div class="sidebar-box" style="border-left:4px solid #c62828">
+    <h3 style="color:#c62828">Common Mistakes</h3>
+    <ul style="font-size:.78rem;padding-left:1.1rem;color:var(--text)">
+      <li style="margin:.3rem 0">Saying validation checks data is "correct" — it only checks data is <em>reasonable</em></li>
+      <li style="margin:.3rem 0">Confusing which key signs vs encrypts in digital signatures</li>
+      <li style="margin:.3rem 0">Saying hashing is the same as encryption — hashing is one-way</li>
+      <li style="margin:.3rem 0">Forgetting that a virus needs a host file but a worm does not</li>
+      <li style="margin:.3rem 0">Saying TLS only uses asymmetric encryption — it uses both</li>
+    </ul>
+  </div>
+
+  <a href="topic6-system-software.html" style="display:block;text-align:center;background:var(--surface2);color:var(--primary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.65rem;font-weight:700;font-size:.82rem;text-decoration:none;margin-top:.25rem">
+    ← Topic 6: System Software
+  </a>
+  <a href="index.html" style="display:block;text-align:center;background:var(--primary);color:#fff;border-radius:var(--radius-sm);padding:.75rem;font-weight:700;font-size:.875rem;text-decoration:none;margin-top:.5rem">
+    ← Back to All Topics
+  </a>
+
+</aside>
+
+</div><!-- /lesson-wrap -->
+
+<footer style="background:var(--surface);border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;font-size:.8rem;color:var(--text-muted)">
+  Cambridge International AS &amp; A Level Computer Science 9618 — Topic 7: Security, Privacy &amp; Data Integrity &nbsp;|&nbsp;
+  Not affiliated with Cambridge Assessment International Education.
+</footer>
+
+<script src="script.js"></script>
+<script>
+  const sections = document.querySelectorAll('.lesson-section[id]');
+  const navLinks = document.querySelectorAll('.toc-list a, .page-nav a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+  document.querySelectorAll('.reveal-btn').forEach(btn => { btn.textContent = 'Show Answer'; });
+</script>
+</body>
+</html>
