@@ -81,7 +81,7 @@
     .plain-table tr:nth-child(even) td { background:var(--surface2); }
 
     /* Code block */
-    .code-block { background:#1e1e2e; border-radius:var(--radius-sm); padding:1.1rem 1.35rem; margin:.75rem 0; font-family:'Courier New',Courier,monospace; font-size:.83rem; line-height:1.7; overflow-x:auto; position:relative; }
+    .code-block { background:#1e1e2e; color:#f8f8f2; white-space:pre; border-radius:var(--radius-sm); padding:1.1rem 1.35rem; margin:.75rem 0; font-family:'Courier New',Courier,monospace; font-size:.83rem; line-height:1.7; overflow-x:auto; position:relative; }
     .code-lang { position:absolute; top:.5rem; right:.75rem; font-size:.68rem; font-weight:700; color:#6272a4; text-transform:uppercase; letter-spacing:.08em; }
     .kw  { color:#ff79c6; }
     .fn  { color:#50fa7b; }
@@ -225,9 +225,9 @@ Scores[<span class="num">1</span>] <span class="op">←</span> <span class="num"
     <div class="code-block">
       <span class="code-lang">Cambridge Pseudocode</span>
 <span class="cm">// Input and output</span>
-INPUT Value
-OUTPUT <span class="str">"Enter your name: "</span>
-OUTPUT <span class="str">"Score is: "</span>, Score
+<span class="kw">INPUT</span> Value
+<span class="kw">OUTPUT</span> <span class="str">"Enter your name: "</span>
+<span class="kw">OUTPUT</span> <span class="str">"Score is: "</span>, Score
 
 <span class="cm">// Arithmetic operators</span>
 <span class="cm">// + - * /  (standard)</span>
@@ -251,28 +251,28 @@ FullName <span class="op">←</span> FirstName &amp; <span class="str">" "</span
       <span class="code-lang">Cambridge Pseudocode</span>
 <span class="cm">// IF … THEN … ELSE … ENDIF</span>
 <span class="kw">IF</span> Score >= <span class="num">50</span> <span class="kw">THEN</span>
-    OUTPUT <span class="str">"Pass"</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Pass"</span>
 <span class="kw">ELSE</span>
-    OUTPUT <span class="str">"Fail"</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Fail"</span>
 <span class="kw">ENDIF</span>
 
 <span class="cm">// Nested IF</span>
 <span class="kw">IF</span> Score >= <span class="num">70</span> <span class="kw">THEN</span>
-    OUTPUT <span class="str">"Distinction"</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Distinction"</span>
 <span class="kw">ELSE</span>
     <span class="kw">IF</span> Score >= <span class="num">50</span> <span class="kw">THEN</span>
-        OUTPUT <span class="str">"Pass"</span>
+        <span class="kw">OUTPUT</span> <span class="str">"Pass"</span>
     <span class="kw">ELSE</span>
-        OUTPUT <span class="str">"Fail"</span>
+        <span class="kw">OUTPUT</span> <span class="str">"Fail"</span>
     <span class="kw">ENDIF</span>
 <span class="kw">ENDIF</span>
 
 <span class="cm">// CASE OF … ENDCASE</span>
 <span class="kw">CASE OF</span> Grade
-    <span class="str">'A'</span> : OUTPUT <span class="str">"Excellent"</span>
-    <span class="str">'B'</span> : OUTPUT <span class="str">"Good"</span>
-    <span class="str">'C'</span> : OUTPUT <span class="str">"Satisfactory"</span>
-    <span class="kw">OTHERWISE</span> : OUTPUT <span class="str">"Below standard"</span>
+    <span class="str">'A'</span> : <span class="kw">OUTPUT</span> <span class="str">"Excellent"</span>
+    <span class="str">'B'</span> : <span class="kw">OUTPUT</span> <span class="str">"Good"</span>
+    <span class="str">'C'</span> : <span class="kw">OUTPUT</span> <span class="str">"Satisfactory"</span>
+    <span class="kw">OTHERWISE</span> : <span class="kw">OUTPUT</span> <span class="str">"Below standard"</span>
 <span class="kw">ENDCASE</span>
     </div>
 
@@ -286,7 +286,7 @@ FullName <span class="op">←</span> FirstName &amp; <span class="str">" "</span
 
 <span class="cm">// FOR with STEP</span>
 <span class="kw">FOR</span> i <span class="op">←</span> <span class="num">10</span> <span class="kw">TO</span> <span class="num">1</span> <span class="kw">STEP</span> -<span class="num">1</span>
-    OUTPUT i
+    <span class="kw">OUTPUT</span> i
 <span class="kw">NEXT</span> i
 
 <span class="cm">// WHILE loop — condition checked before each iteration</span>
@@ -296,9 +296,9 @@ FullName <span class="op">←</span> FirstName &amp; <span class="str">" "</span
 
 <span class="cm">// REPEAT…UNTIL — body always runs at least once</span>
 <span class="kw">REPEAT</span>
-    INPUT Value
+    <span class="kw">INPUT</span> Value
     <span class="kw">IF</span> Value &lt; <span class="num">0</span> <span class="kw">THEN</span>
-        OUTPUT <span class="str">"Must be positive"</span>
+        <span class="kw">OUTPUT</span> <span class="str">"Must be positive"</span>
     <span class="kw">ENDIF</span>
 <span class="kw">UNTIL</span> Value >= <span class="num">0</span>
     </div>
@@ -308,7 +308,7 @@ FullName <span class="op">←</span> FirstName &amp; <span class="str">" "</span
       <span class="code-lang">Cambridge Pseudocode</span>
 <span class="cm">// PROCEDURE — no return value</span>
 <span class="kw">PROCEDURE</span> <span class="fn">PrintHeading</span>(Title : <span class="fn">STRING</span>)
-    OUTPUT <span class="str">"=== "</span> &amp; Title &amp; <span class="str">" ==="</span>
+    <span class="kw">OUTPUT</span> <span class="str">"=== "</span> &amp; Title &amp; <span class="str">" ==="</span>
 <span class="kw">ENDPROCEDURE</span>
 
 <span class="cm">// Call a procedure</span>

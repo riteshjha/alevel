@@ -411,6 +411,7 @@ header {
 .code-block {
   background: #0d1117;
   color: #c9d1d9;
+  white-space: pre;
   border-radius: var(--radius-sm);
   padding: 1.25rem 1.5rem;
   font-family: 'Consolas', 'Courier New', monospace;
