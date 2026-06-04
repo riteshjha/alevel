@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Topic 11: Data Types &amp; Structures — CS 9618</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .page-nav { background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:64px; z-index:90; overflow-x:auto; }
+    .page-nav-inner { max-width:1100px; margin:0 auto; padding:0 2rem; display:flex; gap:0; }
+    .page-nav a { display:block; padding:.75rem 1.1rem; font-size:.82rem; font-weight:600; color:var(--text-muted); text-decoration:none; white-space:nowrap; border-bottom:3px solid transparent; transition:color .2s,border-color .2s; }
+    .page-nav a:hover,.page-nav a.active { color:var(--primary); border-bottom-color:var(--primary); }
+
+    .lesson-wrap { max-width:1100px; margin:0 auto; padding:2.5rem 2rem 4rem; display:grid; grid-template-columns:1fr 280px; gap:2.5rem; align-items:start; }
+    @media(max-width:900px){ .lesson-wrap{grid-template-columns:1fr} .sidebar{display:none} }
+
+    .sidebar { position:sticky; top:120px; }
+    .sidebar-box { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; margin-bottom:1rem; box-shadow:var(--shadow); }
+    .sidebar-box h3 { font-size:.85rem; font-weight:700; margin-bottom:.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; }
+    .toc-list { list-style:none; }
+    .toc-list li { padding:.2rem 0; }
+    .toc-list a { font-size:.82rem; color:var(--text-muted); text-decoration:none; display:block; padding:.25rem .5rem; border-radius:4px; transition:background .15s,color .15s; }
+    .toc-list a:hover { background:var(--surface2); color:var(--primary); }
+    .toc-list a.active { background:var(--accent-light); color:var(--primary); font-weight:600; }
+
+    .lesson-section { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:2rem 2.25rem; margin-bottom:2rem; box-shadow:var(--shadow); scroll-margin-top:130px; }
+    .lesson-section h2 { font-size:1.5rem; font-weight:800; color:var(--primary); margin-bottom:.4rem; display:flex; align-items:center; gap:.6rem; }
+    .section-num { background:var(--primary); color:#fff; width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:.9rem; font-weight:800; flex-shrink:0; }
+    .lesson-section h3 { font-size:1.1rem; font-weight:700; margin:1.75rem 0 .75rem; padding-bottom:.4rem; border-bottom:2px solid var(--border); color:var(--text); }
+    .lesson-section h4 { font-size:.95rem; font-weight:700; margin:1.25rem 0 .5rem; color:var(--primary-light); }
+    .lesson-section p { font-size:.9rem; line-height:1.75; color:var(--text); margin-bottom:.75rem; }
+    .lesson-section ul,.lesson-section ol { padding-left:1.5rem; margin-bottom:.75rem; }
+    .lesson-section li { font-size:.9rem; line-height:1.75; color:var(--text); }
+
+    /* Worked example */
+    .worked { background:linear-gradient(135deg,#e0f2f1,#e8f5e9); border:1px solid #80cbc4; border-left:5px solid #00695c; border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:1.25rem 1.5rem; margin:1rem 0; }
+    [data-theme="dark"] .worked { background:#001a17; border-color:#00695c; }
+    .worked .worked-title { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#00695c; margin-bottom:.6rem; }
+    [data-theme="dark"] .worked .worked-title { color:#80cbc4; }
+    .worked p,.worked li { font-size:.875rem; color:var(--text); }
+    .worked .step { display:flex; gap:.75rem; margin:.4rem 0; align-items:flex-start; }
+    .worked .step-num { background:#00695c; color:#fff; min-width:22px; height:22px; border-radius:50%; font-size:.72rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+    .worked .step-text { font-size:.875rem; line-height:1.6; }
+
+    /* Practice question */
+    .practice { background:var(--surface2); border:1px solid var(--border); border-left:5px solid #2e7d32; border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:1.25rem 1.5rem; margin:1rem 0; }
+    .practice .pq-title { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#2e7d32; margin-bottom:.6rem; }
+    .practice p,.practice li { font-size:.875rem; }
+    .practice .reveal-btn { background:#2e7d32; color:#fff; border:none; border-radius:6px; padding:.4rem 1rem; font-size:.8rem; font-weight:700; cursor:pointer; margin-top:.75rem; transition:background .2s; }
+    .practice .reveal-btn:hover { background:#1b5e20; }
+    .practice .answer-reveal { display:none; margin-top:.75rem; padding:.75rem 1rem; background:#e8f5e9; border-radius:var(--radius-sm); font-size:.875rem; }
+    [data-theme="dark"] .practice .answer-reveal { background:#1b2e1c; color:#c8e6c9; }
+    .practice .answer-reveal.open { display:block; }
+
+    /* Callouts */
+    .callout { background:var(--surface2); border-left:4px solid var(--accent); border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:.85rem 1.1rem; margin:.75rem 0; font-size:.875rem; color:var(--text); }
+    .callout.warn { border-color:#f59e0b; }
+    .callout.tip  { border-color:#22c55e; }
+    .callout.exam { border-color:#7c3aed; }
+
+    /* Key term */
+    .key-term { background:linear-gradient(transparent 60%,rgba(0,105,92,.15) 60%); font-weight:700; }
+
+    /* Objectives & breadcrumb */
+    .objectives-list { list-style:none; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:.5rem; }
+    .objectives-list li { font-size:.85rem; display:flex; align-items:flex-start; gap:.5rem; padding:.4rem 0; color:var(--text); }
+    .objectives-list li::before { content:'✦'; color:var(--accent); flex-shrink:0; }
+    .breadcrumb { display:flex; align-items:center; gap:.4rem; font-size:.82rem; color:var(--text-muted); margin-bottom:1.5rem; }
+    .breadcrumb a { color:var(--primary-light); text-decoration:none; }
+    .breadcrumb a:hover { text-decoration:underline; }
+
+    /* Checklist */
+    .checklist { list-style:none; padding:0; }
+    .checklist li { display:flex; align-items:flex-start; gap:.6rem; padding:.35rem 0; font-size:.875rem; color:var(--text); }
+    .checklist li::before { content:'☐'; color:var(--primary-light); font-size:1rem; flex-shrink:0; }
+
+    /* Comparison table */
+    .plain-table { width:100%; border-collapse:collapse; font-size:.875rem; margin:.75rem 0; }
+    .plain-table th { background:var(--primary); color:#fff; padding:.45rem .8rem; text-align:left; }
+    .plain-table td { border:1px solid var(--border); padding:.4rem .8rem; color:var(--text); vertical-align:top; }
+    .plain-table tr:nth-child(even) td { background:var(--surface2); }
+
+    /* Code block */
+    .code-block { background:#1e1e2e; border-radius:var(--radius-sm); padding:1.1rem 1.35rem; margin:.75rem 0; font-family:'Courier New',Courier,monospace; font-size:.83rem; line-height:1.7; overflow-x:auto; position:relative; }
+    .code-lang { position:absolute; top:.5rem; right:.75rem; font-size:.68rem; font-weight:700; color:#6272a4; text-transform:uppercase; letter-spacing:.08em; }
+    .kw  { color:#ff79c6; }
+    .fn  { color:#50fa7b; }
+    .str { color:#f1fa8c; }
+    .num { color:#bd93f9; }
+    .cm  { color:#6272a4; font-style:italic; }
+    .op  { color:#ff79c6; }
+
+    /* ADT visual diagrams */
+    .adt-diagram { display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; margin:.75rem 0; font-family:'Courier New',Courier,monospace; font-size:.85rem; }
+    .adt-cell { background:var(--surface2); border:2px solid var(--border); border-radius:6px; padding:.5rem .85rem; text-align:center; min-width:52px; color:var(--text); font-weight:700; position:relative; }
+    .adt-cell.highlight { background:var(--primary); color:#fff; border-color:var(--primary); }
+    .adt-cell.faded { opacity:.45; }
+    .adt-arrow { color:var(--primary); font-size:1.2rem; font-weight:900; }
+    .adt-label { font-size:.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; display:block; margin-top:.2rem; }
+
+    /* Stack visual */
+    .stack-visual { display:inline-flex; flex-direction:column-reverse; gap:2px; margin:.75rem 0; }
+    .stack-cell { background:var(--surface2); border:2px solid var(--border); border-radius:4px; padding:.4rem 1.2rem; font-family:'Courier New',Courier,monospace; font-size:.85rem; font-weight:700; color:var(--text); text-align:center; min-width:100px; }
+    .stack-cell.top { background:var(--primary); color:#fff; border-color:var(--primary); }
+
+    /* Node boxes */
+    .node-row { display:flex; align-items:center; gap:.4rem; flex-wrap:wrap; margin:.75rem 0; }
+    .node-box { display:flex; border:2px solid var(--primary); border-radius:6px; overflow:hidden; font-family:'Courier New',Courier,monospace; font-size:.82rem; }
+    .node-data { background:var(--primary); color:#fff; padding:.35rem .65rem; font-weight:700; }
+    .node-ptr  { background:var(--surface2); color:var(--text-muted); padding:.35rem .65rem; }
+    .node-arrow { color:var(--primary); font-size:1.2rem; font-weight:900; align-self:center; }
+    .node-null  { color:var(--text-muted); font-family:'Courier New',Courier,monospace; font-size:.82rem; align-self:center; }
+
+    /* Tree diagram */
+    .tree-diagram { margin:.75rem 0; font-family:'Courier New',Courier,monospace; font-size:.85rem; color:var(--text); line-height:1.9; }
+
+    /* Hash table grid */
+    .hash-grid { display:grid; grid-template-columns:auto 1fr; gap:2px; margin:.75rem 0; max-width:320px; }
+    .hash-idx { background:var(--primary); color:#fff; padding:.3rem .7rem; font-family:'Courier New',Courier,monospace; font-size:.8rem; font-weight:700; text-align:center; }
+    .hash-val { background:var(--surface2); border:1px solid var(--border); padding:.3rem .7rem; font-family:'Courier New',Courier,monospace; font-size:.8rem; color:var(--text); }
+    .hash-val.collision { color:#c62828; font-style:italic; }
+    [data-theme="dark"] .hash-val.collision { color:#ef9a9a; }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="header-inner">
+    <a class="logo" href="index.html">
+      <div class="logo-icon">💻</div>
+      <div>
+        <div class="logo-text">CS 9618</div>
+        <div class="logo-sub">Cambridge AS &amp; A Level</div>
+      </div>
+    </a>
+    <div class="header-actions">
+      <button class="btn-icon" id="theme-btn" title="Toggle theme">🌙</button>
+    </div>
+  </div>
+</header>
+
+<!-- Section nav -->
+<nav class="page-nav" aria-label="Sections">
+  <div class="page-nav-inner">
+    <a href="#data-types" class="active">1. Data Types</a>
+    <a href="#arrays">2. Arrays</a>
+    <a href="#stacks">3. Stacks</a>
+    <a href="#queues">4. Queues</a>
+    <a href="#linked-lists">5. Linked Lists</a>
+    <a href="#trees">6. Trees</a>
+    <a href="#hash-tables">7. Hash Tables</a>
+    <a href="#exam-practice">📝 Exam Practice</a>
+  </div>
+</nav>
+
+<div class="lesson-wrap">
+<main>
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="index.html">Home</a>
+    <span>›</span>
+    <a href="index.html#tab-as">Paper 2 — Programming</a>
+    <span>›</span>
+    <strong style="color:var(--text)">Topic 11: Data Types &amp; Structures</strong>
+  </div>
+
+  <!-- Hero -->
+  <div class="lesson-section" style="background:linear-gradient(135deg,#004d40,#00695c,#00897b);color:#fff;border:none">
+    <div style="display:flex;align-items:flex-start;gap:1.25rem">
+      <div style="font-size:3rem;flex-shrink:0">📚</div>
+      <div>
+        <div style="font-size:.75rem;font-weight:700;opacity:.7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem">Paper 2 · Topic 11</div>
+        <h1 style="font-size:1.9rem;font-weight:900;margin-bottom:.5rem;color:#fff">Data Types &amp; Structures</h1>
+        <p style="opacity:.85;font-size:.95rem;max-width:620px;margin-bottom:1rem;color:#fff">Primitive data types, arrays, and the key abstract data types: stacks, queues, linked lists, binary trees, and hash tables — with pseudocode implementations and worked examples.</p>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+          <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">Paper 2 · AS &amp; A Level</span>
+          <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">~15% of Paper 2 marks</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Learning objectives -->
+  <div class="lesson-section">
+    <h2><span class="section-num">✦</span> Learning Objectives</h2>
+    <p>By the end of this topic you should be able to:</p>
+    <ul class="objectives-list">
+      <li>Identify and use all Cambridge primitive data types</li>
+      <li>Declare and use 1D and 2D arrays in pseudocode</li>
+      <li>Describe a stack and implement push, pop, peek, isEmpty, isFull</li>
+      <li>Describe a queue and implement enqueue, dequeue, and a circular queue</li>
+      <li>Describe a singly linked list and implement traversal, insertion, and deletion</li>
+      <li>Describe a binary search tree and perform insertion and searching</li>
+      <li>Trace in-order, pre-order, and post-order tree traversals</li>
+      <li>Describe a hash table, write a hash function, and handle collisions</li>
+      <li>Compare data structures and justify which is appropriate for a given problem</li>
+    </ul>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 1: DATA TYPES                  -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="data-types">
+    <h2><span class="section-num">1</span> Primitive Data Types</h2>
+
+    <p>A <span class="key-term">primitive data type</span> is a basic data type built into the language. In Cambridge pseudocode, all variables must be declared with their type before use.</p>
+
+    <table class="plain-table">
+      <thead><tr><th>Type</th><th>Description</th><th>Storage</th><th>Example values</th></tr></thead>
+      <tbody>
+        <tr><td><strong>INTEGER</strong></td><td>Whole number (positive, negative, or zero)</td><td>Typically 32 or 64 bits</td><td>0, 42, -7, 1000</td></tr>
+        <tr><td><strong>REAL</strong></td><td>Number with a fractional part (floating point)</td><td>Typically 64 bits (double)</td><td>3.14, -0.5, 9.99</td></tr>
+        <tr><td><strong>CHAR</strong></td><td>Single character, enclosed in single quotes</td><td>1 byte (ASCII) or 2 bytes (Unicode)</td><td>'A', 'z', '9', ' '</td></tr>
+        <tr><td><strong>STRING</strong></td><td>Sequence of zero or more characters</td><td>Variable length</td><td>"Hello", "CS 9618", ""</td></tr>
+        <tr><td><strong>BOOLEAN</strong></td><td>Logical value — TRUE or FALSE only</td><td>1 bit (stored as 1 byte)</td><td>TRUE, FALSE</td></tr>
+        <tr><td><strong>DATE</strong></td><td>Calendar date</td><td>Implementation-defined</td><td>01/06/2026</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Type Casting</h3>
+    <p>Cambridge pseudocode uses built-in functions to convert between types:</p>
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="cm">// Convert types</span>
+Num <span class="op">←</span> <span class="fn">INT</span>(<span class="num">3.9</span>)         <span class="cm">// Num = 3  (truncates, does not round)</span>
+R   <span class="op">←</span> <span class="fn">REAL</span>(<span class="num">7</span>)           <span class="cm">// R   = 7.0</span>
+S   <span class="op">←</span> <span class="fn">NUM_TO_STR</span>(<span class="num">42</span>)    <span class="cm">// S   = "42"</span>
+N   <span class="op">←</span> <span class="fn">STR_TO_NUM</span>(<span class="str">"42"</span>)  <span class="cm">// N   = 42</span>
+
+<span class="cm">// String functions</span>
+L   <span class="op">←</span> <span class="fn">LENGTH</span>(<span class="str">"Hello"</span>)     <span class="cm">// L   = 5</span>
+Sub <span class="op">←</span> <span class="fn">SUBSTRING</span>(<span class="str">"Hello"</span>, <span class="num">1</span>, <span class="num">3</span>)  <span class="cm">// Sub = "Hel"</span>
+U   <span class="op">←</span> <span class="fn">UCASE</span>(<span class="str">"hello"</span>)      <span class="cm">// U   = "HELLO"</span>
+    </div>
+
+    <div class="callout exam">
+      <strong>Exam tip:</strong> Know the difference between CHAR (single quotes, one character) and STRING (double quotes, any length). Mixing them in pseudocode is a common error that loses marks. Also remember INT() truncates — INT(3.9) = 3, not 4.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 2: ARRAYS                      -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="arrays">
+    <h2><span class="section-num">2</span> Arrays</h2>
+
+    <p>An <span class="key-term">array</span> is a fixed-size, ordered collection of elements <em>all of the same type</em>, stored in contiguous memory locations. Cambridge arrays are <strong>1-indexed</strong> by convention.</p>
+
+    <h3>1D Arrays</h3>
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="cm">// Declaration: ARRAY[lower:upper] OF type</span>
+<span class="kw">DECLARE</span> Scores : <span class="fn">ARRAY</span>[<span class="num">1</span>:<span class="num">5</span>] <span class="kw">OF</span> <span class="fn">INTEGER</span>
+
+<span class="cm">// Assign values</span>
+Scores[<span class="num">1</span>] <span class="op">←</span> <span class="num">85</span>
+Scores[<span class="num">2</span>] <span class="op">←</span> <span class="num">72</span>
+Scores[<span class="num">3</span>] <span class="op">←</span> <span class="num">91</span>
+Scores[<span class="num">4</span>] <span class="op">←</span> <span class="num">68</span>
+Scores[<span class="num">5</span>] <span class="op">←</span> <span class="num">77</span>
+
+<span class="cm">// Iterate through array</span>
+Total <span class="op">←</span> <span class="num">0</span>
+<span class="kw">FOR</span> i <span class="op">←</span> <span class="num">1</span> <span class="kw">TO</span> <span class="num">5</span>
+    Total <span class="op">←</span> Total + Scores[i]
+<span class="kw">NEXT</span> i
+Average <span class="op">←</span> Total / <span class="num">5</span>
+    </div>
+
+    <h3>2D Arrays</h3>
+    <p>A 2D array is a grid of rows and columns. It is declared as <code>ARRAY[row1:row2, col1:col2]</code>. Elements are accessed as <code>Grid[row, col]</code>.</p>
+
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="cm">// 3×4 grid (3 rows, 4 columns)</span>
+<span class="kw">DECLARE</span> Grid : <span class="fn">ARRAY</span>[<span class="num">1</span>:<span class="num">3</span>, <span class="num">1</span>:<span class="num">4</span>] <span class="kw">OF</span> <span class="fn">INTEGER</span>
+
+<span class="cm">// Assign value at row 2, column 3</span>
+Grid[<span class="num">2</span>, <span class="num">3</span>] <span class="op">←</span> <span class="num">42</span>
+
+<span class="cm">// Process all elements — nested loops</span>
+<span class="kw">FOR</span> row <span class="op">←</span> <span class="num">1</span> <span class="kw">TO</span> <span class="num">3</span>
+    <span class="kw">FOR</span> col <span class="op">←</span> <span class="num">1</span> <span class="kw">TO</span> <span class="num">4</span>
+        Grid[row, col] <span class="op">←</span> row * col
+    <span class="kw">NEXT</span> col
+<span class="kw">NEXT</span> row
+    </div>
+
+    <div class="callout warn">
+      <strong>Fixed size:</strong> Arrays in pseudocode have a fixed size declared at compile time. You cannot resize them at runtime. If you need a dynamic structure, use a linked list instead.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 3: STACKS                      -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="stacks">
+    <h2><span class="section-num">3</span> Stacks</h2>
+
+    <p>A <span class="key-term">stack</span> is a <strong>Last In, First Out (LIFO)</strong> abstract data type. Elements are added and removed from the same end — the <em>top</em> of the stack. Think of a stack of plates: you always add to and take from the top.</p>
+
+    <h3>Stack Operations</h3>
+    <table class="plain-table">
+      <thead><tr><th>Operation</th><th>Description</th><th>Error condition</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Push(item)</strong></td><td>Add an item to the top of the stack</td><td>Stack overflow — stack is full</td></tr>
+        <tr><td><strong>Pop()</strong></td><td>Remove and return the top item</td><td>Stack underflow — stack is empty</td></tr>
+        <tr><td><strong>Peek() / Top()</strong></td><td>Return the top item without removing it</td><td>Stack is empty</td></tr>
+        <tr><td><strong>isEmpty()</strong></td><td>Return TRUE if the stack contains no items</td><td>—</td></tr>
+        <tr><td><strong>isFull()</strong></td><td>Return TRUE if the stack is at maximum capacity</td><td>—</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Stack Visualisation</h3>
+    <p>After pushing 10, 20, 30 in that order (TopOfStack pointer = 3):</p>
+    <div style="display:flex;gap:2.5rem;align-items:flex-end;flex-wrap:wrap;margin:.75rem 0">
+      <div class="stack-visual">
+        <div class="stack-cell">10</div>
+        <div class="stack-cell">20</div>
+        <div class="stack-cell top">30 ← Top</div>
+      </div>
+      <div style="font-size:.85rem;color:var(--text-muted);align-self:center">
+        <p><strong>Push(40):</strong> TopOfStack → 4, Stack[4] = 40</p>
+        <p><strong>Pop():</strong> returns 30, TopOfStack → 2</p>
+        <p><strong>Peek():</strong> returns Stack[TopOfStack] without changing TopOfStack</p>
+      </div>
+    </div>
+
+    <h3>Stack Implementation using an Array</h3>
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="cm">// Stack stored in array Stack[1..MaxSize], TopOfStack tracks top position</span>
+<span class="kw">DECLARE</span> Stack       : <span class="fn">ARRAY</span>[<span class="num">1</span>:<span class="num">100</span>] <span class="kw">OF</span> <span class="fn">INTEGER</span>
+<span class="kw">DECLARE</span> TopOfStack  : <span class="fn">INTEGER</span>
+<span class="kw">DECLARE</span> MaxSize     : <span class="fn">INTEGER</span>
+MaxSize    <span class="op">←</span> <span class="num">100</span>
+TopOfStack <span class="op">←</span> <span class="num">0</span>    <span class="cm">// 0 means empty</span>
+
+<span class="kw">PROCEDURE</span> <span class="fn">Push</span>(Item : <span class="fn">INTEGER</span>)
+    <span class="kw">IF</span> TopOfStack = MaxSize <span class="kw">THEN</span>
+        OUTPUT <span class="str">"Error: Stack overflow"</span>
+    <span class="kw">ELSE</span>
+        TopOfStack        <span class="op">←</span> TopOfStack + <span class="num">1</span>
+        Stack[TopOfStack] <span class="op">←</span> Item
+    <span class="kw">ENDIF</span>
+<span class="kw">ENDPROCEDURE</span>
+
+<span class="kw">FUNCTION</span> <span class="fn">Pop</span>() <span class="kw">RETURNS</span> <span class="fn">INTEGER</span>
+    <span class="kw">IF</span> TopOfStack = <span class="num">0</span> <span class="kw">THEN</span>
+        OUTPUT <span class="str">"Error: Stack underflow"</span>
+        <span class="kw">RETURN</span> -<span class="num">1</span>
+    <span class="kw">ELSE</span>
+        Item       <span class="op">←</span> Stack[TopOfStack]
+        TopOfStack <span class="op">←</span> TopOfStack - <span class="num">1</span>
+        <span class="kw">RETURN</span> Item
+    <span class="kw">ENDIF</span>
+<span class="kw">ENDFUNCTION</span>
+
+<span class="kw">FUNCTION</span> <span class="fn">Peek</span>() <span class="kw">RETURNS</span> <span class="fn">INTEGER</span>
+    <span class="kw">IF</span> TopOfStack = <span class="num">0</span> <span class="kw">THEN</span>
+        OUTPUT <span class="str">"Error: Stack is empty"</span>
+        <span class="kw">RETURN</span> -<span class="num">1</span>
+    <span class="kw">ELSE</span>
+        <span class="kw">RETURN</span> Stack[TopOfStack]
+    <span class="kw">ENDIF</span>
+<span class="kw">ENDFUNCTION</span>
+
+<span class="kw">FUNCTION</span> <span class="fn">isEmpty</span>() <span class="kw">RETURNS</span> <span class="fn">BOOLEAN</span>
+    <span class="kw">RETURN</span> TopOfStack = <span class="num">0</span>
+<span class="kw">ENDFUNCTION</span>
+
+<span class="kw">FUNCTION</span> <span class="fn">isFull</span>() <span class="kw">RETURNS</span> <span class="fn">BOOLEAN</span>
+    <span class="kw">RETURN</span> TopOfStack = MaxSize
+<span class="kw">ENDFUNCTION</span>
+    </div>
+
+    <h3>Applications of Stacks</h3>
+    <ul>
+      <li><strong>Call stack:</strong> When a function is called, its return address and local variables are pushed. When it returns, they are popped — this is how recursion works.</li>
+      <li><strong>Undo/redo:</strong> Each action is pushed onto an undo stack. Ctrl+Z pops the last action and reverses it.</li>
+      <li><strong>Expression evaluation:</strong> Operators and operands are pushed/popped to evaluate arithmetic expressions (e.g. converting infix to postfix notation).</li>
+      <li><strong>Bracket matching:</strong> Open brackets are pushed; when a closing bracket is seen, the top is popped and checked for a match.</li>
+    </ul>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 4: QUEUES                      -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="queues">
+    <h2><span class="section-num">4</span> Queues</h2>
+
+    <p>A <span class="key-term">queue</span> is a <strong>First In, First Out (FIFO)</strong> abstract data type. Items are added at the <em>back (rear)</em> and removed from the <em>front (head)</em>. Think of a queue of people: the first person to join is the first to be served.</p>
+
+    <h3>Queue Operations</h3>
+    <table class="plain-table">
+      <thead><tr><th>Operation</th><th>Description</th><th>Error condition</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Enqueue(item)</strong></td><td>Add an item to the back of the queue</td><td>Queue is full</td></tr>
+        <tr><td><strong>Dequeue()</strong></td><td>Remove and return the item at the front</td><td>Queue is empty</td></tr>
+        <tr><td><strong>Peek()</strong></td><td>Return the front item without removing it</td><td>Queue is empty</td></tr>
+        <tr><td><strong>isEmpty()</strong></td><td>Return TRUE if the queue contains no items</td><td>—</td></tr>
+        <tr><td><strong>isFull()</strong></td><td>Return TRUE if the queue is at maximum capacity</td><td>—</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Linear Queue — Problem</h3>
+    <p>In a simple array-based queue, the Head pointer moves right as items are dequeued. This wastes the freed spaces at the front — the queue appears full even when most positions are empty.</p>
+
+    <div class="adt-diagram">
+      <span style="font-size:.8rem;color:var(--text-muted);min-width:50px">After 2 dequeues:</span>
+      <div class="adt-cell faded" style="border-style:dashed">—</div>
+      <div class="adt-cell faded" style="border-style:dashed">—</div>
+      <div class="adt-cell highlight">30<span class="adt-label">Head</span></div>
+      <div class="adt-cell">40</div>
+      <div class="adt-cell">50<span class="adt-label">Tail</span></div>
+      <div class="adt-cell faded" style="border-style:dashed">—</div>
+    </div>
+    <p style="font-size:.85rem;color:var(--text-muted)">Indices 1–2 are wasted. The queue will report "full" when Tail reaches the end, despite having free space.</p>
+
+    <h3>Circular Queue — Solution</h3>
+    <p>A <span class="key-term">circular queue</span> wraps the Tail pointer back to index 1 when it reaches the end of the array, reusing freed front positions. The next index after MaxSize is 1 (using MOD arithmetic).</p>
+
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="kw">DECLARE</span> Queue   : <span class="fn">ARRAY</span>[<span class="num">1</span>:<span class="num">6</span>] <span class="kw">OF</span> <span class="fn">INTEGER</span>
+<span class="kw">DECLARE</span> Head    : <span class="fn">INTEGER</span>
+<span class="kw">DECLARE</span> Tail    : <span class="fn">INTEGER</span>
+<span class="kw">DECLARE</span> Count   : <span class="fn">INTEGER</span>
+<span class="kw">DECLARE</span> MaxSize : <span class="fn">INTEGER</span>
+Head    <span class="op">←</span> <span class="num">1</span>
+Tail    <span class="op">←</span> <span class="num">0</span>
+Count   <span class="op">←</span> <span class="num">0</span>
+MaxSize <span class="op">←</span> <span class="num">6</span>
+
+<span class="kw">PROCEDURE</span> <span class="fn">Enqueue</span>(Item : <span class="fn">INTEGER</span>)
+    <span class="kw">IF</span> Count = MaxSize <span class="kw">THEN</span>
+        OUTPUT <span class="str">"Error: Queue is full"</span>
+    <span class="kw">ELSE</span>
+        Tail        <span class="op">←</span> (Tail <span class="kw">MOD</span> MaxSize) + <span class="num">1</span>
+        Queue[Tail] <span class="op">←</span> Item
+        Count       <span class="op">←</span> Count + <span class="num">1</span>
+    <span class="kw">ENDIF</span>
+<span class="kw">ENDPROCEDURE</span>
+
+<span class="kw">FUNCTION</span> <span class="fn">Dequeue</span>() <span class="kw">RETURNS</span> <span class="fn">INTEGER</span>
+    <span class="kw">IF</span> Count = <span class="num">0</span> <span class="kw">THEN</span>
+        OUTPUT <span class="str">"Error: Queue is empty"</span>
+        <span class="kw">RETURN</span> -<span class="num">1</span>
+    <span class="kw">ELSE</span>
+        Item <span class="op">←</span> Queue[Head]
+        Head <span class="op">←</span> (Head <span class="kw">MOD</span> MaxSize) + <span class="num">1</span>
+        Count <span class="op">←</span> Count - <span class="num">1</span>
+        <span class="kw">RETURN</span> Item
+    <span class="kw">ENDIF</span>
+<span class="kw">ENDFUNCTION</span>
+    </div>
+
+    <div class="callout tip">
+      <strong>Why Count?</strong> Using a Count variable (rather than checking Head = Tail) avoids ambiguity: if Head = Tail, is the queue empty or full? Count makes the distinction explicit and unambiguous.
+    </div>
+
+    <h3>Applications of Queues</h3>
+    <ul>
+      <li><strong>Print spooling:</strong> Documents are queued for printing in the order they are submitted</li>
+      <li><strong>CPU scheduling:</strong> Processes waiting for CPU time are held in a ready queue</li>
+      <li><strong>Keyboard buffer:</strong> Keystrokes are queued so none are missed if the CPU is busy</li>
+      <li><strong>Breadth-first search:</strong> Nodes to visit next are stored in a queue</li>
+    </ul>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 5: LINKED LISTS                -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="linked-lists">
+    <h2><span class="section-num">5</span> Linked Lists</h2>
+
+    <p>A <span class="key-term">linked list</span> is a dynamic data structure where each element (called a <em>node</em>) stores a data value and a pointer to the next node. Nodes do not need to be stored in contiguous memory — the pointer links them logically.</p>
+
+    <h3>Singly Linked List Structure</h3>
+    <div class="node-row">
+      <div style="font-size:.8rem;color:var(--text-muted);min-width:40px">Head →</div>
+      <div class="node-box"><div class="node-data">10</div><div class="node-ptr">→</div></div>
+      <div class="node-arrow">→</div>
+      <div class="node-box"><div class="node-data">25</div><div class="node-ptr">→</div></div>
+      <div class="node-arrow">→</div>
+      <div class="node-box"><div class="node-data">40</div><div class="node-ptr">→</div></div>
+      <div class="node-arrow">→</div>
+      <div class="node-box"><div class="node-data">63</div><div class="node-ptr">→</div></div>
+      <div class="node-arrow">→</div>
+      <div class="node-null">NIL</div>
+    </div>
+    <p style="font-size:.8rem;color:var(--text-muted)">Each node holds data and a pointer to the next node. NIL (or NULL) marks the end of the list. Head points to the first node.</p>
+
+    <h3>Doubly Linked List</h3>
+    <p>A <span class="key-term">doubly linked list</span> has nodes with <em>two</em> pointers — one to the next node and one to the previous node. This allows traversal in both directions and makes deletion O(1) when you already have a reference to the node.</p>
+
+    <div class="node-row" style="flex-wrap:wrap;gap:.3rem">
+      <div class="node-null">NIL ←</div>
+      <div class="node-box"><div class="node-ptr">←</div><div class="node-data">10</div><div class="node-ptr">→</div></div>
+      <div class="node-arrow">⇄</div>
+      <div class="node-box"><div class="node-ptr">←</div><div class="node-data">25</div><div class="node-ptr">→</div></div>
+      <div class="node-arrow">⇄</div>
+      <div class="node-box"><div class="node-ptr">←</div><div class="node-data">40</div><div class="node-ptr">→</div></div>
+      <div class="node-arrow">→</div>
+      <div class="node-null">NIL</div>
+    </div>
+
+    <h3>Traversal</h3>
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="cm">// Linked list stored in parallel arrays: Data[] and Next[]</span>
+<span class="cm">// Head holds the index of the first node; 0 = NIL</span>
+<span class="kw">DECLARE</span> Data : <span class="fn">ARRAY</span>[<span class="num">1</span>:<span class="num">100</span>] <span class="kw">OF</span> <span class="fn">INTEGER</span>
+<span class="kw">DECLARE</span> Next : <span class="fn">ARRAY</span>[<span class="num">1</span>:<span class="num">100</span>] <span class="kw">OF</span> <span class="fn">INTEGER</span>
+<span class="kw">DECLARE</span> Head : <span class="fn">INTEGER</span>
+
+<span class="kw">PROCEDURE</span> <span class="fn">Traverse</span>()
+    Current <span class="op">←</span> Head
+    <span class="kw">WHILE</span> Current <span class="op">&lt;&gt;</span> <span class="num">0</span> <span class="kw">DO</span>
+        OUTPUT Data[Current]
+        Current <span class="op">←</span> Next[Current]
+    <span class="kw">ENDWHILE</span>
+<span class="kw">ENDPROCEDURE</span>
+    </div>
+
+    <h3>Insertion at Head</h3>
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="cm">// FreeList holds index of next available slot</span>
+<span class="kw">PROCEDURE</span> <span class="fn">InsertAtHead</span>(NewData : <span class="fn">INTEGER</span>)
+    <span class="kw">IF</span> FreeList = <span class="num">0</span> <span class="kw">THEN</span>
+        OUTPUT <span class="str">"Error: List is full"</span>
+    <span class="kw">ELSE</span>
+        NewNode       <span class="op">←</span> FreeList
+        FreeList      <span class="op">←</span> Next[FreeList]
+        Data[NewNode] <span class="op">←</span> NewData
+        Next[NewNode] <span class="op">←</span> Head
+        Head          <span class="op">←</span> NewNode
+    <span class="kw">ENDIF</span>
+<span class="kw">ENDPROCEDURE</span>
+    </div>
+
+    <h3>Deletion</h3>
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="kw">PROCEDURE</span> <span class="fn">Delete</span>(Target : <span class="fn">INTEGER</span>)
+    <span class="cm">// Find node before the one to delete</span>
+    <span class="kw">IF</span> Data[Head] = Target <span class="kw">THEN</span>
+        <span class="cm">// Delete head node</span>
+        Temp <span class="op">←</span> Head
+        Head <span class="op">←</span> Next[Head]
+        Next[Temp] <span class="op">←</span> FreeList
+        FreeList   <span class="op">←</span> Temp
+    <span class="kw">ELSE</span>
+        Prev <span class="op">←</span> Head
+        <span class="kw">WHILE</span> Next[Prev] <span class="op">&lt;&gt;</span> <span class="num">0</span> <span class="kw">AND</span> Data[Next[Prev]] <span class="op">&lt;&gt;</span> Target <span class="kw">DO</span>
+            Prev <span class="op">←</span> Next[Prev]
+        <span class="kw">ENDWHILE</span>
+        <span class="kw">IF</span> Next[Prev] <span class="op">&lt;&gt;</span> <span class="num">0</span> <span class="kw">THEN</span>
+            Temp       <span class="op">←</span> Next[Prev]
+            Next[Prev] <span class="op">←</span> Next[Temp]
+            Next[Temp] <span class="op">←</span> FreeList
+            FreeList   <span class="op">←</span> Temp
+        <span class="kw">ENDIF</span>
+    <span class="kw">ENDIF</span>
+<span class="kw">ENDPROCEDURE</span>
+    </div>
+
+    <h3>Linked List vs Array</h3>
+    <table class="plain-table">
+      <thead><tr><th>Feature</th><th>Array</th><th>Linked List</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Size</strong></td><td>Fixed at declaration</td><td>Dynamic — grows/shrinks as needed</td></tr>
+        <tr><td><strong>Access by index</strong></td><td>O(1) — direct</td><td>O(n) — must traverse from head</td></tr>
+        <tr><td><strong>Insertion at head</strong></td><td>O(n) — shift elements</td><td>O(1) — update pointer</td></tr>
+        <tr><td><strong>Deletion</strong></td><td>O(n) — shift elements</td><td>O(1) once node is found</td></tr>
+        <tr><td><strong>Memory</strong></td><td>Contiguous; no pointer overhead</td><td>Non-contiguous; each node stores a pointer</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 6: TREES                       -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="trees">
+    <h2><span class="section-num">6</span> Binary Trees</h2>
+
+    <p>A <span class="key-term">binary tree</span> is a hierarchical data structure where each node has at most two children: a <em>left child</em> and a <em>right child</em>. A <span class="key-term">Binary Search Tree (BST)</span> imposes an ordering rule: <strong>left child &lt; parent &lt; right child</strong>.</p>
+
+    <h3>Key Terminology</h3>
+    <table class="plain-table">
+      <thead><tr><th>Term</th><th>Definition</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Root</strong></td><td>The topmost node — the starting point for all traversals</td></tr>
+        <tr><td><strong>Leaf</strong></td><td>A node with no children</td></tr>
+        <tr><td><strong>Parent / Child</strong></td><td>A node directly above / below another in the hierarchy</td></tr>
+        <tr><td><strong>Subtree</strong></td><td>A node and all its descendants</td></tr>
+        <tr><td><strong>Height</strong></td><td>Number of edges on the longest path from root to a leaf</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Building a BST — Worked Example</h3>
+    <p>Insert the values <strong>50, 30, 70, 20, 40, 60, 80</strong> into an empty BST in that order:</p>
+
+    <div class="worked">
+      <div class="worked-title">BST Insertion</div>
+      <div class="step"><div class="step-num">1</div><div class="step-text">Insert 50 → becomes the root.</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Insert 30 → 30 &lt; 50, goes left of 50.</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Insert 70 → 70 &gt; 50, goes right of 50.</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text">Insert 20 → 20 &lt; 50, go left → 20 &lt; 30, goes left of 30.</div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-text">Insert 40 → 40 &lt; 50, go left → 40 &gt; 30, goes right of 30.</div></div>
+      <div class="step"><div class="step-num">6</div><div class="step-text">Insert 60 → 60 &gt; 50, go right → 60 &lt; 70, goes left of 70.</div></div>
+      <div class="step"><div class="step-num">7</div><div class="step-text">Insert 80 → 80 &gt; 50, go right → 80 &gt; 70, goes right of 70.</div></div>
+    </div>
+
+    <div class="tree-diagram">
+<pre style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;font-size:.85rem;line-height:1.8;overflow-x:auto;margin:.75rem 0">
+              50
+            /    \
+          30      70
+         /  \    /  \
+        20  40  60  80
+</pre>
+    </div>
+
+    <h3>BST Search and Insertion — Pseudocode</h3>
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="cm">// BST in parallel arrays: NodeData[], LeftPtr[], RightPtr[]</span>
+<span class="cm">// Root holds index of root node; 0 = no child (NIL)</span>
+
+<span class="kw">FUNCTION</span> <span class="fn">Search</span>(Current : <span class="fn">INTEGER</span>, Target : <span class="fn">INTEGER</span>) <span class="kw">RETURNS</span> <span class="fn">BOOLEAN</span>
+    <span class="kw">IF</span> Current = <span class="num">0</span> <span class="kw">THEN</span>
+        <span class="kw">RETURN</span> <span class="kw">FALSE</span>
+    <span class="kw">ELSE</span>
+        <span class="kw">IF</span> NodeData[Current] = Target <span class="kw">THEN</span>
+            <span class="kw">RETURN</span> <span class="kw">TRUE</span>
+        <span class="kw">ELSE</span>
+            <span class="kw">IF</span> Target &lt; NodeData[Current] <span class="kw">THEN</span>
+                <span class="kw">RETURN</span> <span class="fn">Search</span>(LeftPtr[Current], Target)
+            <span class="kw">ELSE</span>
+                <span class="kw">RETURN</span> <span class="fn">Search</span>(RightPtr[Current], Target)
+            <span class="kw">ENDIF</span>
+        <span class="kw">ENDIF</span>
+    <span class="kw">ENDIF</span>
+<span class="kw">ENDFUNCTION</span>
+    </div>
+
+    <h3>Tree Traversals</h3>
+    <p>Three standard recursive traversals — each visits nodes in a different order.</p>
+
+    <table class="plain-table">
+      <thead><tr><th>Traversal</th><th>Order</th><th>Mnemonic</th><th>Output for example BST</th></tr></thead>
+      <tbody>
+        <tr><td><strong>In-order</strong></td><td>Left → Root → Right</td><td>LNR</td><td>20, 30, 40, 50, 60, 70, 80 (sorted!)</td></tr>
+        <tr><td><strong>Pre-order</strong></td><td>Root → Left → Right</td><td>NLR</td><td>50, 30, 20, 40, 70, 60, 80</td></tr>
+        <tr><td><strong>Post-order</strong></td><td>Left → Right → Root</td><td>LRN</td><td>20, 40, 30, 60, 80, 70, 50</td></tr>
+      </tbody>
+    </table>
+
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="kw">PROCEDURE</span> <span class="fn">InOrder</span>(Current : <span class="fn">INTEGER</span>)
+    <span class="kw">IF</span> Current &lt;&gt; <span class="num">0</span> <span class="kw">THEN</span>
+        <span class="fn">InOrder</span>(LeftPtr[Current])
+        OUTPUT NodeData[Current]
+        <span class="fn">InOrder</span>(RightPtr[Current])
+    <span class="kw">ENDIF</span>
+<span class="kw">ENDPROCEDURE</span>
+
+<span class="kw">PROCEDURE</span> <span class="fn">PreOrder</span>(Current : <span class="fn">INTEGER</span>)
+    <span class="kw">IF</span> Current &lt;&gt; <span class="num">0</span> <span class="kw">THEN</span>
+        OUTPUT NodeData[Current]
+        <span class="fn">PreOrder</span>(LeftPtr[Current])
+        <span class="fn">PreOrder</span>(RightPtr[Current])
+    <span class="kw">ENDIF</span>
+<span class="kw">ENDPROCEDURE</span>
+
+<span class="kw">PROCEDURE</span> <span class="fn">PostOrder</span>(Current : <span class="fn">INTEGER</span>)
+    <span class="kw">IF</span> Current &lt;&gt; <span class="num">0</span> <span class="kw">THEN</span>
+        <span class="fn">PostOrder</span>(LeftPtr[Current])
+        <span class="fn">PostOrder</span>(RightPtr[Current])
+        OUTPUT NodeData[Current]
+    <span class="kw">ENDIF</span>
+<span class="kw">ENDPROCEDURE</span>
+    </div>
+
+    <div class="worked">
+      <div class="worked-title">Traversal Trace — In-Order on the BST [50, 30, 70, 20, 40, 60, 80]</div>
+      <div class="step"><div class="step-num">1</div><div class="step-text">InOrder(50) → call InOrder(30) first</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">InOrder(30) → call InOrder(20) first</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">InOrder(20) → no left child → <strong>output 20</strong> → no right child → return</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text">Back at 30 → <strong>output 30</strong> → call InOrder(40)</div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-text">InOrder(40) → no children → <strong>output 40</strong> → return</div></div>
+      <div class="step"><div class="step-num">6</div><div class="step-text">Back at 50 → <strong>output 50</strong> → call InOrder(70)</div></div>
+      <div class="step"><div class="step-num">7</div><div class="step-text">InOrder(70) → InOrder(60) → <strong>output 60</strong> → <strong>output 70</strong> → InOrder(80) → <strong>output 80</strong></div></div>
+      <p style="margin-top:.5rem">Final output: <strong>20, 30, 40, 50, 60, 70, 80</strong> — in sorted order.</p>
+    </div>
+
+    <div class="callout tip">
+      <strong>In-order always gives sorted output from a BST.</strong> This property is why BSTs are useful for maintaining sorted data with efficient O(log n) insertion and lookup (on a balanced tree).
+    </div>
+
+    <div class="callout exam">
+      <strong>Exam tip:</strong> When asked to trace a traversal, work through it methodically using a call stack. For in-order, think "go as far left as possible, then output, then go right." Cambridge often asks you to state the output of a traversal — practice on a diagram before the exam.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 7: HASH TABLES                 -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="hash-tables">
+    <h2><span class="section-num">7</span> Hash Tables</h2>
+
+    <p>A <span class="key-term">hash table</span> stores key-value pairs and uses a <span class="key-term">hash function</span> to compute an index (bucket) for each key. This enables O(1) average-case lookup, insertion, and deletion — much faster than searching a sorted array or BST.</p>
+
+    <h3>How Hashing Works</h3>
+    <div class="worked">
+      <div class="worked-title">Example: Hash table of size 7, hash function = key MOD 7</div>
+      <div class="step"><div class="step-num">1</div><div class="step-text">Insert key 23: 23 MOD 7 = 2 → store at index 2</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Insert key 14: 14 MOD 7 = 0 → store at index 0</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Insert key 30: 30 MOD 7 = 2 → index 2 is occupied! This is a <strong>collision</strong></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text">Insert key 9:  9 MOD 7 = 2 → index 2 is occupied! Another collision</div></div>
+    </div>
+
+    <div class="hash-grid">
+      <div class="hash-idx">0</div><div class="hash-val">14</div>
+      <div class="hash-idx">1</div><div class="hash-val">—</div>
+      <div class="hash-idx">2</div><div class="hash-val">23</div>
+      <div class="hash-idx">3</div><div class="hash-val">—</div>
+      <div class="hash-idx">4</div><div class="hash-val">—</div>
+      <div class="hash-idx">5</div><div class="hash-val">—</div>
+      <div class="hash-idx">6</div><div class="hash-val">—</div>
+    </div>
+    <p style="font-size:.8rem;color:var(--text-muted)">Keys 30 and 9 both hash to index 2 (already occupied by 23) — a collision must be resolved.</p>
+
+    <h3>Collision Handling</h3>
+
+    <h4>1. Chaining (Open Hashing)</h4>
+    <p>Each bucket holds a linked list. When a collision occurs, the new item is appended to the list at that bucket. Lookup must search the chain at the computed index.</p>
+    <div class="hash-grid" style="max-width:350px">
+      <div class="hash-idx">0</div><div class="hash-val">14 → NIL</div>
+      <div class="hash-idx">1</div><div class="hash-val">—</div>
+      <div class="hash-idx">2</div><div class="hash-val collision">23 → 30 → 9 → NIL</div>
+      <div class="hash-idx">3</div><div class="hash-val">—</div>
+      <div class="hash-idx">4</div><div class="hash-val">—</div>
+      <div class="hash-idx">5</div><div class="hash-val">—</div>
+      <div class="hash-idx">6</div><div class="hash-val">—</div>
+    </div>
+
+    <h4>2. Open Addressing (Linear Probing)</h4>
+    <p>All items are stored within the table itself. If the computed index is occupied, probe the next index (index + 1, index + 2, …) until an empty slot is found. Wrap around using MOD.</p>
+    <div class="hash-grid">
+      <div class="hash-idx">0</div><div class="hash-val">14</div>
+      <div class="hash-idx">1</div><div class="hash-val">—</div>
+      <div class="hash-idx">2</div><div class="hash-val">23</div>
+      <div class="hash-idx">3</div><div class="hash-val collision">30 (probed from 2)</div>
+      <div class="hash-idx">4</div><div class="hash-val collision">9 (probed from 2→3)</div>
+      <div class="hash-idx">5</div><div class="hash-val">—</div>
+      <div class="hash-idx">6</div><div class="hash-val">—</div>
+    </div>
+
+    <h3>Hash Table — Pseudocode</h3>
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="kw">DECLARE</span> Table   : <span class="fn">ARRAY</span>[<span class="num">0</span>:<span class="num">6</span>] <span class="kw">OF</span> <span class="fn">INTEGER</span>
+<span class="kw">DECLARE</span> MaxSize : <span class="fn">INTEGER</span>
+MaxSize <span class="op">←</span> <span class="num">7</span>
+<span class="cm">// Initialise all slots to -1 (empty)</span>
+<span class="kw">FOR</span> i <span class="op">←</span> <span class="num">0</span> <span class="kw">TO</span> MaxSize - <span class="num">1</span>
+    Table[i] <span class="op">←</span> -<span class="num">1</span>
+<span class="kw">NEXT</span> i
+
+<span class="kw">FUNCTION</span> <span class="fn">HashFunction</span>(Key : <span class="fn">INTEGER</span>) <span class="kw">RETURNS</span> <span class="fn">INTEGER</span>
+    <span class="kw">RETURN</span> Key <span class="kw">MOD</span> MaxSize
+<span class="kw">ENDFUNCTION</span>
+
+<span class="kw">PROCEDURE</span> <span class="fn">Insert</span>(Key : <span class="fn">INTEGER</span>)
+    Index <span class="op">←</span> <span class="fn">HashFunction</span>(Key)
+    <span class="cm">// Linear probing: find next empty slot</span>
+    <span class="kw">WHILE</span> Table[Index] &lt;&gt; -<span class="num">1</span> <span class="kw">DO</span>
+        Index <span class="op">←</span> (Index + <span class="num">1</span>) <span class="kw">MOD</span> MaxSize
+    <span class="kw">ENDWHILE</span>
+    Table[Index] <span class="op">←</span> Key
+<span class="kw">ENDPROCEDURE</span>
+
+<span class="kw">FUNCTION</span> <span class="fn">Search</span>(Key : <span class="fn">INTEGER</span>) <span class="kw">RETURNS</span> <span class="fn">INTEGER</span>
+    <span class="cm">// Returns index, or -1 if not found</span>
+    Index   <span class="op">←</span> <span class="fn">HashFunction</span>(Key)
+    Checked <span class="op">←</span> <span class="num">0</span>
+    <span class="kw">WHILE</span> Table[Index] &lt;&gt; Key <span class="kw">AND</span> Checked &lt; MaxSize <span class="kw">DO</span>
+        Index   <span class="op">←</span> (Index + <span class="num">1</span>) <span class="kw">MOD</span> MaxSize
+        Checked <span class="op">←</span> Checked + <span class="num">1</span>
+    <span class="kw">ENDWHILE</span>
+    <span class="kw">IF</span> Table[Index] = Key <span class="kw">THEN</span>
+        <span class="kw">RETURN</span> Index
+    <span class="kw">ELSE</span>
+        <span class="kw">RETURN</span> -<span class="num">1</span>
+    <span class="kw">ENDIF</span>
+<span class="kw">ENDFUNCTION</span>
+    </div>
+
+    <h3>Properties of a Good Hash Function</h3>
+    <ul>
+      <li>Produces a valid index (within the table bounds)</li>
+      <li>Distributes keys evenly across the table — minimises clustering</li>
+      <li>Is fast to compute — O(1)</li>
+      <li>Is deterministic — the same key always produces the same index</li>
+    </ul>
+
+    <h3>Data Structure Summary</h3>
+    <table class="plain-table">
+      <thead><tr><th>Structure</th><th>Access</th><th>Insert</th><th>Delete</th><th>Search</th><th>Best use case</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Array</strong></td><td>O(1)</td><td>O(n)</td><td>O(n)</td><td>O(n) / O(log n)*</td><td>Fixed data, index-based access</td></tr>
+        <tr><td><strong>Stack</strong></td><td>O(1) top</td><td>O(1)</td><td>O(1)</td><td>O(n)</td><td>LIFO: undo, call stack, recursion</td></tr>
+        <tr><td><strong>Queue</strong></td><td>O(1) front</td><td>O(1)</td><td>O(1)</td><td>O(n)</td><td>FIFO: scheduling, buffering</td></tr>
+        <tr><td><strong>Linked List</strong></td><td>O(n)</td><td>O(1)**</td><td>O(1)**</td><td>O(n)</td><td>Dynamic size, frequent inserts/deletes</td></tr>
+        <tr><td><strong>BST (balanced)</strong></td><td>O(log n)</td><td>O(log n)</td><td>O(log n)</td><td>O(log n)</td><td>Sorted data, frequent searching</td></tr>
+        <tr><td><strong>Hash Table</strong></td><td>O(1) avg</td><td>O(1) avg</td><td>O(1) avg</td><td>O(1) avg</td><td>Fast key-based lookup, dictionaries</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:.8rem;color:var(--text-muted)">* O(log n) with binary search on sorted array. ** O(1) once position is known (O(n) to find position).</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- EXAM PRACTICE                          -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="exam-practice">
+    <h2><span class="section-num">📝</span> Exam Practice</h2>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question 1 — 4 marks</div>
+      <p>A stack is implemented using an array of size 4. The stack currently contains (from bottom to top): <strong>5, 12, 8</strong>. Show the state of the stack and the TopOfStack pointer after each operation in order:</p>
+      <ol style="font-size:.875rem"><li>Push(20)</li><li>Pop()</li><li>Push(3)</li><li>Push(17)</li></ol>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <table style="width:100%;border-collapse:collapse;font-size:.85rem">
+          <thead><tr style="background:#00695c;color:#fff"><th style="padding:.3rem .5rem">Operation</th><th>Stack (bottom→top)</th><th>TopOfStack</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td style="padding:.25rem .5rem">Start</td><td>[5, 12, 8, —]</td><td>3</td><td>—</td></tr>
+            <tr><td>Push(20)</td><td>[5, 12, 8, 20]</td><td>4</td><td>Stack now full</td></tr>
+            <tr><td>Pop()</td><td>[5, 12, 8, —]</td><td>3</td><td>Returns 20</td></tr>
+            <tr><td>Push(3)</td><td>[5, 12, 8, 3]</td><td>4</td><td>Stack full again</td></tr>
+            <tr><td>Push(17)</td><td>[5, 12, 8, 3]</td><td>4</td><td>Error: stack overflow — no change</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question 2 — 5 marks</div>
+      <p>A circular queue of maximum size 5 uses a Head pointer, a Tail pointer, and a Count. Initially Head = 1, Tail = 5, Count = 0. Perform these operations in order and show the values of Head, Tail, Count after each:</p>
+      <ol style="font-size:.875rem"><li>Enqueue(10)</li><li>Enqueue(20)</li><li>Enqueue(30)</li><li>Dequeue()</li><li>Enqueue(40)</li></ol>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Formula:</strong> Tail ← (Tail MOD MaxSize) + 1 on Enqueue; Head ← (Head MOD MaxSize) + 1 on Dequeue.</p>
+        <table style="width:100%;border-collapse:collapse;font-size:.85rem">
+          <thead><tr style="background:#00695c;color:#fff"><th style="padding:.3rem .5rem">Operation</th><th>Head</th><th>Tail</th><th>Count</th><th>Queue contents (index 1–5)</th></tr></thead>
+          <tbody>
+            <tr><td style="padding:.25rem .5rem">Start</td><td>1</td><td>5</td><td>0</td><td>[—, —, —, —, —]</td></tr>
+            <tr><td>Enqueue(10)</td><td>1</td><td>1</td><td>1</td><td>[10, —, —, —, —]</td></tr>
+            <tr><td>Enqueue(20)</td><td>1</td><td>2</td><td>2</td><td>[10, 20, —, —, —]</td></tr>
+            <tr><td>Enqueue(30)</td><td>1</td><td>3</td><td>3</td><td>[10, 20, 30, —, —]</td></tr>
+            <tr><td>Dequeue()</td><td>2</td><td>3</td><td>2</td><td>[—, 20, 30, —, —] → returns 10</td></tr>
+            <tr><td>Enqueue(40)</td><td>2</td><td>4</td><td>3</td><td>[—, 20, 30, 40, —]</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question 3 — 5 marks</div>
+      <p>The values <strong>45, 20, 60, 10, 35, 55, 70</strong> are inserted one by one into an initially empty binary search tree. Draw the resulting tree and state the output of an in-order traversal.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <pre style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:.75rem;font-size:.85rem;line-height:1.9;overflow-x:auto">
+               45
+             /    \
+           20      60
+          /  \    /  \
+         10  35  55  70
+        </pre>
+        <p><strong>In-order traversal (Left → Root → Right):</strong><br>
+        10, 20, 35, 45, 55, 60, 70</p>
+        <p>The in-order traversal of a BST always produces the keys in ascending sorted order.</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question 4 — 4 marks</div>
+      <p>A hash table has 7 slots (indices 0–6). The hash function is <strong>key MOD 7</strong>. Insert the following keys in order using <strong>linear probing</strong> to resolve collisions: <strong>14, 17, 21, 28, 35</strong>. State the final contents of each slot.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <table style="width:100%;border-collapse:collapse;font-size:.85rem;font-family:'Courier New',Courier,monospace">
+          <thead><tr style="background:#00695c;color:#fff"><th style="padding:.3rem .5rem">Key</th><th>Hash (key MOD 7)</th><th>Slot used</th><th>Reason</th></tr></thead>
+          <tbody>
+            <tr><td style="padding:.25rem .5rem">14</td><td>0</td><td>0</td><td>Slot 0 empty</td></tr>
+            <tr><td>17</td><td>3</td><td>3</td><td>Slot 3 empty</td></tr>
+            <tr><td>21</td><td>0</td><td>1</td><td>Slot 0 taken → probe slot 1 (empty)</td></tr>
+            <tr><td>28</td><td>0</td><td>2</td><td>Slot 0 taken → slot 1 taken → probe slot 2 (empty)</td></tr>
+            <tr><td>35</td><td>0</td><td>4</td><td>Slots 0,1,2 taken → slot 3 taken → probe slot 4 (empty)</td></tr>
+          </tbody>
+        </table>
+        <p>Final table: Index 0→14, 1→21, 2→28, 3→17, 4→35, 5→empty, 6→empty</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question 5 — 4 marks</div>
+      <p>Compare a linked list and an array as implementations for a stack. State one advantage and one disadvantage of each.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Array-based stack:</strong></p>
+        <ul>
+          <li><strong>Advantage:</strong> O(1) push and pop — no memory allocation per operation; fast due to cache locality of contiguous memory.</li>
+          <li><strong>Disadvantage:</strong> Fixed maximum size must be declared in advance — stack overflow if the bound is exceeded; wastes memory if the stack is usually small.</li>
+        </ul>
+        <p><strong>Linked list-based stack:</strong></p>
+        <ul>
+          <li><strong>Advantage:</strong> Dynamic size — can grow as large as available memory allows with no pre-declared limit.</li>
+          <li><strong>Disadvantage:</strong> Each node requires extra memory for a pointer; heap allocation per push is slower than simple index increment; poorer cache performance.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question 6 — 3 marks</div>
+      <p>State the output of a <strong>pre-order</strong> and a <strong>post-order</strong> traversal of this tree:</p>
+      <pre style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:.75rem;font-size:.85rem;line-height:1.9;margin:.5rem 0">
+        A
+       / \
+      B   C
+     / \
+    D   E
+      </pre>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Pre-order (Root → Left → Right):</strong><br>A, B, D, E, C</p>
+        <p><strong>Post-order (Left → Right → Root):</strong><br>D, E, B, C, A</p>
+        <p><em>Tip: Pre-order visits root before children (useful for copying a tree). Post-order visits root last (useful for deleting a tree — children deleted before parent).</em></p>
+      </div>
+    </div>
+
+    <h3>Revision Checklist</h3>
+    <ul class="checklist">
+      <li>I can name all six Cambridge primitive data types and give an example of each</li>
+      <li>I can declare 1D and 2D arrays in pseudocode and access elements correctly (1-indexed)</li>
+      <li>I can describe a stack as LIFO and implement push, pop, peek, isEmpty, isFull in pseudocode</li>
+      <li>I can explain stack overflow and underflow and identify when they occur</li>
+      <li>I can describe a queue as FIFO and explain the problem with a linear queue</li>
+      <li>I can implement a circular queue using MOD arithmetic and a Count variable</li>
+      <li>I can describe a singly linked list and implement traversal, insert at head, and deletion</li>
+      <li>I can explain the difference between a singly and doubly linked list</li>
+      <li>I can insert values into a BST and draw the resulting tree</li>
+      <li>I can trace in-order, pre-order, and post-order traversals and state their output</li>
+      <li>I can explain what a hash function does, compute a hash index, and identify collisions</li>
+      <li>I can describe chaining and linear probing as collision resolution strategies</li>
+      <li>I can compare data structures and justify the most appropriate choice for a given problem</li>
+    </ul>
+  </div>
+
+</main>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+
+  <div class="sidebar-box">
+    <h3>Contents</h3>
+    <ul class="toc-list">
+      <li><a href="#data-types">1. Data Types</a></li>
+      <li><a href="#arrays">2. Arrays</a></li>
+      <li><a href="#stacks">3. Stacks</a></li>
+      <li><a href="#queues">4. Queues</a></li>
+      <li><a href="#linked-lists">5. Linked Lists</a></li>
+      <li><a href="#trees">6. Trees</a></li>
+      <li><a href="#hash-tables">7. Hash Tables</a></li>
+      <li><a href="#exam-practice">📝 Exam Practice</a></li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>ADT Quick Ref</h3>
+    <ul style="font-size:.78rem;padding-left:1.1rem;color:var(--text)">
+      <li style="margin:.3rem 0"><strong>Stack</strong> — LIFO, push/pop top</li>
+      <li style="margin:.3rem 0"><strong>Queue</strong> — FIFO, enqueue rear / dequeue front</li>
+      <li style="margin:.3rem 0"><strong>Linked List</strong> — dynamic, pointer-linked nodes</li>
+      <li style="margin:.3rem 0"><strong>BST</strong> — left &lt; root &lt; right</li>
+      <li style="margin:.3rem 0"><strong>Hash Table</strong> — key MOD size → O(1) avg</li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>Tree Traversals</h3>
+    <ul style="font-size:.78rem;padding-left:1.1rem;color:var(--text)">
+      <li style="margin:.3rem 0"><strong>In-order:</strong> L → N → R (sorted)</li>
+      <li style="margin:.3rem 0"><strong>Pre-order:</strong> N → L → R (copy)</li>
+      <li style="margin:.3rem 0"><strong>Post-order:</strong> L → R → N (delete)</li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>Primitive Types</h3>
+    <ul style="font-size:.78rem;padding-left:0;list-style:none;color:var(--text)">
+      <li style="margin:.2rem 0;padding:.2rem 0;border-bottom:1px solid var(--border)"><code>INTEGER</code> — whole number</li>
+      <li style="margin:.2rem 0;padding:.2rem 0;border-bottom:1px solid var(--border)"><code>REAL</code> — decimal</li>
+      <li style="margin:.2rem 0;padding:.2rem 0;border-bottom:1px solid var(--border)"><code>CHAR</code> — one character</li>
+      <li style="margin:.2rem 0;padding:.2rem 0;border-bottom:1px solid var(--border)"><code>STRING</code> — text</li>
+      <li style="margin:.2rem 0;padding:.2rem 0;border-bottom:1px solid var(--border)"><code>BOOLEAN</code> — TRUE/FALSE</li>
+      <li style="margin:.2rem 0;padding:.2rem 0"><code>DATE</code> — calendar date</li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box" style="border-left:4px solid #00695c">
+    <h3 style="color:#00695c">Common Mistakes</h3>
+    <ul style="font-size:.78rem;padding-left:1.1rem;color:var(--text)">
+      <li style="margin:.3rem 0">Forgetting TopOfStack starts at 0 (empty) not 1</li>
+      <li style="margin:.3rem 0">Linear queue: not using circular logic — wastes slots</li>
+      <li style="margin:.3rem 0">Mixing up in-order vs pre-order in traversals</li>
+      <li style="margin:.3rem 0">Hash table: forgetting MOD wraps index into range</li>
+      <li style="margin:.3rem 0">Arrays in pseudocode are 1-indexed — not 0</li>
+      <li style="margin:.3rem 0">BST left &lt; root ≤ right (some texts use strict &lt;, know your convention)</li>
+    </ul>
+  </div>
+
+  <a href="topic10-algorithm-design.html" style="display:block;text-align:center;background:var(--surface2);color:var(--primary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.65rem;font-weight:700;font-size:.82rem;text-decoration:none;margin-top:.25rem">
+    ← Topic 10: Algorithm Design
+  </a>
+  <a href="index.html" style="display:block;text-align:center;background:var(--primary);color:#fff;border-radius:var(--radius-sm);padding:.75rem;font-weight:700;font-size:.875rem;text-decoration:none;margin-top:.5rem">
+    ← Back to All Topics
+  </a>
+
+</aside>
+
+</div><!-- /lesson-wrap -->
+
+<footer style="background:var(--surface);border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;font-size:.8rem;color:var(--text-muted)">
+  Cambridge International AS &amp; A Level Computer Science 9618 — Topic 11: Data Types &amp; Structures &nbsp;|&nbsp;
+  Not affiliated with Cambridge Assessment International Education.
+</footer>
+
+<script src="script.js"></script>
+<script>
+  const sections = document.querySelectorAll('.lesson-section[id]');
+  const navLinks = document.querySelectorAll('.toc-list a, .page-nav a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+  document.querySelectorAll('.reveal-btn').forEach(btn => { btn.textContent = 'Show Answer'; });
+</script>
+</body>
+</html>
