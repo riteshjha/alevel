@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Topic 10: Algorithm Design &amp; Problem-Solving — CS 9618</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .page-nav { background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:64px; z-index:90; overflow-x:auto; }
+    .page-nav-inner { max-width:1100px; margin:0 auto; padding:0 2rem; display:flex; gap:0; }
+    .page-nav a { display:block; padding:.75rem 1.1rem; font-size:.82rem; font-weight:600; color:var(--text-muted); text-decoration:none; white-space:nowrap; border-bottom:3px solid transparent; transition:color .2s,border-color .2s; }
+    .page-nav a:hover,.page-nav a.active { color:var(--primary); border-bottom-color:var(--primary); }
+
+    .lesson-wrap { max-width:1100px; margin:0 auto; padding:2.5rem 2rem 4rem; display:grid; grid-template-columns:1fr 280px; gap:2.5rem; align-items:start; }
+    @media(max-width:900px){ .lesson-wrap{grid-template-columns:1fr} .sidebar{display:none} }
+
+    .sidebar { position:sticky; top:120px; }
+    .sidebar-box { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; margin-bottom:1rem; box-shadow:var(--shadow); }
+    .sidebar-box h3 { font-size:.85rem; font-weight:700; margin-bottom:.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; }
+    .toc-list { list-style:none; }
+    .toc-list li { padding:.2rem 0; }
+    .toc-list a { font-size:.82rem; color:var(--text-muted); text-decoration:none; display:block; padding:.25rem .5rem; border-radius:4px; transition:background .15s,color .15s; }
+    .toc-list a:hover { background:var(--surface2); color:var(--primary); }
+    .toc-list a.active { background:var(--accent-light); color:var(--primary); font-weight:600; }
+
+    .lesson-section { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:2rem 2.25rem; margin-bottom:2rem; box-shadow:var(--shadow); scroll-margin-top:130px; }
+    .lesson-section h2 { font-size:1.5rem; font-weight:800; color:var(--primary); margin-bottom:.4rem; display:flex; align-items:center; gap:.6rem; }
+    .section-num { background:var(--primary); color:#fff; width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:.9rem; font-weight:800; flex-shrink:0; }
+    .lesson-section h3 { font-size:1.1rem; font-weight:700; margin:1.75rem 0 .75rem; padding-bottom:.4rem; border-bottom:2px solid var(--border); color:var(--text); }
+    .lesson-section h4 { font-size:.95rem; font-weight:700; margin:1.25rem 0 .5rem; color:var(--primary-light); }
+    .lesson-section p { font-size:.9rem; line-height:1.75; color:var(--text); margin-bottom:.75rem; }
+    .lesson-section ul,.lesson-section ol { padding-left:1.5rem; margin-bottom:.75rem; }
+    .lesson-section li { font-size:.9rem; line-height:1.75; color:var(--text); }
+
+    /* Worked example */
+    .worked { background:linear-gradient(135deg,#fff3e0,#fce4ec); border:1px solid #ffcc80; border-left:5px solid #e65100; border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:1.25rem 1.5rem; margin:1rem 0; }
+    [data-theme="dark"] .worked { background:#1a0e00; border-color:#e65100; }
+    .worked .worked-title { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#e65100; margin-bottom:.6rem; }
+    [data-theme="dark"] .worked .worked-title { color:#ffcc80; }
+    .worked p,.worked li { font-size:.875rem; color:var(--text); }
+    .worked .step { display:flex; gap:.75rem; margin:.4rem 0; align-items:flex-start; }
+    .worked .step-num { background:#e65100; color:#fff; min-width:22px; height:22px; border-radius:50%; font-size:.72rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+    .worked .step-text { font-size:.875rem; line-height:1.6; }
+
+    /* Practice question */
+    .practice { background:var(--surface2); border:1px solid var(--border); border-left:5px solid #2e7d32; border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:1.25rem 1.5rem; margin:1rem 0; }
+    .practice .pq-title { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#2e7d32; margin-bottom:.6rem; }
+    .practice p,.practice li { font-size:.875rem; }
+    .practice .reveal-btn { background:#2e7d32; color:#fff; border:none; border-radius:6px; padding:.4rem 1rem; font-size:.8rem; font-weight:700; cursor:pointer; margin-top:.75rem; transition:background .2s; }
+    .practice .reveal-btn:hover { background:#1b5e20; }
+    .practice .answer-reveal { display:none; margin-top:.75rem; padding:.75rem 1rem; background:#e8f5e9; border-radius:var(--radius-sm); font-size:.875rem; }
+    [data-theme="dark"] .practice .answer-reveal { background:#1b2e1c; color:#c8e6c9; }
+    .practice .answer-reveal.open { display:block; }
+
+    /* Callouts */
+    .callout { background:var(--surface2); border-left:4px solid var(--accent); border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:.85rem 1.1rem; margin:.75rem 0; font-size:.875rem; color:var(--text); }
+    .callout.warn { border-color:#f59e0b; }
+    .callout.tip  { border-color:#22c55e; }
+    .callout.exam { border-color:#7c3aed; }
+
+    /* Key term */
+    .key-term { background:linear-gradient(transparent 60%,rgba(230,81,0,.15) 60%); font-weight:700; }
+
+    /* Objectives & breadcrumb */
+    .objectives-list { list-style:none; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:.5rem; }
+    .objectives-list li { font-size:.85rem; display:flex; align-items:flex-start; gap:.5rem; padding:.4rem 0; color:var(--text); }
+    .objectives-list li::before { content:'✦'; color:var(--accent); flex-shrink:0; }
+    .breadcrumb { display:flex; align-items:center; gap:.4rem; font-size:.82rem; color:var(--text-muted); margin-bottom:1.5rem; }
+    .breadcrumb a { color:var(--primary-light); text-decoration:none; }
+    .breadcrumb a:hover { text-decoration:underline; }
+
+    /* Checklist */
+    .checklist { list-style:none; padding:0; }
+    .checklist li { display:flex; align-items:flex-start; gap:.6rem; padding:.35rem 0; font-size:.875rem; color:var(--text); }
+    .checklist li::before { content:'☐'; color:var(--primary-light); font-size:1rem; flex-shrink:0; }
+
+    /* Comparison table */
+    .plain-table { width:100%; border-collapse:collapse; font-size:.875rem; margin:.75rem 0; }
+    .plain-table th { background:var(--primary); color:#fff; padding:.45rem .8rem; text-align:left; }
+    .plain-table td { border:1px solid var(--border); padding:.4rem .8rem; color:var(--text); vertical-align:top; }
+    .plain-table tr:nth-child(even) td { background:var(--surface2); }
+
+    /* Code block */
+    .code-block { background:#1e1e2e; border-radius:var(--radius-sm); padding:1.1rem 1.35rem; margin:.75rem 0; font-family:'Courier New',Courier,monospace; font-size:.83rem; line-height:1.7; overflow-x:auto; position:relative; }
+    .code-lang { position:absolute; top:.5rem; right:.75rem; font-size:.68rem; font-weight:700; color:#6272a4; text-transform:uppercase; letter-spacing:.08em; }
+    .kw  { color:#ff79c6; }
+    .fn  { color:#50fa7b; }
+    .str { color:#f1fa8c; }
+    .num { color:#bd93f9; }
+    .cm  { color:#6272a4; font-style:italic; }
+    .op  { color:#ff79c6; }
+
+    /* Sort cards */
+    .sort-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:.85rem; margin:.75rem 0; }
+    .sort-card { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:1rem 1.1rem; }
+    .sort-card h4 { font-size:.9rem; font-weight:800; color:var(--primary); margin-bottom:.5rem; }
+    .sort-card .complexity { display:inline-block; background:var(--primary); color:#fff; font-size:.72rem; font-weight:700; border-radius:12px; padding:.1rem .55rem; margin-bottom:.5rem; }
+    .sort-card ul { padding-left:1.1rem; margin:0; }
+    .sort-card li { font-size:.82rem; line-height:1.65; color:var(--text); }
+
+    /* Big-O table colours */
+    .bigo-fast { background:#e8f5e9 !important; }
+    .bigo-mid  { background:#fff8e1 !important; }
+    .bigo-slow { background:#ffebee !important; }
+    [data-theme="dark"] .bigo-fast { background:#1b2e1c !important; }
+    [data-theme="dark"] .bigo-mid  { background:#2a2000 !important; }
+    [data-theme="dark"] .bigo-slow { background:#2a0000 !important; }
+
+    /* Trace table */
+    .trace-table { width:100%; border-collapse:collapse; font-size:.82rem; margin:.75rem 0; font-family:'Courier New',Courier,monospace; }
+    .trace-table th { background:#e65100; color:#fff; padding:.35rem .7rem; text-align:center; }
+    .trace-table td { border:1px solid var(--border); padding:.3rem .7rem; text-align:center; color:var(--text); }
+    .trace-table tr:nth-child(even) td { background:var(--surface2); }
+    .trace-table .swap { background:#fff3e0; color:#e65100; font-weight:700; }
+    [data-theme="dark"] .trace-table .swap { background:#1a0e00; color:#ffcc80; }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="header-inner">
+    <a class="logo" href="index.html">
+      <div class="logo-icon">💻</div>
+      <div>
+        <div class="logo-text">CS 9618</div>
+        <div class="logo-sub">Cambridge AS &amp; A Level</div>
+      </div>
+    </a>
+    <div class="header-actions">
+      <button class="btn-icon" id="theme-btn" title="Toggle theme">🌙</button>
+    </div>
+  </div>
+</header>
+
+<!-- Section nav -->
+<nav class="page-nav" aria-label="Sections">
+  <div class="page-nav-inner">
+    <a href="#pseudocode" class="active">1. Pseudocode</a>
+    <a href="#sorting">2. Sorting</a>
+    <a href="#searching">3. Searching</a>
+    <a href="#complexity">4. Complexity</a>
+    <a href="#problem-solving">5. Problem-Solving</a>
+    <a href="#exam-practice">📝 Exam Practice</a>
+  </div>
+</nav>
+
+<div class="lesson-wrap">
+<main>
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="index.html">Home</a>
+    <span>›</span>
+    <a href="index.html#tab-as">Paper 2 — Programming</a>
+    <span>›</span>
+    <strong style="color:var(--text)">Topic 10: Algorithm Design &amp; Problem-Solving</strong>
+  </div>
+
+  <!-- Hero -->
+  <div class="lesson-section" style="background:linear-gradient(135deg,#bf360c,#e64a19,#ff5722);color:#fff;border:none">
+    <div style="display:flex;align-items:flex-start;gap:1.25rem">
+      <div style="font-size:3rem;flex-shrink:0">🔍</div>
+      <div>
+        <div style="font-size:.75rem;font-weight:700;opacity:.7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem">Paper 2 · Topic 10</div>
+        <h1 style="font-size:1.9rem;font-weight:900;margin-bottom:.5rem;color:#fff">Algorithm Design &amp; Problem-Solving</h1>
+        <p style="opacity:.85;font-size:.95rem;max-width:620px;margin-bottom:1rem;color:#fff">Cambridge pseudocode conventions, sorting and searching algorithms, Big-O complexity analysis, and systematic problem-solving strategies.</p>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+          <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">Paper 2 · AS &amp; A Level</span>
+          <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">~15% of Paper 2 marks</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Learning objectives -->
+  <div class="lesson-section">
+    <h2><span class="section-num">✦</span> Learning Objectives</h2>
+    <p>By the end of this topic you should be able to:</p>
+    <ul class="objectives-list">
+      <li>Write correct Cambridge pseudocode using all required constructs</li>
+      <li>Trace through algorithms and produce accurate trace tables</li>
+      <li>Describe, implement, and compare bubble, insertion, merge, and quick sort</li>
+      <li>Implement and compare linear and binary search</li>
+      <li>Express algorithm efficiency using Big-O notation</li>
+      <li>Identify tractable and intractable problems</li>
+      <li>Apply decomposition, abstraction, and pattern recognition</li>
+      <li>Design algorithms from a problem description using top-down design</li>
+    </ul>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 1: PSEUDOCODE                  -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="pseudocode">
+    <h2><span class="section-num">1</span> Cambridge Pseudocode Conventions</h2>
+
+    <p><span class="key-term">Pseudocode</span> is a structured, language-independent way of describing an algorithm. Cambridge 9618 uses a specific pseudocode style — you must follow it in Paper 2 answers.</p>
+
+    <h3>Variables and Data Types</h3>
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="cm">// Declaration</span>
+<span class="kw">DECLARE</span> Count : <span class="fn">INTEGER</span>
+<span class="kw">DECLARE</span> Price : <span class="fn">REAL</span>
+<span class="kw">DECLARE</span> Name  : <span class="fn">STRING</span>
+<span class="kw">DECLARE</span> Pass  : <span class="fn">BOOLEAN</span>
+<span class="kw">DECLARE</span> Grade : <span class="fn">CHAR</span>
+
+<span class="cm">// Assignment uses ← (not =)</span>
+Count <span class="op">←</span> <span class="num">0</span>
+Price <span class="op">←</span> <span class="num">9.99</span>
+Name  <span class="op">←</span> <span class="str">"Alice"</span>
+Pass  <span class="op">←</span> <span class="kw">TRUE</span>
+
+<span class="cm">// Arrays: 1-indexed by convention</span>
+<span class="kw">DECLARE</span> Scores : <span class="fn">ARRAY</span>[<span class="num">1</span>:<span class="num">10</span>] <span class="kw">OF</span> <span class="fn">INTEGER</span>
+Scores[<span class="num">1</span>] <span class="op">←</span> <span class="num">85</span>
+
+<span class="cm">// 2D array</span>
+<span class="kw">DECLARE</span> Grid : <span class="fn">ARRAY</span>[<span class="num">1</span>:<span class="num">3</span>, <span class="num">1</span>:<span class="num">3</span>] <span class="kw">OF</span> <span class="fn">INTEGER</span>
+    </div>
+
+    <h3>Input, Output, and Operators</h3>
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="cm">// Input and output</span>
+INPUT Value
+OUTPUT <span class="str">"Enter your name: "</span>
+OUTPUT <span class="str">"Score is: "</span>, Score
+
+<span class="cm">// Arithmetic operators</span>
+<span class="cm">// + - * /  (standard)</span>
+<span class="cm">// DIV  → integer division (truncates)</span>
+<span class="cm">// MOD  → remainder</span>
+Result <span class="op">←</span> <span class="num">17</span> <span class="kw">DIV</span> <span class="num">5</span>   <span class="cm">// Result = 3</span>
+Remain <span class="op">←</span> <span class="num">17</span> <span class="kw">MOD</span> <span class="num">5</span>   <span class="cm">// Remain = 2</span>
+
+<span class="cm">// Comparison operators</span>
+<span class="cm">// =  &lt;&gt;  &lt;  &gt;  &lt;=  &gt;=</span>
+
+<span class="cm">// Logical operators</span>
+<span class="cm">// AND  OR  NOT</span>
+
+<span class="cm">// String concatenation</span>
+FullName <span class="op">←</span> FirstName &amp; <span class="str">" "</span> &amp; LastName
+    </div>
+
+    <h3>Selection (IF and CASE)</h3>
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="cm">// IF … THEN … ELSE … ENDIF</span>
+<span class="kw">IF</span> Score >= <span class="num">50</span> <span class="kw">THEN</span>
+    OUTPUT <span class="str">"Pass"</span>
+<span class="kw">ELSE</span>
+    OUTPUT <span class="str">"Fail"</span>
+<span class="kw">ENDIF</span>
+
+<span class="cm">// Nested IF</span>
+<span class="kw">IF</span> Score >= <span class="num">70</span> <span class="kw">THEN</span>
+    OUTPUT <span class="str">"Distinction"</span>
+<span class="kw">ELSE</span>
+    <span class="kw">IF</span> Score >= <span class="num">50</span> <span class="kw">THEN</span>
+        OUTPUT <span class="str">"Pass"</span>
+    <span class="kw">ELSE</span>
+        OUTPUT <span class="str">"Fail"</span>
+    <span class="kw">ENDIF</span>
+<span class="kw">ENDIF</span>
+
+<span class="cm">// CASE OF … ENDCASE</span>
+<span class="kw">CASE OF</span> Grade
+    <span class="str">'A'</span> : OUTPUT <span class="str">"Excellent"</span>
+    <span class="str">'B'</span> : OUTPUT <span class="str">"Good"</span>
+    <span class="str">'C'</span> : OUTPUT <span class="str">"Satisfactory"</span>
+    <span class="kw">OTHERWISE</span> : OUTPUT <span class="str">"Below standard"</span>
+<span class="kw">ENDCASE</span>
+    </div>
+
+    <h3>Iteration (Loops)</h3>
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="cm">// FOR loop — use when number of iterations is known</span>
+<span class="kw">FOR</span> i <span class="op">←</span> <span class="num">1</span> <span class="kw">TO</span> <span class="num">10</span>
+    Total <span class="op">←</span> Total + Scores[i]
+<span class="kw">NEXT</span> i
+
+<span class="cm">// FOR with STEP</span>
+<span class="kw">FOR</span> i <span class="op">←</span> <span class="num">10</span> <span class="kw">TO</span> <span class="num">1</span> <span class="kw">STEP</span> -<span class="num">1</span>
+    OUTPUT i
+<span class="kw">NEXT</span> i
+
+<span class="cm">// WHILE loop — condition checked before each iteration</span>
+<span class="kw">WHILE</span> Count &lt; <span class="num">5</span> <span class="kw">DO</span>
+    Count <span class="op">←</span> Count + <span class="num">1</span>
+<span class="kw">ENDWHILE</span>
+
+<span class="cm">// REPEAT…UNTIL — body always runs at least once</span>
+<span class="kw">REPEAT</span>
+    INPUT Value
+    <span class="kw">IF</span> Value &lt; <span class="num">0</span> <span class="kw">THEN</span>
+        OUTPUT <span class="str">"Must be positive"</span>
+    <span class="kw">ENDIF</span>
+<span class="kw">UNTIL</span> Value >= <span class="num">0</span>
+    </div>
+
+    <h3>Procedures and Functions</h3>
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="cm">// PROCEDURE — no return value</span>
+<span class="kw">PROCEDURE</span> <span class="fn">PrintHeading</span>(Title : <span class="fn">STRING</span>)
+    OUTPUT <span class="str">"=== "</span> &amp; Title &amp; <span class="str">" ==="</span>
+<span class="kw">ENDPROCEDURE</span>
+
+<span class="cm">// Call a procedure</span>
+<span class="kw">CALL</span> <span class="fn">PrintHeading</span>(<span class="str">"Results"</span>)
+
+<span class="cm">// FUNCTION — returns a value</span>
+<span class="kw">FUNCTION</span> <span class="fn">Max</span>(A : <span class="fn">INTEGER</span>, B : <span class="fn">INTEGER</span>) <span class="kw">RETURNS</span> <span class="fn">INTEGER</span>
+    <span class="kw">IF</span> A > B <span class="kw">THEN</span>
+        <span class="kw">RETURN</span> A
+    <span class="kw">ELSE</span>
+        <span class="kw">RETURN</span> B
+    <span class="kw">ENDIF</span>
+<span class="kw">ENDFUNCTION</span>
+
+<span class="cm">// Call a function</span>
+Largest <span class="op">←</span> <span class="fn">Max</span>(<span class="num">7</span>, <span class="num">12</span>)
+
+<span class="cm">// BYREF — changes to parameter affect original variable</span>
+<span class="kw">PROCEDURE</span> <span class="fn">Swap</span>(<span class="kw">BYREF</span> X : <span class="fn">INTEGER</span>, <span class="kw">BYREF</span> Y : <span class="fn">INTEGER</span>)
+    Temp <span class="op">←</span> X
+    X <span class="op">←</span> Y
+    Y <span class="op">←</span> Temp
+<span class="kw">ENDPROCEDURE</span>
+    </div>
+
+    <div class="callout exam">
+      <strong>Exam tip:</strong> Cambridge mark schemes penalise wrong pseudocode syntax. Use <code>←</code> for assignment (not <code>=</code>), always close loops with NEXT/ENDWHILE/UNTIL/ENDFOR, and terminate PROCEDURE/FUNCTION with ENDPROCEDURE/ENDFUNCTION. Indentation is expected.
+    </div>
+
+    <h3>Trace Tables</h3>
+    <p>A <span class="key-term">trace table</span> is used to manually simulate an algorithm step-by-step, tracking the value of each variable at each step. It is a key exam technique.</p>
+
+    <div class="worked">
+      <div class="worked-title">Trace Table Example</div>
+      <p>Trace the following algorithm for the array <strong>[5, 3, 8, 1]</strong>:</p>
+      <div class="code-block" style="margin:.5rem 0">
+<span class="kw">FOR</span> i <span class="op">←</span> <span class="num">1</span> <span class="kw">TO</span> <span class="num">3</span>
+    <span class="kw">IF</span> Data[i] > Data[i+<span class="num">1</span>] <span class="kw">THEN</span>
+        <span class="kw">CALL</span> <span class="fn">Swap</span>(Data[i], Data[i+<span class="num">1</span>])
+    <span class="kw">ENDIF</span>
+<span class="kw">NEXT</span> i
+      </div>
+      <table class="trace-table" style="margin:.75rem 0">
+        <thead><tr><th>i</th><th>Data[1]</th><th>Data[2]</th><th>Data[3]</th><th>Data[4]</th><th>Swap?</th></tr></thead>
+        <tbody>
+          <tr><td>Start</td><td>5</td><td>3</td><td>8</td><td>1</td><td>—</td></tr>
+          <tr><td>1</td><td class="swap">3</td><td class="swap">5</td><td>8</td><td>1</td><td class="swap">Yes (5&gt;3)</td></tr>
+          <tr><td>2</td><td>3</td><td>5</td><td>8</td><td>1</td><td>No (5&lt;8)</td></tr>
+          <tr><td>3</td><td>3</td><td>5</td><td class="swap">1</td><td class="swap">8</td><td class="swap">Yes (8&gt;1)</td></tr>
+        </tbody>
+      </table>
+      <p>After one pass: <strong>[3, 5, 1, 8]</strong> — the largest element (8) has bubbled to the end.</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 2: SORTING ALGORITHMS          -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="sorting">
+    <h2><span class="section-num">2</span> Sorting Algorithms</h2>
+
+    <p>Sorting places data into a defined order (ascending or descending). Cambridge 9618 requires you to describe, trace, implement in pseudocode, and compare the following algorithms.</p>
+
+    <div class="sort-grid">
+      <div class="sort-card">
+        <h4>Bubble Sort</h4>
+        <span class="complexity">O(n²)</span>
+        <ul>
+          <li>Compare adjacent pairs, swap if out of order</li>
+          <li>Repeat passes until no swaps occur</li>
+          <li>Each pass bubbles the next largest to its place</li>
+          <li>Simple to implement; very inefficient for large data</li>
+          <li>Stable sort</li>
+        </ul>
+      </div>
+      <div class="sort-card">
+        <h4>Insertion Sort</h4>
+        <span class="complexity">O(n²)</span>
+        <ul>
+          <li>Build a sorted sub-array left to right</li>
+          <li>Insert each unsorted element into correct position</li>
+          <li>Efficient for small or nearly-sorted data</li>
+          <li>O(n) best case on already-sorted input</li>
+          <li>Stable sort</li>
+        </ul>
+      </div>
+      <div class="sort-card">
+        <h4>Merge Sort</h4>
+        <span class="complexity">O(n log n)</span>
+        <ul>
+          <li>Divide array into two halves recursively</li>
+          <li>Sort each half, then merge sorted halves</li>
+          <li>Consistent O(n log n) regardless of input</li>
+          <li>Requires O(n) extra memory</li>
+          <li>Stable sort; well-suited to large datasets</li>
+        </ul>
+      </div>
+      <div class="sort-card">
+        <h4>Quick Sort</h4>
+        <span class="complexity">O(n log n) avg</span>
+        <ul>
+          <li>Choose a pivot; partition into &lt;pivot and &gt;pivot</li>
+          <li>Recursively sort each partition</li>
+          <li>Fast in practice; in-place (O(log n) stack space)</li>
+          <li>Worst case O(n²) with bad pivot choices</li>
+          <li>Not stable (relative order may change)</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Bubble Sort — Pseudocode</h3>
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="kw">PROCEDURE</span> <span class="fn">BubbleSort</span>(<span class="kw">BYREF</span> Data : <span class="fn">ARRAY</span>[<span class="num">1</span>:<span class="num">100</span>] <span class="kw">OF</span> <span class="fn">INTEGER</span>, n : <span class="fn">INTEGER</span>)
+    <span class="kw">DECLARE</span> Swapped : <span class="fn">BOOLEAN</span>
+    <span class="kw">DECLARE</span> Temp    : <span class="fn">INTEGER</span>
+    <span class="kw">REPEAT</span>
+        Swapped <span class="op">←</span> <span class="kw">FALSE</span>
+        <span class="kw">FOR</span> i <span class="op">←</span> <span class="num">1</span> <span class="kw">TO</span> n - <span class="num">1</span>
+            <span class="kw">IF</span> Data[i] > Data[i + <span class="num">1</span>] <span class="kw">THEN</span>
+                Temp        <span class="op">←</span> Data[i]
+                Data[i]     <span class="op">←</span> Data[i + <span class="num">1</span>]
+                Data[i + <span class="num">1</span>] <span class="op">←</span> Temp
+                Swapped     <span class="op">←</span> <span class="kw">TRUE</span>
+            <span class="kw">ENDIF</span>
+        <span class="kw">NEXT</span> i
+    <span class="kw">UNTIL NOT</span> Swapped
+<span class="kw">ENDPROCEDURE</span>
+    </div>
+
+    <h3>Insertion Sort — Pseudocode</h3>
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="kw">PROCEDURE</span> <span class="fn">InsertionSort</span>(<span class="kw">BYREF</span> Data : <span class="fn">ARRAY</span>[<span class="num">1</span>:<span class="num">100</span>] <span class="kw">OF</span> <span class="fn">INTEGER</span>, n : <span class="fn">INTEGER</span>)
+    <span class="kw">DECLARE</span> Key : <span class="fn">INTEGER</span>
+    <span class="kw">DECLARE</span> j   : <span class="fn">INTEGER</span>
+    <span class="kw">FOR</span> i <span class="op">←</span> <span class="num">2</span> <span class="kw">TO</span> n
+        Key <span class="op">←</span> Data[i]
+        j   <span class="op">←</span> i - <span class="num">1</span>
+        <span class="kw">WHILE</span> j >= <span class="num">1</span> <span class="kw">AND</span> Data[j] > Key <span class="kw">DO</span>
+            Data[j + <span class="num">1</span>] <span class="op">←</span> Data[j]
+            j <span class="op">←</span> j - <span class="num">1</span>
+        <span class="kw">ENDWHILE</span>
+        Data[j + <span class="num">1</span>] <span class="op">←</span> Key
+    <span class="kw">NEXT</span> i
+<span class="kw">ENDPROCEDURE</span>
+    </div>
+
+    <h3>Merge Sort — Concept</h3>
+    <p>Merge sort uses the <span class="key-term">divide and conquer</span> strategy: split in half until each sub-array has one element (trivially sorted), then merge pairs back in sorted order.</p>
+
+    <div class="worked">
+      <div class="worked-title">Merge Sort Trace — [38, 27, 43, 3]</div>
+      <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Split:</strong> [38, 27, 43, 3] → [38, 27] and [43, 3]</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Split again:</strong> [38, 27] → [38] and [27] &nbsp;&nbsp; [43, 3] → [43] and [3]</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Merge [38] and [27]:</strong> compare 38 vs 27 → [27, 38]</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Merge [43] and [3]:</strong> compare 43 vs 3 → [3, 43]</div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-text"><strong>Merge [27, 38] and [3, 43]:</strong> 3&lt;27 → take 3; 27&lt;43 → take 27; 38&lt;43 → take 38; take 43 → <strong>[3, 27, 38, 43]</strong></div></div>
+    </div>
+
+    <h3>Quick Sort — Concept</h3>
+    <p>Quick sort chooses a <span class="key-term">pivot</span> element, partitions the array so all elements less than the pivot come before it and all greater elements come after it, then recursively sorts each partition.</p>
+
+    <div class="worked">
+      <div class="worked-title">Quick Sort Trace — [5, 3, 8, 1, 9, 2], pivot = first element</div>
+      <div class="step"><div class="step-num">1</div><div class="step-text">Pivot = <strong>5</strong>. Partition: [3, 1, 2] | <strong>5</strong> | [8, 9]</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Recursively sort [3, 1, 2]: pivot = 3 → [1, 2] | 3 → sort [1, 2] → [1, 2] | 3 → <strong>[1, 2, 3]</strong></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Recursively sort [8, 9]: pivot = 8 → 8 | [9] → <strong>[8, 9]</strong></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text">Combine: <strong>[1, 2, 3, 5, 8, 9]</strong></div></div>
+    </div>
+
+    <h3>Sorting Algorithm Comparison</h3>
+    <table class="plain-table">
+      <thead><tr><th>Algorithm</th><th>Best Case</th><th>Average Case</th><th>Worst Case</th><th>Space</th><th>Stable?</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Bubble Sort</strong></td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>Yes</td></tr>
+        <tr><td><strong>Insertion Sort</strong></td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>Yes</td></tr>
+        <tr><td><strong>Merge Sort</strong></td><td>O(n log n)</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n)</td><td>Yes</td></tr>
+        <tr><td><strong>Quick Sort</strong></td><td>O(n log n)</td><td>O(n log n)</td><td>O(n²)</td><td>O(log n)</td><td>No</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout tip">
+      <strong>Choosing a sort:</strong> For small or nearly-sorted data, insertion sort is efficient and simple. For large datasets where consistent performance matters, use merge sort. Quick sort is fastest in practice on random data due to low constant factors, but avoid it when worst-case performance is critical.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 3: SEARCHING ALGORITHMS        -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="searching">
+    <h2><span class="section-num">3</span> Searching Algorithms</h2>
+
+    <p>Searching finds whether a target value exists in a collection and, if so, returns its location.</p>
+
+    <h3>Linear Search — O(n)</h3>
+    <p>Check each element in sequence from the beginning. Works on <strong>unsorted or sorted</strong> data.</p>
+
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="kw">FUNCTION</span> <span class="fn">LinearSearch</span>(Data : <span class="fn">ARRAY</span>[<span class="num">1</span>:<span class="num">100</span>] <span class="kw">OF</span> <span class="fn">INTEGER</span>, n : <span class="fn">INTEGER</span>, Target : <span class="fn">INTEGER</span>) <span class="kw">RETURNS</span> <span class="fn">INTEGER</span>
+    <span class="cm">// Returns index of Target, or -1 if not found</span>
+    <span class="kw">FOR</span> i <span class="op">←</span> <span class="num">1</span> <span class="kw">TO</span> n
+        <span class="kw">IF</span> Data[i] = Target <span class="kw">THEN</span>
+            <span class="kw">RETURN</span> i
+        <span class="kw">ENDIF</span>
+    <span class="kw">NEXT</span> i
+    <span class="kw">RETURN</span> -<span class="num">1</span>
+<span class="kw">ENDFUNCTION</span>
+    </div>
+
+    <table class="plain-table">
+      <thead><tr><th></th><th>Best Case</th><th>Worst Case</th><th>Average Case</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Linear Search</strong></td><td>O(1) — first element is target</td><td>O(n) — target at end or absent</td><td>O(n/2) ≈ O(n)</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Binary Search — O(log n)</h3>
+    <p>Requires <strong>sorted</strong> data. Repeatedly halves the search space by comparing the target to the middle element.</p>
+
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="kw">FUNCTION</span> <span class="fn">BinarySearch</span>(Data : <span class="fn">ARRAY</span>[<span class="num">1</span>:<span class="num">100</span>] <span class="kw">OF</span> <span class="fn">INTEGER</span>, n : <span class="fn">INTEGER</span>, Target : <span class="fn">INTEGER</span>) <span class="kw">RETURNS</span> <span class="fn">INTEGER</span>
+    <span class="kw">DECLARE</span> Low, High, Mid : <span class="fn">INTEGER</span>
+    Low  <span class="op">←</span> <span class="num">1</span>
+    High <span class="op">←</span> n
+    <span class="kw">WHILE</span> Low &lt;= High <span class="kw">DO</span>
+        Mid <span class="op">←</span> (Low + High) <span class="kw">DIV</span> <span class="num">2</span>
+        <span class="kw">IF</span> Data[Mid] = Target <span class="kw">THEN</span>
+            <span class="kw">RETURN</span> Mid
+        <span class="kw">ELSE</span>
+            <span class="kw">IF</span> Data[Mid] &lt; Target <span class="kw">THEN</span>
+                Low <span class="op">←</span> Mid + <span class="num">1</span>   <span class="cm">// target in upper half</span>
+            <span class="kw">ELSE</span>
+                High <span class="op">←</span> Mid - <span class="num">1</span>  <span class="cm">// target in lower half</span>
+            <span class="kw">ENDIF</span>
+        <span class="kw">ENDIF</span>
+    <span class="kw">ENDWHILE</span>
+    <span class="kw">RETURN</span> -<span class="num">1</span>   <span class="cm">// not found</span>
+<span class="kw">ENDFUNCTION</span>
+    </div>
+
+    <div class="worked">
+      <div class="worked-title">Binary Search Trace — Target = 23 in [5, 9, 12, 17, 23, 31, 45]</div>
+      <table class="trace-table" style="margin:.6rem 0">
+        <thead><tr><th>Step</th><th>Low</th><th>High</th><th>Mid</th><th>Data[Mid]</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>1</td><td>7</td><td>4</td><td>17</td><td>17 &lt; 23 → Low = 5</td></tr>
+          <tr><td>2</td><td>5</td><td>7</td><td>6</td><td>31</td><td>31 &gt; 23 → High = 5</td></tr>
+          <tr><td>3</td><td>5</td><td>5</td><td>5</td><td class="swap">23</td><td class="swap">Found at index 5</td></tr>
+        </tbody>
+      </table>
+      <p>Binary search halved the search space each step — only 3 comparisons for 7 elements. Linear search could have needed up to 7.</p>
+    </div>
+
+    <h3>Searching Algorithm Comparison</h3>
+    <table class="plain-table">
+      <thead><tr><th>Feature</th><th>Linear Search</th><th>Binary Search</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Requires sorted data?</strong></td><td>No</td><td>Yes</td></tr>
+        <tr><td><strong>Best case</strong></td><td>O(1)</td><td>O(1)</td></tr>
+        <tr><td><strong>Worst case</strong></td><td>O(n)</td><td>O(log n)</td></tr>
+        <tr><td><strong>Suitable for large datasets?</strong></td><td>No — too slow</td><td>Yes — very efficient</td></tr>
+        <tr><td><strong>Use when</strong></td><td>Small or unsorted data</td><td>Large, sorted data</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout exam">
+      <strong>Exam tip:</strong> If asked which search to use, state the precondition — binary search requires sorted data. If data is not sorted, either sort first (at a cost) or use linear search. Cambridge questions often ask you to justify your choice.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 4: COMPLEXITY                  -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="complexity">
+    <h2><span class="section-num">4</span> Algorithm Complexity &amp; Big-O Notation</h2>
+
+    <p><span class="key-term">Big-O notation</span> describes how the running time (or memory usage) of an algorithm grows as the input size n increases. It expresses the <em>worst-case</em> growth rate, ignoring constants and lower-order terms.</p>
+
+    <h3>Common Complexity Classes</h3>
+    <table class="plain-table">
+      <thead><tr><th>Notation</th><th>Name</th><th>Growth</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr class="bigo-fast"><td><strong>O(1)</strong></td><td>Constant</td><td>Same time regardless of n</td><td>Accessing an array element by index</td></tr>
+        <tr class="bigo-fast"><td><strong>O(log n)</strong></td><td>Logarithmic</td><td>Doubles input → one extra step</td><td>Binary search</td></tr>
+        <tr class="bigo-mid"><td><strong>O(n)</strong></td><td>Linear</td><td>Doubles input → doubles time</td><td>Linear search, reading all n items</td></tr>
+        <tr class="bigo-mid"><td><strong>O(n log n)</strong></td><td>Linearithmic</td><td>Slightly worse than linear</td><td>Merge sort, quick sort (average)</td></tr>
+        <tr class="bigo-slow"><td><strong>O(n²)</strong></td><td>Quadratic</td><td>Doubles input → quadruples time</td><td>Bubble sort, insertion sort, nested loops</td></tr>
+        <tr class="bigo-slow"><td><strong>O(2ⁿ)</strong></td><td>Exponential</td><td>Adding one element → doubles time</td><td>Naive recursive Fibonacci, brute-force TSP</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Identifying Complexity from Code Structure</h3>
+    <table class="plain-table">
+      <thead><tr><th>Code Structure</th><th>Typical Complexity</th></tr></thead>
+      <tbody>
+        <tr><td>Single statement / no loop</td><td>O(1)</td></tr>
+        <tr><td>One loop over n elements</td><td>O(n)</td></tr>
+        <tr><td>Two nested loops over n elements</td><td>O(n²)</td></tr>
+        <tr><td>Halving the problem each iteration (e.g. binary search)</td><td>O(log n)</td></tr>
+        <tr><td>Loop + recursive halving (e.g. merge sort)</td><td>O(n log n)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout warn">
+      <strong>Big-O simplification:</strong> Drop constants and lower-order terms. O(3n² + 2n + 7) simplifies to O(n²) — we only care about the dominant term as n grows large.
+    </div>
+
+    <h3>Tractable vs Intractable Problems</h3>
+    <p>An algorithm is <span class="key-term">tractable</span> if it can be solved in polynomial time — O(nᵏ) for some constant k. Problems that have no known polynomial-time solution are called <span class="key-term">intractable</span>.</p>
+
+    <table class="plain-table">
+      <thead><tr><th>Category</th><th>Definition</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Tractable</strong></td><td>Solvable in polynomial time; feasible for large inputs</td><td>Sorting, searching, shortest path</td></tr>
+        <tr><td><strong>Intractable</strong></td><td>No known polynomial algorithm; only feasible for very small inputs</td><td>Travelling Salesman (exact), graph colouring</td></tr>
+        <tr><td><strong>Heuristic solution</strong></td><td>Approximation that gives a "good enough" answer quickly</td><td>Nearest-neighbour for TSP</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout tip">
+      <strong>Heuristics:</strong> When an exact solution is intractable, a <span class="key-term">heuristic</span> trades guaranteed optimality for speed. The solution found may not be the best possible, but it is found in reasonable time. Example: for the Travelling Salesman Problem, always travel to the nearest unvisited city — not optimal, but fast.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 5: PROBLEM-SOLVING             -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="problem-solving">
+    <h2><span class="section-num">5</span> Problem-Solving Strategies</h2>
+
+    <p>Before writing an algorithm, you must understand and decompose the problem. Cambridge 9618 expects you to apply the following computational thinking skills.</p>
+
+    <h3>Computational Thinking Components</h3>
+    <table class="plain-table">
+      <thead><tr><th>Component</th><th>Definition</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Decomposition</strong></td><td>Break a complex problem into smaller, more manageable sub-problems</td><td>A school management system broken into: student records, timetabling, reporting</td></tr>
+        <tr><td><strong>Abstraction</strong></td><td>Focus on essential details; ignore irrelevant ones</td><td>Modelling a car as speed, fuel level, direction — ignoring paint colour</td></tr>
+        <tr><td><strong>Pattern Recognition</strong></td><td>Identify similarities between problems or within data</td><td>Recognising that search appears in many sub-tasks</td></tr>
+        <tr><td><strong>Algorithm Design</strong></td><td>Define step-by-step instructions to solve the problem</td><td>Writing pseudocode for a sort or search</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Top-Down Design (Stepwise Refinement)</h3>
+    <p><span class="key-term">Top-down design</span> starts with the overall problem and repeatedly breaks it into smaller sub-tasks until each sub-task is simple enough to code directly. The result is a hierarchy of modules.</p>
+
+    <div class="worked">
+      <div class="worked-title">Top-Down Design — Student Grade System</div>
+      <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Top level:</strong> Run Grade System</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Level 2:</strong> Input Scores | Calculate Grades | Output Report</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Input Scores → Level 3:</strong> Read number of students | For each student: validate and store score</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Calculate Grades → Level 3:</strong> For each score: apply grade boundary | Store grade</div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-text"><strong>Output Report → Level 3:</strong> Print header | Print each student's name and grade | Print statistics</div></div>
+    </div>
+
+    <h3>Flowcharts</h3>
+    <p>Flowcharts visually represent algorithm flow using standardised symbols:</p>
+    <table class="plain-table">
+      <thead><tr><th>Symbol</th><th>Shape</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Terminal</strong></td><td>Rounded rectangle (oval)</td><td>Start or End of algorithm</td></tr>
+        <tr><td><strong>Process</strong></td><td>Rectangle</td><td>A computation or assignment</td></tr>
+        <tr><td><strong>Decision</strong></td><td>Diamond</td><td>A yes/no question (branch)</td></tr>
+        <tr><td><strong>Input/Output</strong></td><td>Parallelogram</td><td>Read from user or display output</td></tr>
+        <tr><td><strong>Flow arrow</strong></td><td>Arrow</td><td>Direction of execution</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Structure Charts</h3>
+    <p>A <span class="key-term">structure chart</span> shows the hierarchy of modules in a top-down design. Each box is a module; lines show which module calls which. Parameters passed between modules are labelled on the connecting lines.</p>
+
+    <div class="callout exam">
+      <strong>Exam tip:</strong> When asked to design a solution, always show decomposition first — list the sub-tasks before writing pseudocode. Cambridge mark schemes award marks for a structured approach, not just a working solution. Show your thinking explicitly.
+    </div>
+
+    <h3>Validation and Verification</h3>
+    <table class="plain-table">
+      <thead><tr><th>Technique</th><th>Purpose</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Validation</strong></td><td>Check that data is reasonable and within expected rules before accepting it</td><td>Range check: age must be between 0 and 120; type check: input must be an integer</td></tr>
+        <tr><td><strong>Verification</strong></td><td>Check that data has been entered correctly (e.g. no transcription errors)</td><td>Asking the user to type a password twice and comparing both entries</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- EXAM PRACTICE                          -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="exam-practice">
+    <h2><span class="section-num">📝</span> Exam Practice</h2>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question 1 — 5 marks</div>
+      <p>An array <strong>Nums[1:6]</strong> contains the values <strong>[4, 7, 2, 9, 1, 5]</strong>. Trace through one complete pass of bubble sort. Show the state of the array after each comparison and state how many swaps occurred.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p>One pass compares adjacent pairs from index 1 to 5:</p>
+        <table style="width:100%;border-collapse:collapse;font-size:.85rem;font-family:'Courier New',Courier,monospace">
+          <thead><tr style="background:#e65100;color:#fff"><th style="padding:.3rem .5rem">Step</th><th>Array state</th><th>Swap?</th></tr></thead>
+          <tbody>
+            <tr><td style="padding:.25rem .5rem">Start</td><td>[4, 7, 2, 9, 1, 5]</td><td></td></tr>
+            <tr><td>i=1</td><td>[4, 7, 2, 9, 1, 5]</td><td>No (4&lt;7)</td></tr>
+            <tr><td>i=2</td><td>[4, 2, 7, 9, 1, 5]</td><td>Yes (7&gt;2)</td></tr>
+            <tr><td>i=3</td><td>[4, 2, 7, 9, 1, 5]</td><td>No (7&lt;9)</td></tr>
+            <tr><td>i=4</td><td>[4, 2, 7, 1, 9, 5]</td><td>Yes (9&gt;1)</td></tr>
+            <tr><td>i=5</td><td>[4, 2, 7, 1, 5, 9]</td><td>Yes (9&gt;5)</td></tr>
+          </tbody>
+        </table>
+        <p>After one pass: <strong>[4, 2, 7, 1, 5, 9]</strong>. Three swaps occurred. The largest element (9) has moved to its correct position.</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question 2 — 4 marks</div>
+      <p>A sorted array contains the values <strong>[3, 8, 14, 22, 35, 47, 56, 71, 89, 95]</strong> (indices 1–10). Trace a binary search for the target value <strong>47</strong>. Show the value of Low, High, and Mid at each step.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <table style="width:100%;border-collapse:collapse;font-size:.85rem;font-family:'Courier New',Courier,monospace">
+          <thead><tr style="background:#e65100;color:#fff"><th style="padding:.3rem .5rem">Step</th><th>Low</th><th>High</th><th>Mid</th><th>Data[Mid]</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td style="padding:.25rem .5rem">1</td><td>1</td><td>10</td><td>5</td><td>35</td><td>35 &lt; 47 → Low = 6</td></tr>
+            <tr><td>2</td><td>6</td><td>10</td><td>8</td><td>71</td><td>71 &gt; 47 → High = 7</td></tr>
+            <tr><td>3</td><td>6</td><td>7</td><td>6</td><td>47</td><td>Found at index 6</td></tr>
+          </tbody>
+        </table>
+        <p>Target 47 found at index 6 in just 3 comparisons. A linear search would have required 6 comparisons.</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question 3 — 6 marks</div>
+      <p>Write pseudocode for a function <strong>FindMin</strong> that takes an array of n integers and returns the smallest value. Then state its time complexity and explain why.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <div class="code-block" style="margin:.5rem 0">
+          <span class="code-lang">Cambridge Pseudocode</span>
+<span class="kw">FUNCTION</span> <span class="fn">FindMin</span>(Data : <span class="fn">ARRAY</span>[<span class="num">1</span>:<span class="num">100</span>] <span class="kw">OF</span> <span class="fn">INTEGER</span>, n : <span class="fn">INTEGER</span>) <span class="kw">RETURNS</span> <span class="fn">INTEGER</span>
+    <span class="kw">DECLARE</span> MinVal : <span class="fn">INTEGER</span>
+    MinVal <span class="op">←</span> Data[<span class="num">1</span>]
+    <span class="kw">FOR</span> i <span class="op">←</span> <span class="num">2</span> <span class="kw">TO</span> n
+        <span class="kw">IF</span> Data[i] &lt; MinVal <span class="kw">THEN</span>
+            MinVal <span class="op">←</span> Data[i]
+        <span class="kw">ENDIF</span>
+    <span class="kw">NEXT</span> i
+    <span class="kw">RETURN</span> MinVal
+<span class="kw">ENDFUNCTION</span>
+        </div>
+        <p><strong>Time complexity: O(n)</strong>. The algorithm must examine every element exactly once — it cannot stop early because the minimum could be anywhere in an unsorted array. The loop runs n–1 times, giving linear O(n) complexity.</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question 4 — 4 marks</div>
+      <p>State the time complexity of each algorithm below and briefly justify your answer:</p>
+      <ol style="font-size:.875rem">
+        <li>A loop that prints every element of an array of n items</li>
+        <li>Two nested loops each running n times</li>
+        <li>Binary search on a sorted list of n items</li>
+        <li>Merge sort on n items</li>
+      </ol>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <ul>
+          <li><strong>O(n)</strong> — the loop runs exactly n times; time is proportional to input size.</li>
+          <li><strong>O(n²)</strong> — the inner loop runs n times for each of the n outer iterations: n × n = n² comparisons.</li>
+          <li><strong>O(log n)</strong> — each comparison halves the remaining search space; the number of steps is log₂(n).</li>
+          <li><strong>O(n log n)</strong> — the array is split log n times (divide phase), and each merge level processes all n elements (merge phase), giving n × log n total operations.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question 5 — 5 marks</div>
+      <p>A teacher wants to find a student's record in a list of 1 024 students sorted alphabetically by surname. Compare a linear search and a binary search in terms of the <strong>maximum number of comparisons</strong> needed, and justify which is more appropriate here.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Linear search:</strong> In the worst case (student not found or at the very end), all 1 024 records must be checked → <strong>1 024 comparisons</strong>.</p>
+        <p><strong>Binary search:</strong> Each step halves the remaining list. log₂(1 024) = 10, so at most <strong>10 comparisons</strong> are needed.</p>
+        <p><strong>Binary search is more appropriate</strong> because: (1) the list is sorted — the required precondition is met; (2) it requires only 10 comparisons versus up to 1 024 for linear search; (3) the efficiency advantage grows further as the list grows. The cost of maintaining sorted order is justified when many searches are performed.</p>
+      </div>
+    </div>
+
+    <h3>Revision Checklist</h3>
+    <ul class="checklist">
+      <li>I can write Cambridge pseudocode using DECLARE, ←, IF/THEN/ELSE/ENDIF, CASE OF, FOR/NEXT, WHILE/ENDWHILE, REPEAT/UNTIL</li>
+      <li>I can define PROCEDURE and FUNCTION with parameters, and use BYVAL and BYREF correctly</li>
+      <li>I can produce accurate trace tables for algorithms with loops and conditions</li>
+      <li>I can describe and implement bubble sort and insertion sort in pseudocode</li>
+      <li>I can describe the divide-and-conquer approach of merge sort and quick sort</li>
+      <li>I can compare sorting algorithms by time complexity, space complexity, and stability</li>
+      <li>I can implement linear search and binary search in pseudocode</li>
+      <li>I can state the precondition for binary search and justify when each search is appropriate</li>
+      <li>I can express algorithm efficiency using Big-O notation and identify common complexity classes</li>
+      <li>I can distinguish tractable from intractable problems and explain the role of heuristics</li>
+      <li>I can apply decomposition, abstraction, and pattern recognition to a problem</li>
+      <li>I can describe top-down design and explain how it produces a hierarchy of modules</li>
+    </ul>
+  </div>
+
+</main>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+
+  <div class="sidebar-box">
+    <h3>Contents</h3>
+    <ul class="toc-list">
+      <li><a href="#pseudocode">1. Pseudocode</a></li>
+      <li><a href="#sorting">2. Sorting</a></li>
+      <li><a href="#searching">3. Searching</a></li>
+      <li><a href="#complexity">4. Complexity</a></li>
+      <li><a href="#problem-solving">5. Problem-Solving</a></li>
+      <li><a href="#exam-practice">📝 Exam Practice</a></li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>Pseudocode Quick Ref</h3>
+    <ul style="font-size:.78rem;padding-left:1.1rem;color:var(--text)">
+      <li style="margin:.25rem 0"><strong>←</strong> assignment (not =)</li>
+      <li style="margin:.25rem 0"><strong>FOR</strong> … <strong>NEXT</strong> i</li>
+      <li style="margin:.25rem 0"><strong>WHILE</strong> … <strong>ENDWHILE</strong></li>
+      <li style="margin:.25rem 0"><strong>REPEAT</strong> … <strong>UNTIL</strong></li>
+      <li style="margin:.25rem 0"><strong>IF</strong> … <strong>THEN</strong> … <strong>ENDIF</strong></li>
+      <li style="margin:.25rem 0"><strong>CASE OF</strong> … <strong>ENDCASE</strong></li>
+      <li style="margin:.25rem 0"><strong>PROCEDURE</strong> … <strong>ENDPROCEDURE</strong></li>
+      <li style="margin:.25rem 0"><strong>FUNCTION</strong> … <strong>ENDFUNCTION</strong></li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>Sort Complexity</h3>
+    <table style="font-size:.76rem;width:100%;border-collapse:collapse">
+      <thead><tr style="background:var(--primary);color:#fff"><th style="padding:.25rem .4rem">Sort</th><th>Avg</th><th>Worst</th></tr></thead>
+      <tbody>
+        <tr><td style="padding:.2rem .4rem;border:1px solid var(--border)">Bubble</td><td style="border:1px solid var(--border);padding:.2rem .4rem">O(n²)</td><td style="border:1px solid var(--border);padding:.2rem .4rem">O(n²)</td></tr>
+        <tr><td style="padding:.2rem .4rem;border:1px solid var(--border)">Insertion</td><td style="border:1px solid var(--border);padding:.2rem .4rem">O(n²)</td><td style="border:1px solid var(--border);padding:.2rem .4rem">O(n²)</td></tr>
+        <tr><td style="padding:.2rem .4rem;border:1px solid var(--border)">Merge</td><td style="border:1px solid var(--border);padding:.2rem .4rem">O(n log n)</td><td style="border:1px solid var(--border);padding:.2rem .4rem">O(n log n)</td></tr>
+        <tr><td style="padding:.2rem .4rem;border:1px solid var(--border)">Quick</td><td style="border:1px solid var(--border);padding:.2rem .4rem">O(n log n)</td><td style="border:1px solid var(--border);padding:.2rem .4rem">O(n²)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>Big-O Reference</h3>
+    <ul style="font-size:.78rem;padding-left:1.1rem;color:var(--text)">
+      <li style="margin:.25rem 0"><strong>O(1)</strong> — constant</li>
+      <li style="margin:.25rem 0"><strong>O(log n)</strong> — binary search</li>
+      <li style="margin:.25rem 0"><strong>O(n)</strong> — linear scan</li>
+      <li style="margin:.25rem 0"><strong>O(n log n)</strong> — merge/quick</li>
+      <li style="margin:.25rem 0"><strong>O(n²)</strong> — bubble/insertion</li>
+      <li style="margin:.25rem 0"><strong>O(2ⁿ)</strong> — exponential</li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box" style="border-left:4px solid #e65100">
+    <h3 style="color:#e65100">Common Mistakes</h3>
+    <ul style="font-size:.78rem;padding-left:1.1rem;color:var(--text)">
+      <li style="margin:.3rem 0">Using = instead of ← for assignment</li>
+      <li style="margin:.3rem 0">Forgetting ENDWHILE, ENDIF, ENDPROCEDURE</li>
+      <li style="margin:.3rem 0">Binary search on unsorted data</li>
+      <li style="margin:.3rem 0">Saying bubble sort is O(n) — it's O(n) best case only</li>
+      <li style="margin:.3rem 0">Confusing DIV (integer division) with / (real division)</li>
+      <li style="margin:.3rem 0">Off-by-one errors in loop bounds — Cambridge arrays are 1-indexed</li>
+    </ul>
+  </div>
+
+  <a href="topic9-databases.html" style="display:block;text-align:center;background:var(--surface2);color:var(--primary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.65rem;font-weight:700;font-size:.82rem;text-decoration:none;margin-top:.25rem">
+    ← Topic 9: Databases
+  </a>
+  <a href="index.html" style="display:block;text-align:center;background:var(--primary);color:#fff;border-radius:var(--radius-sm);padding:.75rem;font-weight:700;font-size:.875rem;text-decoration:none;margin-top:.5rem">
+    ← Back to All Topics
+  </a>
+
+</aside>
+
+</div><!-- /lesson-wrap -->
+
+<footer style="background:var(--surface);border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;font-size:.8rem;color:var(--text-muted)">
+  Cambridge International AS &amp; A Level Computer Science 9618 — Topic 10: Algorithm Design &amp; Problem-Solving &nbsp;|&nbsp;
+  Not affiliated with Cambridge Assessment International Education.
+</footer>
+
+<script src="script.js"></script>
+<script>
+  const sections = document.querySelectorAll('.lesson-section[id]');
+  const navLinks = document.querySelectorAll('.toc-list a, .page-nav a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+  document.querySelectorAll('.reveal-btn').forEach(btn => { btn.textContent = 'Show Answer'; });
+</script>
+</body>
+</html>
