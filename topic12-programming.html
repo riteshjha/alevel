@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Topic 12: Programming Concepts — CS 9618</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .page-nav { background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:64px; z-index:90; overflow-x:auto; }
+    .page-nav-inner { max-width:1100px; margin:0 auto; padding:0 2rem; display:flex; gap:0; }
+    .page-nav a { display:block; padding:.75rem 1.1rem; font-size:.82rem; font-weight:600; color:var(--text-muted); text-decoration:none; white-space:nowrap; border-bottom:3px solid transparent; transition:color .2s,border-color .2s; }
+    .page-nav a:hover,.page-nav a.active { color:var(--primary); border-bottom-color:var(--primary); }
+
+    .lesson-wrap { max-width:1100px; margin:0 auto; padding:2.5rem 2rem 4rem; display:grid; grid-template-columns:1fr 280px; gap:2.5rem; align-items:start; }
+    @media(max-width:900px){ .lesson-wrap{grid-template-columns:1fr} .sidebar{display:none} }
+
+    .sidebar { position:sticky; top:120px; }
+    .sidebar-box { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; margin-bottom:1rem; box-shadow:var(--shadow); }
+    .sidebar-box h3 { font-size:.85rem; font-weight:700; margin-bottom:.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; }
+    .toc-list { list-style:none; }
+    .toc-list li { padding:.2rem 0; }
+    .toc-list a { font-size:.82rem; color:var(--text-muted); text-decoration:none; display:block; padding:.25rem .5rem; border-radius:4px; transition:background .15s,color .15s; }
+    .toc-list a:hover { background:var(--surface2); color:var(--primary); }
+    .toc-list a.active { background:var(--accent-light); color:var(--primary); font-weight:600; }
+
+    .lesson-section { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:2rem 2.25rem; margin-bottom:2rem; box-shadow:var(--shadow); scroll-margin-top:130px; }
+    .lesson-section h2 { font-size:1.5rem; font-weight:800; color:var(--primary); margin-bottom:.4rem; display:flex; align-items:center; gap:.6rem; }
+    .section-num { background:var(--primary); color:#fff; width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:.9rem; font-weight:800; flex-shrink:0; }
+    .lesson-section h3 { font-size:1.1rem; font-weight:700; margin:1.75rem 0 .75rem; padding-bottom:.4rem; border-bottom:2px solid var(--border); color:var(--text); }
+    .lesson-section h4 { font-size:.95rem; font-weight:700; margin:1.25rem 0 .5rem; color:var(--primary-light); }
+    .lesson-section p { font-size:.9rem; line-height:1.75; color:var(--text); margin-bottom:.75rem; }
+    .lesson-section ul,.lesson-section ol { padding-left:1.5rem; margin-bottom:.75rem; }
+    .lesson-section li { font-size:.9rem; line-height:1.75; color:var(--text); }
+
+    /* Worked example */
+    .worked { background:linear-gradient(135deg,#fce4ec,#f3e5f5); border:1px solid #f48fb1; border-left:5px solid #880e4f; border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:1.25rem 1.5rem; margin:1rem 0; }
+    [data-theme="dark"] .worked { background:#1a0011; border-color:#880e4f; }
+    .worked .worked-title { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#880e4f; margin-bottom:.6rem; }
+    [data-theme="dark"] .worked .worked-title { color:#f48fb1; }
+    .worked p,.worked li { font-size:.875rem; color:var(--text); }
+    .worked .step { display:flex; gap:.75rem; margin:.4rem 0; align-items:flex-start; }
+    .worked .step-num { background:#880e4f; color:#fff; min-width:22px; height:22px; border-radius:50%; font-size:.72rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+    .worked .step-text { font-size:.875rem; line-height:1.6; }
+
+    /* Practice question */
+    .practice { background:var(--surface2); border:1px solid var(--border); border-left:5px solid #2e7d32; border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:1.25rem 1.5rem; margin:1rem 0; }
+    .practice .pq-title { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#2e7d32; margin-bottom:.6rem; }
+    .practice p,.practice li { font-size:.875rem; }
+    .practice .reveal-btn { background:#2e7d32; color:#fff; border:none; border-radius:6px; padding:.4rem 1rem; font-size:.8rem; font-weight:700; cursor:pointer; margin-top:.75rem; transition:background .2s; }
+    .practice .reveal-btn:hover { background:#1b5e20; }
+    .practice .answer-reveal { display:none; margin-top:.75rem; padding:.75rem 1rem; background:#e8f5e9; border-radius:var(--radius-sm); font-size:.875rem; }
+    [data-theme="dark"] .practice .answer-reveal { background:#1b2e1c; color:#c8e6c9; }
+    .practice .answer-reveal.open { display:block; }
+
+    /* Callouts */
+    .callout { background:var(--surface2); border-left:4px solid var(--accent); border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:.85rem 1.1rem; margin:.75rem 0; font-size:.875rem; color:var(--text); }
+    .callout.warn { border-color:#f59e0b; }
+    .callout.tip  { border-color:#22c55e; }
+    .callout.exam { border-color:#7c3aed; }
+
+    /* Key term */
+    .key-term { background:linear-gradient(transparent 60%,rgba(136,14,79,.15) 60%); font-weight:700; }
+
+    /* Objectives & breadcrumb */
+    .objectives-list { list-style:none; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:.5rem; }
+    .objectives-list li { font-size:.85rem; display:flex; align-items:flex-start; gap:.5rem; padding:.4rem 0; color:var(--text); }
+    .objectives-list li::before { content:'✦'; color:var(--accent); flex-shrink:0; }
+    .breadcrumb { display:flex; align-items:center; gap:.4rem; font-size:.82rem; color:var(--text-muted); margin-bottom:1.5rem; }
+    .breadcrumb a { color:var(--primary-light); text-decoration:none; }
+    .breadcrumb a:hover { text-decoration:underline; }
+
+    /* Checklist */
+    .checklist { list-style:none; padding:0; }
+    .checklist li { display:flex; align-items:flex-start; gap:.6rem; padding:.35rem 0; font-size:.875rem; color:var(--text); }
+    .checklist li::before { content:'☐'; color:var(--primary-light); font-size:1rem; flex-shrink:0; }
+
+    /* Comparison table */
+    .plain-table { width:100%; border-collapse:collapse; font-size:.875rem; margin:.75rem 0; }
+    .plain-table th { background:var(--primary); color:#fff; padding:.45rem .8rem; text-align:left; }
+    .plain-table td { border:1px solid var(--border); padding:.4rem .8rem; color:var(--text); vertical-align:top; }
+    .plain-table tr:nth-child(even) td { background:var(--surface2); }
+
+    /* Code block */
+    .code-block { background:#1e1e2e; color:#f8f8f2; white-space:pre; border-radius:var(--radius-sm); padding:1.1rem 1.35rem; margin:.75rem 0; font-family:'Courier New',Courier,monospace; font-size:.83rem; line-height:1.7; overflow-x:auto; position:relative; }
+    .code-lang { position:absolute; top:.5rem; right:.75rem; font-size:.68rem; font-weight:700; color:#6272a4; text-transform:uppercase; letter-spacing:.08em; }
+    .kw  { color:#ff79c6; }
+    .fn  { color:#50fa7b; }
+    .str { color:#f1fa8c; }
+    .num { color:#bd93f9; }
+    .cm  { color:#6272a4; font-style:italic; }
+    .op  { color:#ff79c6; }
+    .py-kw { color:#ff79c6; }
+    .py-fn { color:#50fa7b; }
+    .py-str { color:#f1fa8c; }
+    .py-cm { color:#6272a4; font-style:italic; }
+    .py-dec { color:#bd93f9; }
+    .py-self { color:#ffb86c; }
+
+    /* OOP concept cards */
+    .oop-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:.85rem; margin:.75rem 0; }
+    .oop-card { background:var(--surface2); border:1px solid var(--border); border-top:3px solid #880e4f; border-radius:var(--radius-sm); padding:1rem 1.1rem; }
+    .oop-card h4 { font-size:.9rem; font-weight:800; color:#880e4f; margin-bottom:.4rem; }
+    [data-theme="dark"] .oop-card h4 { color:#f48fb1; }
+    .oop-card p { font-size:.82rem; line-height:1.6; color:var(--text); margin:0; }
+
+    /* Inheritance diagram */
+    .inherit-diagram { margin:.75rem 0; display:flex; flex-direction:column; align-items:center; gap:0; font-size:.85rem; }
+    .inherit-box { background:var(--primary); color:#fff; font-weight:700; padding:.5rem 1.5rem; border-radius:6px; text-align:center; min-width:140px; }
+    .inherit-box.sub { background:var(--surface2); color:var(--primary); border:2px solid var(--primary); }
+    .inherit-arrow { color:var(--primary); font-size:1.4rem; line-height:1.2; }
+    .inherit-row { display:flex; gap:1.5rem; justify-content:center; }
+
+    /* Recursion call stack */
+    .call-stack { display:flex; flex-direction:column-reverse; gap:2px; margin:.75rem 0; max-width:260px; }
+    .frame { background:var(--surface2); border:1px solid var(--border); border-radius:4px; padding:.35rem .85rem; font-family:'Courier New',Courier,monospace; font-size:.82rem; color:var(--text); }
+    .frame.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+    .frame.returning { background:#e8f5e9; color:#1b5e20; border-color:#a5d6a7; }
+    [data-theme="dark"] .frame.returning { background:#1b2e1c; color:#c8e6c9; border-color:#2e7d32; }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="header-inner">
+    <a class="logo" href="index.html">
+      <div class="logo-icon">💻</div>
+      <div>
+        <div class="logo-text">CS 9618</div>
+        <div class="logo-sub">Cambridge AS &amp; A Level</div>
+      </div>
+    </a>
+    <div class="header-actions">
+      <button class="btn-icon" id="theme-btn" title="Toggle theme">🌙</button>
+    </div>
+  </div>
+</header>
+
+<!-- Section nav -->
+<nav class="page-nav" aria-label="Sections">
+  <div class="page-nav-inner">
+    <a href="#oop" class="active">1. OOP</a>
+    <a href="#inheritance">2. Inheritance</a>
+    <a href="#recursion">3. Recursion</a>
+    <a href="#file-handling">4. File Handling</a>
+    <a href="#exception-handling">5. Exceptions</a>
+    <a href="#scope">6. Scope &amp; Parameters</a>
+    <a href="#exam-practice">📝 Exam Practice</a>
+  </div>
+</nav>
+
+<div class="lesson-wrap">
+<main>
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="index.html">Home</a>
+    <span>›</span>
+    <a href="index.html#tab-as">Paper 2 — Programming</a>
+    <span>›</span>
+    <strong style="color:var(--text)">Topic 12: Programming Concepts</strong>
+  </div>
+
+  <!-- Hero -->
+  <div class="lesson-section" style="background:linear-gradient(135deg,#4a0030,#880e4f,#ad1457);color:#fff;border:none">
+    <div style="display:flex;align-items:flex-start;gap:1.25rem">
+      <div style="font-size:3rem;flex-shrink:0">💡</div>
+      <div>
+        <div style="font-size:.75rem;font-weight:700;opacity:.7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem">Paper 2 · Topic 12</div>
+        <h1 style="font-size:1.9rem;font-weight:900;margin-bottom:.5rem;color:#fff">Programming Concepts</h1>
+        <p style="opacity:.85;font-size:.95rem;max-width:620px;margin-bottom:1rem;color:#fff">Object-oriented programming, inheritance and polymorphism, recursion, file handling, exception handling, and variable scope — with pseudocode and Python examples throughout.</p>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+          <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">Paper 2 · AS &amp; A Level</span>
+          <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">~20% of Paper 2 marks</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Learning objectives -->
+  <div class="lesson-section">
+    <h2><span class="section-num">✦</span> Learning Objectives</h2>
+    <p>By the end of this topic you should be able to:</p>
+    <ul class="objectives-list">
+      <li>Define class, object, attribute, method, constructor, and instantiation</li>
+      <li>Write a class definition with private attributes, getters, setters, and methods</li>
+      <li>Implement inheritance between a superclass and subclass</li>
+      <li>Explain and demonstrate polymorphism through method overriding</li>
+      <li>Write and trace recursive functions with a clear base and recursive case</li>
+      <li>Explain how the call stack supports recursion</li>
+      <li>Open, read, write, and append to text files in pseudocode</li>
+      <li>Use exception handling to manage runtime errors gracefully</li>
+      <li>Distinguish between local and global variables and BYVAL vs BYREF parameters</li>
+    </ul>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 1: OOP                         -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="oop">
+    <h2><span class="section-num">1</span> Object-Oriented Programming (OOP)</h2>
+
+    <p><span class="key-term">Object-Oriented Programming (OOP)</span> models a program as a collection of interacting <em>objects</em>, each combining data (attributes) and behaviour (methods). It promotes code reuse, modularity, and maintainability.</p>
+
+    <div class="oop-grid">
+      <div class="oop-card">
+        <h4>Class</h4>
+        <p>A blueprint or template that defines the attributes and methods shared by all objects of that type. A class is not an object itself — it is the definition.</p>
+      </div>
+      <div class="oop-card">
+        <h4>Object</h4>
+        <p>An instance of a class. Each object has its own copy of the attributes but shares the class's method definitions. Creating an object is called <em>instantiation</em>.</p>
+      </div>
+      <div class="oop-card">
+        <h4>Attribute</h4>
+        <p>A variable that belongs to a class or object. Stores the state (data) of an object. Also called an instance variable or field.</p>
+      </div>
+      <div class="oop-card">
+        <h4>Method</h4>
+        <p>A function defined inside a class that describes the behaviour of objects. Methods can read or modify attributes.</p>
+      </div>
+      <div class="oop-card">
+        <h4>Constructor</h4>
+        <p>A special method called automatically when an object is created. Initialises the object's attributes. In Python: <code>__init__</code>. In pseudocode: <code>NEW ClassName()</code>.</p>
+      </div>
+      <div class="oop-card">
+        <h4>Encapsulation</h4>
+        <p>Hiding internal data by making attributes private. External code accesses them only through getter and setter methods, protecting data integrity.</p>
+      </div>
+    </div>
+
+    <h3>Class Definition — Pseudocode</h3>
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="kw">CLASS</span> <span class="fn">BankAccount</span>
+    <span class="kw">PRIVATE</span> AccountNumber : <span class="fn">STRING</span>
+    <span class="kw">PRIVATE</span> Balance       : <span class="fn">REAL</span>
+    <span class="kw">PRIVATE</span> Owner         : <span class="fn">STRING</span>
+
+    <span class="kw">PUBLIC PROCEDURE</span> <span class="fn">NEW</span>(AccNum : <span class="fn">STRING</span>, InitBalance : <span class="fn">REAL</span>, OwnerName : <span class="fn">STRING</span>)
+        AccountNumber <span class="op">←</span> AccNum
+        Balance       <span class="op">←</span> InitBalance
+        Owner         <span class="op">←</span> OwnerName
+    <span class="kw">ENDPROCEDURE</span>
+
+    <span class="kw">PUBLIC FUNCTION</span> <span class="fn">GetBalance</span>() <span class="kw">RETURNS</span> <span class="fn">REAL</span>   <span class="cm">// getter</span>
+        <span class="kw">RETURN</span> Balance
+    <span class="kw">ENDFUNCTION</span>
+
+    <span class="kw">PUBLIC FUNCTION</span> <span class="fn">GetOwner</span>() <span class="kw">RETURNS</span> <span class="fn">STRING</span>
+        <span class="kw">RETURN</span> Owner
+    <span class="kw">ENDFUNCTION</span>
+
+    <span class="kw">PUBLIC PROCEDURE</span> <span class="fn">Deposit</span>(Amount : <span class="fn">REAL</span>)
+        <span class="kw">IF</span> Amount > <span class="num">0</span> <span class="kw">THEN</span>
+            Balance <span class="op">←</span> Balance + Amount
+        <span class="kw">ENDIF</span>
+    <span class="kw">ENDPROCEDURE</span>
+
+    <span class="kw">PUBLIC FUNCTION</span> <span class="fn">Withdraw</span>(Amount : <span class="fn">REAL</span>) <span class="kw">RETURNS</span> <span class="fn">BOOLEAN</span>
+        <span class="kw">IF</span> Amount > <span class="num">0</span> <span class="kw">AND</span> Amount <= Balance <span class="kw">THEN</span>
+            Balance <span class="op">←</span> Balance - Amount
+            <span class="kw">RETURN</span> <span class="kw">TRUE</span>
+        <span class="kw">ELSE</span>
+            <span class="kw">RETURN</span> <span class="kw">FALSE</span>
+        <span class="kw">ENDIF</span>
+    <span class="kw">ENDFUNCTION</span>
+
+<span class="kw">ENDCLASS</span>
+
+<span class="cm">// Instantiation and use</span>
+<span class="kw">DECLARE</span> MyAccount : <span class="fn">BankAccount</span>
+MyAccount <span class="op">←</span> <span class="kw">NEW</span> <span class="fn">BankAccount</span>(<span class="str">"ACC001"</span>, <span class="num">500.00</span>, <span class="str">"Alice"</span>)
+<span class="kw">CALL</span> MyAccount.<span class="fn">Deposit</span>(<span class="num">200.00</span>)
+<span class="kw">OUTPUT</span> MyAccount.<span class="fn">GetBalance</span>()   <span class="cm">// outputs 700.00</span>
+    </div>
+
+    <h3>Class Definition — Python</h3>
+    <div class="code-block">
+      <span class="code-lang">Python</span>
+<span class="py-kw">class</span> <span class="py-fn">BankAccount</span>:
+    <span class="py-kw">def</span> <span class="py-fn">__init__</span>(<span class="py-self">self</span>, acc_num, balance, owner):
+        <span class="py-self">self</span>.__account_number = acc_num   <span class="py-cm"># private (name-mangled)</span>
+        <span class="py-self">self</span>.__balance = balance
+        <span class="py-self">self</span>.__owner = owner
+
+    <span class="py-kw">def</span> <span class="py-fn">get_balance</span>(<span class="py-self">self</span>):              <span class="py-cm"># getter</span>
+        <span class="py-kw">return</span> <span class="py-self">self</span>.__balance
+
+    <span class="py-kw">def</span> <span class="py-fn">get_owner</span>(<span class="py-self">self</span>):
+        <span class="py-kw">return</span> <span class="py-self">self</span>.__owner
+
+    <span class="py-kw">def</span> <span class="py-fn">deposit</span>(<span class="py-self">self</span>, amount):
+        <span class="py-kw">if</span> amount > <span class="num">0</span>:
+            <span class="py-self">self</span>.__balance += amount
+
+    <span class="py-kw">def</span> <span class="py-fn">withdraw</span>(<span class="py-self">self</span>, amount):
+        <span class="py-kw">if</span> <span class="num">0</span> < amount <= <span class="py-self">self</span>.__balance:
+            <span class="py-self">self</span>.__balance -= amount
+            <span class="py-kw">return</span> <span class="py-kw">True</span>
+        <span class="py-kw">return</span> <span class="py-kw">False</span>
+
+<span class="py-cm"># Instantiation and use</span>
+my_account = <span class="py-fn">BankAccount</span>(<span class="str">"ACC001"</span>, <span class="num">500.00</span>, <span class="str">"Alice"</span>)
+my_account.<span class="py-fn">deposit</span>(<span class="num">200.00</span>)
+<span class="py-fn">print</span>(my_account.<span class="py-fn">get_balance</span>())     <span class="py-cm"># 700.0</span>
+    </div>
+
+    <div class="callout exam">
+      <strong>Exam tip:</strong> Cambridge expects you to know the difference between PUBLIC and PRIVATE. Attributes should always be PRIVATE and accessed only through PUBLIC methods. If asked to "write a class," always include a constructor (NEW), getters for any private attributes needed externally, and appropriate methods.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 2: INHERITANCE & POLYMORPHISM  -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="inheritance">
+    <h2><span class="section-num">2</span> Inheritance &amp; Polymorphism</h2>
+
+    <p><span class="key-term">Inheritance</span> allows a <em>subclass</em> (child class) to acquire all the attributes and methods of a <em>superclass</em> (parent class). The subclass can add new attributes/methods and override inherited ones.</p>
+
+    <h3>Inheritance Hierarchy</h3>
+    <div class="inherit-diagram">
+      <div class="inherit-box">Shape (superclass)</div>
+      <div class="inherit-arrow">↓ inherits</div>
+      <div class="inherit-row">
+        <div class="inherit-box sub">Circle (subclass)</div>
+        <div class="inherit-box sub">Rectangle (subclass)</div>
+        <div class="inherit-box sub">Triangle (subclass)</div>
+      </div>
+    </div>
+    <p style="font-size:.85rem;color:var(--text-muted);margin-top:.5rem">Each subclass inherits Shape's attributes (e.g. Colour) and methods (e.g. GetColour) and adds its own (e.g. Radius for Circle).</p>
+
+    <h3>Inheritance — Pseudocode</h3>
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="kw">CLASS</span> <span class="fn">Shape</span>
+    <span class="kw">PRIVATE</span> Colour : <span class="fn">STRING</span>
+
+    <span class="kw">PUBLIC PROCEDURE</span> <span class="fn">NEW</span>(C : <span class="fn">STRING</span>)
+        Colour <span class="op">←</span> C
+    <span class="kw">ENDPROCEDURE</span>
+
+    <span class="kw">PUBLIC FUNCTION</span> <span class="fn">GetColour</span>() <span class="kw">RETURNS</span> <span class="fn">STRING</span>
+        <span class="kw">RETURN</span> Colour
+    <span class="kw">ENDFUNCTION</span>
+
+    <span class="kw">PUBLIC FUNCTION</span> <span class="fn">Area</span>() <span class="kw">RETURNS</span> <span class="fn">REAL</span>
+        <span class="kw">RETURN</span> <span class="num">0</span>   <span class="cm">// overridden in subclasses</span>
+    <span class="kw">ENDFUNCTION</span>
+
+<span class="kw">ENDCLASS</span>
+
+<span class="cm">// Circle INHERITS FROM Shape</span>
+<span class="kw">CLASS</span> <span class="fn">Circle</span> <span class="kw">INHERITS</span> <span class="fn">Shape</span>
+    <span class="kw">PRIVATE</span> Radius : <span class="fn">REAL</span>
+
+    <span class="kw">PUBLIC PROCEDURE</span> <span class="fn">NEW</span>(C : <span class="fn">STRING</span>, R : <span class="fn">REAL</span>)
+        <span class="kw">SUPER</span>.<span class="fn">NEW</span>(C)       <span class="cm">// call parent constructor</span>
+        Radius <span class="op">←</span> R
+    <span class="kw">ENDPROCEDURE</span>
+
+    <span class="kw">PUBLIC FUNCTION</span> <span class="fn">Area</span>() <span class="kw">RETURNS</span> <span class="fn">REAL</span>   <span class="cm">// overrides Shape.Area()</span>
+        <span class="kw">RETURN</span> <span class="num">3.14159</span> * Radius * Radius
+    <span class="kw">ENDFUNCTION</span>
+
+    <span class="kw">PUBLIC FUNCTION</span> <span class="fn">GetRadius</span>() <span class="kw">RETURNS</span> <span class="fn">REAL</span>
+        <span class="kw">RETURN</span> Radius
+    <span class="kw">ENDFUNCTION</span>
+
+<span class="kw">ENDCLASS</span>
+
+<span class="cm">// Instantiation</span>
+<span class="kw">DECLARE</span> C1 : <span class="fn">Circle</span>
+C1 <span class="op">←</span> <span class="kw">NEW</span> <span class="fn">Circle</span>(<span class="str">"Red"</span>, <span class="num">5.0</span>)
+<span class="kw">OUTPUT</span> C1.<span class="fn">GetColour</span>()    <span class="cm">// "Red"  — inherited from Shape</span>
+<span class="kw">OUTPUT</span> C1.<span class="fn">Area</span>()          <span class="cm">// 78.53975 — overridden in Circle</span>
+    </div>
+
+    <h3>Polymorphism</h3>
+    <p><span class="key-term">Polymorphism</span> means "many forms." The same method name (e.g. <code>Area()</code>) produces different behaviour depending on which class the object belongs to. This is achieved through <em>method overriding</em>.</p>
+
+    <div class="worked">
+      <div class="worked-title">Polymorphism in action</div>
+      <div class="step"><div class="step-num">1</div><div class="step-text">Both Circle and Rectangle inherit from Shape and both override <code>Area()</code>.</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">If you call <code>S.Area()</code> where S is a Circle, Python/the runtime calls <strong>Circle's</strong> Area method.</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">If S is a Rectangle, the same call <code>S.Area()</code> calls <strong>Rectangle's</strong> Area method.</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text">The calling code does not need to know which type of Shape it holds — the correct method is selected automatically at runtime.</div></div>
+    </div>
+
+    <h3>Inheritance — Python</h3>
+    <div class="code-block">
+      <span class="code-lang">Python</span>
+<span class="py-kw">class</span> <span class="py-fn">Shape</span>:
+    <span class="py-kw">def</span> <span class="py-fn">__init__</span>(<span class="py-self">self</span>, colour):
+        <span class="py-self">self</span>.__colour = colour
+
+    <span class="py-kw">def</span> <span class="py-fn">get_colour</span>(<span class="py-self">self</span>):
+        <span class="py-kw">return</span> <span class="py-self">self</span>.__colour
+
+    <span class="py-kw">def</span> <span class="py-fn">area</span>(<span class="py-self">self</span>):
+        <span class="py-kw">return</span> <span class="num">0</span>
+
+<span class="py-kw">class</span> <span class="py-fn">Circle</span>(<span class="py-fn">Shape</span>):           <span class="py-cm"># inherits from Shape</span>
+    <span class="py-kw">def</span> <span class="py-fn">__init__</span>(<span class="py-self">self</span>, colour, radius):
+        <span class="py-fn">super</span>().<span class="py-fn">__init__</span>(colour)  <span class="py-cm"># call parent constructor</span>
+        <span class="py-self">self</span>.__radius = radius
+
+    <span class="py-kw">def</span> <span class="py-fn">area</span>(<span class="py-self">self</span>):              <span class="py-cm"># overrides Shape.area()</span>
+        <span class="py-kw">return</span> <span class="num">3.14159</span> * <span class="py-self">self</span>.__radius ** <span class="num">2</span>
+
+<span class="py-kw">class</span> <span class="py-fn">Rectangle</span>(<span class="py-fn">Shape</span>):
+    <span class="py-kw">def</span> <span class="py-fn">__init__</span>(<span class="py-self">self</span>, colour, width, height):
+        <span class="py-fn">super</span>().<span class="py-fn">__init__</span>(colour)
+        <span class="py-self">self</span>.__width = width
+        <span class="py-self">self</span>.__height = height
+
+    <span class="py-kw">def</span> <span class="py-fn">area</span>(<span class="py-self">self</span>):              <span class="py-cm"># overrides Shape.area()</span>
+        <span class="py-kw">return</span> <span class="py-self">self</span>.__width * <span class="py-self">self</span>.__height
+
+<span class="py-cm"># Polymorphism — same method call, different behaviour</span>
+shapes = [<span class="py-fn">Circle</span>(<span class="str">"Red"</span>, <span class="num">5</span>), <span class="py-fn">Rectangle</span>(<span class="str">"Blue"</span>, <span class="num">4</span>, <span class="num">6</span>)]
+<span class="py-kw">for</span> s <span class="py-kw">in</span> shapes:
+    <span class="py-fn">print</span>(s.<span class="py-fn">area</span>())   <span class="py-cm"># 78.53... then 24 — different results, same call</span>
+    </div>
+
+    <table class="plain-table" style="margin-top:1rem">
+      <thead><tr><th>Concept</th><th>Definition</th><th>Key benefit</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Inheritance</strong></td><td>Subclass gains all attributes and methods of superclass</td><td>Code reuse — common behaviour written once in superclass</td></tr>
+        <tr><td><strong>Method Overriding</strong></td><td>Subclass provides its own version of an inherited method</td><td>Specialisation — each subclass behaves appropriately</td></tr>
+        <tr><td><strong>Polymorphism</strong></td><td>Same method name works differently per class</td><td>Flexible code — one interface, many implementations</td></tr>
+        <tr><td><strong>super()</strong></td><td>Calls a method from the parent class</td><td>Extend parent behaviour rather than replace it entirely</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 3: RECURSION                   -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="recursion">
+    <h2><span class="section-num">3</span> Recursion</h2>
+
+    <p>A <span class="key-term">recursive</span> function is one that calls itself as part of its own definition. Every recursive solution must have:</p>
+    <ul>
+      <li><strong>Base case</strong> — a condition that stops the recursion and returns a value directly</li>
+      <li><strong>Recursive case</strong> — reduces the problem towards the base case and calls the function again</li>
+    </ul>
+
+    <div class="callout warn">
+      <strong>Infinite recursion:</strong> If there is no base case, or the recursive case never reaches it, the function calls itself forever until the call stack overflows — causing a stack overflow error.
+    </div>
+
+    <h3>Factorial — Pseudocode &amp; Trace</h3>
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="kw">FUNCTION</span> <span class="fn">Factorial</span>(n : <span class="fn">INTEGER</span>) <span class="kw">RETURNS</span> <span class="fn">INTEGER</span>
+    <span class="kw">IF</span> n <= <span class="num">1</span> <span class="kw">THEN</span>
+        <span class="kw">RETURN</span> <span class="num">1</span>                        <span class="cm">// base case</span>
+    <span class="kw">ELSE</span>
+        <span class="kw">RETURN</span> n * <span class="fn">Factorial</span>(n - <span class="num">1</span>)   <span class="cm">// recursive case</span>
+    <span class="kw">ENDIF</span>
+<span class="kw">ENDFUNCTION</span>
+    </div>
+
+    <div class="worked">
+      <div class="worked-title">Trace: Factorial(4)</div>
+      <div class="step"><div class="step-num">1</div><div class="step-text">Factorial(4) → 4 ≠ 1, calls Factorial(3)</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Factorial(3) → 3 ≠ 1, calls Factorial(2)</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Factorial(2) → 2 ≠ 1, calls Factorial(1)</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text">Factorial(1) → base case → returns <strong>1</strong></div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-text">Factorial(2) resumes → returns 2 × 1 = <strong>2</strong></div></div>
+      <div class="step"><div class="step-num">6</div><div class="step-text">Factorial(3) resumes → returns 3 × 2 = <strong>6</strong></div></div>
+      <div class="step"><div class="step-num">7</div><div class="step-text">Factorial(4) resumes → returns 4 × 6 = <strong>24</strong></div></div>
+    </div>
+
+    <h3>The Call Stack</h3>
+    <p>Each function call pushes a <span class="key-term">stack frame</span> onto the call stack. The frame stores the local variables and the return address. When the function returns, its frame is popped.</p>
+
+    <div style="display:flex;gap:2rem;flex-wrap:wrap;margin:.75rem 0;align-items:flex-start">
+      <div>
+        <p style="font-size:.8rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin:.25rem 0">Calling phase (building up)</p>
+        <div class="call-stack">
+          <div class="frame">Factorial(4) — waiting</div>
+          <div class="frame">Factorial(3) — waiting</div>
+          <div class="frame">Factorial(2) — waiting</div>
+          <div class="frame active">Factorial(1) — returns 1</div>
+        </div>
+      </div>
+      <div>
+        <p style="font-size:.8rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin:.25rem 0">Returning phase (unwinding)</p>
+        <div class="call-stack">
+          <div class="frame returning">Factorial(4) → returns 24</div>
+          <div class="frame returning">Factorial(3) → returns 6</div>
+          <div class="frame returning">Factorial(2) → returns 2</div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Fibonacci — Recursive</h3>
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="cm">// Fibonacci: F(0)=0, F(1)=1, F(n)=F(n-1)+F(n-2)</span>
+<span class="kw">FUNCTION</span> <span class="fn">Fibonacci</span>(n : <span class="fn">INTEGER</span>) <span class="kw">RETURNS</span> <span class="fn">INTEGER</span>
+    <span class="kw">IF</span> n = <span class="num">0</span> <span class="kw">THEN</span>
+        <span class="kw">RETURN</span> <span class="num">0</span>                                       <span class="cm">// base case 1</span>
+    <span class="kw">ELSE</span>
+        <span class="kw">IF</span> n = <span class="num">1</span> <span class="kw">THEN</span>
+            <span class="kw">RETURN</span> <span class="num">1</span>                                   <span class="cm">// base case 2</span>
+        <span class="kw">ELSE</span>
+            <span class="kw">RETURN</span> <span class="fn">Fibonacci</span>(n-<span class="num">1</span>) + <span class="fn">Fibonacci</span>(n-<span class="num">2</span>)   <span class="cm">// recursive case</span>
+        <span class="kw">ENDIF</span>
+    <span class="kw">ENDIF</span>
+<span class="kw">ENDFUNCTION</span>
+    </div>
+
+    <h3>Binary Search — Recursive Version</h3>
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="kw">FUNCTION</span> <span class="fn">BinSearch</span>(Data : <span class="fn">ARRAY</span>[<span class="num">1</span>:<span class="num">100</span>] <span class="kw">OF</span> <span class="fn">INTEGER</span>, Low : <span class="fn">INTEGER</span>, High : <span class="fn">INTEGER</span>, Target : <span class="fn">INTEGER</span>) <span class="kw">RETURNS</span> <span class="fn">INTEGER</span>
+    <span class="kw">IF</span> Low > High <span class="kw">THEN</span>
+        <span class="kw">RETURN</span> -<span class="num">1</span>                                      <span class="cm">// base case — not found</span>
+    <span class="kw">ELSE</span>
+        Mid <span class="op">←</span> (Low + High) <span class="kw">DIV</span> <span class="num">2</span>
+        <span class="kw">IF</span> Data[Mid] = Target <span class="kw">THEN</span>
+            <span class="kw">RETURN</span> Mid                                  <span class="cm">// base case — found</span>
+        <span class="kw">ELSE</span>
+            <span class="kw">IF</span> Target < Data[Mid] <span class="kw">THEN</span>
+                <span class="kw">RETURN</span> <span class="fn">BinSearch</span>(Data, Low, Mid-<span class="num">1</span>, Target)   <span class="cm">// search left</span>
+            <span class="kw">ELSE</span>
+                <span class="kw">RETURN</span> <span class="fn">BinSearch</span>(Data, Mid+<span class="num">1</span>, High, Target)  <span class="cm">// search right</span>
+            <span class="kw">ENDIF</span>
+        <span class="kw">ENDIF</span>
+    <span class="kw">ENDIF</span>
+<span class="kw">ENDFUNCTION</span>
+    </div>
+
+    <h3>Recursion vs Iteration</h3>
+    <table class="plain-table">
+      <thead><tr><th>Feature</th><th>Recursion</th><th>Iteration</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Code clarity</strong></td><td>Often cleaner for naturally recursive problems (trees, fractals)</td><td>Clearer for simple repeated tasks</td></tr>
+        <tr><td><strong>Memory use</strong></td><td>Each call uses stack space — risk of stack overflow on deep recursion</td><td>Uses constant extra memory</td></tr>
+        <tr><td><strong>Speed</strong></td><td>Function call overhead per step</td><td>Generally faster</td></tr>
+        <tr><td><strong>Use when</strong></td><td>Problem is naturally self-similar (tree traversal, divide-and-conquer)</td><td>Simple loops over a sequence</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout exam">
+      <strong>Exam tip:</strong> Cambridge questions on recursion often ask you to (1) identify the base case and recursive case, (2) trace the calls for a small input, or (3) rewrite a recursive function iteratively. Always state both cases explicitly — one mark each is common.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 4: FILE HANDLING               -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="file-handling">
+    <h2><span class="section-num">4</span> File Handling</h2>
+
+    <p>Files provide <span class="key-term">persistent storage</span> — data survives after the program ends. Cambridge 9618 requires you to handle text files using pseudocode file operations.</p>
+
+    <h3>File Modes</h3>
+    <table class="plain-table">
+      <thead><tr><th>Mode</th><th>Keyword</th><th>Behaviour</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Read</strong></td><td><code>FOR READ</code></td><td>Opens an existing file for reading. File pointer starts at the beginning.</td></tr>
+        <tr><td><strong>Write</strong></td><td><code>FOR WRITE</code></td><td>Creates a new file (or overwrites an existing one). Data is written from the start.</td></tr>
+        <tr><td><strong>Append</strong></td><td><code>FOR APPEND</code></td><td>Opens an existing file and adds new data at the end. Existing content is preserved.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Reading a File</h3>
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="kw">DECLARE</span> Line  : <span class="fn">STRING</span>
+<span class="kw">DECLARE</span> Total : <span class="fn">INTEGER</span>
+<span class="kw">DECLARE</span> Count : <span class="fn">INTEGER</span>
+Total <span class="op">←</span> <span class="num">0</span>
+Count <span class="op">←</span> <span class="num">0</span>
+
+<span class="kw">OPENFILE</span> <span class="str">"scores.txt"</span> <span class="kw">FOR</span> READ
+<span class="kw">WHILE NOT</span> <span class="fn">EOF</span>(<span class="str">"scores.txt"</span>) <span class="kw">DO</span>
+    <span class="kw">READFILE</span> <span class="str">"scores.txt"</span>, Line
+    Total <span class="op">←</span> Total + <span class="fn">STR_TO_NUM</span>(Line)
+    Count <span class="op">←</span> Count + <span class="num">1</span>
+<span class="kw">ENDWHILE</span>
+<span class="kw">CLOSEFILE</span> <span class="str">"scores.txt"</span>
+
+<span class="kw">IF</span> Count > <span class="num">0</span> <span class="kw">THEN</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Average: "</span>, Total / Count
+<span class="kw">ENDIF</span>
+    </div>
+
+    <h3>Writing a File</h3>
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="cm">// FOR WRITE — creates/overwrites the file</span>
+<span class="kw">OPENFILE</span> <span class="str">"results.txt"</span> <span class="kw">FOR</span> WRITE
+<span class="kw">FOR</span> i <span class="op">←</span> <span class="num">1</span> <span class="kw">TO</span> <span class="num">5</span>
+    <span class="kw">INPUT</span> Score
+    <span class="kw">WRITEFILE</span> <span class="str">"results.txt"</span>, <span class="fn">NUM_TO_STR</span>(Score)
+<span class="kw">NEXT</span> i
+<span class="kw">CLOSEFILE</span> <span class="str">"results.txt"</span>
+
+<span class="cm">// FOR APPEND — adds to existing file</span>
+<span class="kw">OPENFILE</span> <span class="str">"log.txt"</span> <span class="kw">FOR</span> APPEND
+<span class="kw">WRITEFILE</span> <span class="str">"log.txt"</span>, <span class="str">"New entry added"</span>
+<span class="kw">CLOSEFILE</span> <span class="str">"log.txt"</span>
+    </div>
+
+    <h3>File Handling — Python Equivalent</h3>
+    <div class="code-block">
+      <span class="code-lang">Python</span>
+<span class="py-cm"># Reading</span>
+<span class="py-kw">with</span> <span class="py-fn">open</span>(<span class="str">"scores.txt"</span>, <span class="str">"r"</span>) <span class="py-kw">as</span> f:
+    <span class="py-kw">for</span> line <span class="py-kw">in</span> f:
+        <span class="py-fn">print</span>(line.<span class="py-fn">strip</span>())
+
+<span class="py-cm"># Writing (overwrites)</span>
+<span class="py-kw">with</span> <span class="py-fn">open</span>(<span class="str">"results.txt"</span>, <span class="str">"w"</span>) <span class="py-kw">as</span> f:
+    <span class="py-kw">for</span> score <span class="py-kw">in</span> [<span class="num">85</span>, <span class="num">72</span>, <span class="num">91</span>]:
+        f.<span class="py-fn">write</span>(<span class="py-fn">str</span>(score) + <span class="str">"\n"</span>)
+
+<span class="py-cm"># Appending</span>
+<span class="py-kw">with</span> <span class="py-fn">open</span>(<span class="str">"log.txt"</span>, <span class="str">"a"</span>) <span class="py-kw">as</span> f:
+    f.<span class="py-fn">write</span>(<span class="str">"New entry\n"</span>)
+    </div>
+
+    <div class="callout tip">
+      <strong>Always close files!</strong> In pseudocode you must explicitly write <code>CLOSEFILE</code>. Forgetting to close a file can cause data loss (buffered writes not flushed) or lock the file from other processes. In Python, the <code>with</code> statement closes the file automatically.
+    </div>
+
+    <div class="callout exam">
+      <strong>Exam tip:</strong> Cambridge mark schemes check for: correct OPENFILE with mode, READFILE/WRITEFILE with the filename repeated, EOF check in a WHILE loop for reading, and CLOSEFILE. Each of these is typically worth a separate mark.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 5: EXCEPTION HANDLING          -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="exception-handling">
+    <h2><span class="section-num">5</span> Exception Handling</h2>
+
+    <p>An <span class="key-term">exception</span> is a runtime error that interrupts normal program flow (e.g. dividing by zero, reading a non-existent file, converting a non-numeric string). <span class="key-term">Exception handling</span> lets a program catch these errors and respond gracefully rather than crashing.</p>
+
+    <h3>Common Exception Types</h3>
+    <table class="plain-table">
+      <thead><tr><th>Exception</th><th>Cause</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td><strong>ZeroDivisionError</strong></td><td>Dividing by zero</td><td><code>10 / 0</code></td></tr>
+        <tr><td><strong>ValueError</strong></td><td>Wrong value type (e.g. converting non-number to int)</td><td><code>int("hello")</code></td></tr>
+        <tr><td><strong>FileNotFoundError</strong></td><td>Opening a file that does not exist</td><td><code>open("missing.txt")</code></td></tr>
+        <tr><td><strong>IndexError</strong></td><td>Accessing an index outside the array/list bounds</td><td><code>arr[100]</code> on a list of 5</td></tr>
+        <tr><td><strong>TypeError</strong></td><td>Operation on incompatible types</td><td><code>"5" + 3</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>TRY … EXCEPT — Pseudocode</h3>
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="kw">TRY</span>
+    <span class="kw">INPUT</span> NumStr
+    Num <span class="op">←</span> <span class="fn">STR_TO_NUM</span>(NumStr)
+    <span class="kw">OUTPUT</span> <span class="str">"Double is: "</span>, Num * <span class="num">2</span>
+<span class="kw">EXCEPT</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Error: please enter a valid number"</span>
+<span class="kw">ENDTRY</span>
+    </div>
+
+    <h3>try / except / else / finally — Python</h3>
+    <div class="code-block">
+      <span class="code-lang">Python</span>
+<span class="py-kw">try</span>:
+    num_str = <span class="py-fn">input</span>(<span class="str">"Enter a number: "</span>)
+    num = <span class="py-fn">int</span>(num_str)
+    result = <span class="num">100</span> / num
+<span class="py-kw">except</span> <span class="py-fn">ValueError</span>:
+    <span class="py-fn">print</span>(<span class="str">"Not a valid integer."</span>)
+<span class="py-kw">except</span> <span class="py-fn">ZeroDivisionError</span>:
+    <span class="py-fn">print</span>(<span class="str">"Cannot divide by zero."</span>)
+<span class="py-kw">else</span>:
+    <span class="py-cm"># runs only if no exception was raised</span>
+    <span class="py-fn">print</span>(<span class="str">f"Result: {result}"</span>)
+<span class="py-kw">finally</span>:
+    <span class="py-cm"># always runs — e.g. close resources</span>
+    <span class="py-fn">print</span>(<span class="str">"Done."</span>)
+    </div>
+
+    <h3>Exception Handling with Files — Python</h3>
+    <div class="code-block">
+      <span class="code-lang">Python</span>
+<span class="py-kw">try</span>:
+    <span class="py-kw">with</span> <span class="py-fn">open</span>(<span class="str">"data.txt"</span>, <span class="str">"r"</span>) <span class="py-kw">as</span> f:
+        content = f.<span class="py-fn">read</span>()
+        <span class="py-fn">print</span>(content)
+<span class="py-kw">except</span> <span class="py-fn">FileNotFoundError</span>:
+    <span class="py-fn">print</span>(<span class="str">"Error: file not found."</span>)
+<span class="py-kw">except</span> <span class="py-fn">PermissionError</span>:
+    <span class="py-fn">print</span>(<span class="str">"Error: no permission to read this file."</span>)
+    </div>
+
+    <table class="plain-table" style="margin-top:1rem">
+      <thead><tr><th>Block</th><th>When it runs</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><code>try</code></td><td>Always — contains the risky code</td><td>Code that might raise an exception</td></tr>
+        <tr><td><code>except</code></td><td>Only if a matching exception is raised</td><td>Handle the error gracefully</td></tr>
+        <tr><td><code>else</code></td><td>Only if no exception was raised</td><td>Code that should run on success</td></tr>
+        <tr><td><code>finally</code></td><td>Always, whether or not an exception occurred</td><td>Clean-up: close files, release resources</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 6: SCOPE & PARAMETERS          -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="scope">
+    <h2><span class="section-num">6</span> Scope &amp; Parameter Passing</h2>
+
+    <p>Understanding where variables exist and how values are passed between routines is essential for writing correct modular programs.</p>
+
+    <h3>Variable Scope</h3>
+    <table class="plain-table">
+      <thead><tr><th>Scope</th><th>Definition</th><th>Lifetime</th><th>Access</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Local variable</strong></td><td>Declared inside a procedure or function</td><td>Created when routine starts; destroyed when it ends</td><td>Only visible within that routine</td></tr>
+        <tr><td><strong>Global variable</strong></td><td>Declared outside all procedures/functions, at the top level</td><td>Exists for the entire duration of the program</td><td>Visible to all routines</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout warn">
+      <strong>Avoid global variables where possible.</strong> If multiple routines modify a global variable, bugs become hard to trace. Prefer passing data as parameters and returning results — this makes each routine self-contained and testable.
+    </div>
+
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="kw">DECLARE</span> GlobalCount : <span class="fn">INTEGER</span>   <span class="cm">// global — visible everywhere</span>
+GlobalCount <span class="op">←</span> <span class="num">0</span>
+
+<span class="kw">PROCEDURE</span> <span class="fn">Example</span>()
+    <span class="kw">DECLARE</span> LocalVal : <span class="fn">INTEGER</span>   <span class="cm">// local — only visible inside Example</span>
+    LocalVal    <span class="op">←</span> <span class="num">10</span>
+    GlobalCount <span class="op">←</span> GlobalCount + <span class="num">1</span>
+    <span class="kw">OUTPUT</span> LocalVal, GlobalCount
+<span class="kw">ENDPROCEDURE</span>
+
+<span class="cm">// LocalVal cannot be accessed here — it is out of scope</span>
+    </div>
+
+    <h3>Parameter Passing: BYVAL vs BYREF</h3>
+    <table class="plain-table">
+      <thead><tr><th>Method</th><th>How it works</th><th>Effect on original</th><th>Use when</th></tr></thead>
+      <tbody>
+        <tr><td><strong>BYVAL</strong> (by value)</td><td>A copy of the variable's value is passed. The routine works on the copy.</td><td>Original variable is unchanged</td><td>The routine only needs to read the value; caller's variable should be protected</td></tr>
+        <tr><td><strong>BYREF</strong> (by reference)</td><td>The memory address of the variable is passed. The routine works on the original.</td><td>Any changes inside the routine modify the original</td><td>The routine needs to update the caller's variable (e.g. Swap, Sort)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="code-block">
+      <span class="code-lang">Cambridge Pseudocode</span>
+<span class="cm">// BYVAL — original is unchanged</span>
+<span class="kw">PROCEDURE</span> <span class="fn">DoubleByVal</span>(<span class="kw">BYVAL</span> X : <span class="fn">INTEGER</span>)
+    X <span class="op">←</span> X * <span class="num">2</span>
+    <span class="kw">OUTPUT</span> X       <span class="cm">// outputs doubled value</span>
+<span class="kw">ENDPROCEDURE</span>
+
+<span class="kw">DECLARE</span> Num : <span class="fn">INTEGER</span>
+Num <span class="op">←</span> <span class="num">5</span>
+<span class="kw">CALL</span> <span class="fn">DoubleByVal</span>(Num)
+<span class="kw">OUTPUT</span> Num       <span class="cm">// still 5 — original unchanged</span>
+
+<span class="cm">// BYREF — original IS changed</span>
+<span class="kw">PROCEDURE</span> <span class="fn">DoubleByRef</span>(<span class="kw">BYREF</span> X : <span class="fn">INTEGER</span>)
+    X <span class="op">←</span> X * <span class="num">2</span>
+<span class="kw">ENDPROCEDURE</span>
+
+Num <span class="op">←</span> <span class="num">5</span>
+<span class="kw">CALL</span> <span class="fn">DoubleByRef</span>(Num)
+<span class="kw">OUTPUT</span> Num       <span class="cm">// now 10 — original was modified</span>
+
+<span class="cm">// Classic BYREF use case: Swap</span>
+<span class="kw">PROCEDURE</span> <span class="fn">Swap</span>(<span class="kw">BYREF</span> A : <span class="fn">INTEGER</span>, <span class="kw">BYREF</span> B : <span class="fn">INTEGER</span>)
+    <span class="kw">DECLARE</span> Temp : <span class="fn">INTEGER</span>
+    Temp <span class="op">←</span> A
+    A    <span class="op">←</span> B
+    B    <span class="op">←</span> Temp
+<span class="kw">ENDPROCEDURE</span>
+    </div>
+
+    <div class="callout exam">
+      <strong>Exam tip:</strong> Cambridge questions often ask you to state whether a parameter should be passed BYVAL or BYREF and justify why. The key question is: <em>does the routine need to change the caller's variable?</em> If yes → BYREF. If no → BYVAL (safer, protects the original).
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- EXAM PRACTICE                          -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="exam-practice">
+    <h2><span class="section-num">📝</span> Exam Practice</h2>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question 1 — 6 marks</div>
+      <p>A program models library books. Write a class <strong>Book</strong> with private attributes <em>Title</em> (STRING), <em>Author</em> (STRING), and <em>Available</em> (BOOLEAN). Include a constructor, a getter for each attribute, and a method <strong>Borrow()</strong> that sets Available to FALSE if the book is currently available and returns TRUE, or returns FALSE if it is already borrowed.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <div class="code-block" style="margin:.5rem 0">
+          <span class="code-lang">Cambridge Pseudocode</span>
+<span class="kw">CLASS</span> <span class="fn">Book</span>
+    <span class="kw">PRIVATE</span> Title     : <span class="fn">STRING</span>
+    <span class="kw">PRIVATE</span> Author    : <span class="fn">STRING</span>
+    <span class="kw">PRIVATE</span> Available : <span class="fn">BOOLEAN</span>
+
+    <span class="kw">PUBLIC PROCEDURE</span> <span class="fn">NEW</span>(T : <span class="fn">STRING</span>, A : <span class="fn">STRING</span>)
+        Title     <span class="op">←</span> T
+        Author    <span class="op">←</span> A
+        Available <span class="op">←</span> <span class="kw">TRUE</span>
+    <span class="kw">ENDPROCEDURE</span>
+
+    <span class="kw">PUBLIC FUNCTION</span> <span class="fn">GetTitle</span>() <span class="kw">RETURNS</span> <span class="fn">STRING</span>
+        <span class="kw">RETURN</span> Title
+    <span class="kw">ENDFUNCTION</span>
+
+    <span class="kw">PUBLIC FUNCTION</span> <span class="fn">GetAuthor</span>() <span class="kw">RETURNS</span> <span class="fn">STRING</span>
+        <span class="kw">RETURN</span> Author
+    <span class="kw">ENDFUNCTION</span>
+
+    <span class="kw">PUBLIC FUNCTION</span> <span class="fn">IsAvailable</span>() <span class="kw">RETURNS</span> <span class="fn">BOOLEAN</span>
+        <span class="kw">RETURN</span> Available
+    <span class="kw">ENDFUNCTION</span>
+
+    <span class="kw">PUBLIC FUNCTION</span> <span class="fn">Borrow</span>() <span class="kw">RETURNS</span> <span class="fn">BOOLEAN</span>
+        <span class="kw">IF</span> Available <span class="kw">THEN</span>
+            Available <span class="op">←</span> <span class="kw">FALSE</span>
+            <span class="kw">RETURN</span> <span class="kw">TRUE</span>
+        <span class="kw">ELSE</span>
+            <span class="kw">RETURN</span> <span class="kw">FALSE</span>
+        <span class="kw">ENDIF</span>
+    <span class="kw">ENDFUNCTION</span>
+
+<span class="kw">ENDCLASS</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question 2 — 5 marks</div>
+      <p>Write a recursive function <strong>SumArray</strong> that takes an array of integers and an index <em>n</em>, and returns the sum of elements from index 1 to n. Identify the base case and recursive case, and trace the calls for the array [3, 7, 2, 5] with n = 4.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <div class="code-block" style="margin:.5rem 0">
+          <span class="code-lang">Cambridge Pseudocode</span>
+<span class="kw">FUNCTION</span> <span class="fn">SumArray</span>(Data : <span class="fn">ARRAY</span>[<span class="num">1</span>:<span class="num">100</span>] <span class="kw">OF</span> <span class="fn">INTEGER</span>, n : <span class="fn">INTEGER</span>) <span class="kw">RETURNS</span> <span class="fn">INTEGER</span>
+    <span class="kw">IF</span> n = <span class="num">0</span> <span class="kw">THEN</span>
+        <span class="kw">RETURN</span> <span class="num">0</span>                               <span class="cm">// base case</span>
+    <span class="kw">ELSE</span>
+        <span class="kw">RETURN</span> Data[n] + <span class="fn">SumArray</span>(Data, n-<span class="num">1</span>) <span class="cm">// recursive case</span>
+    <span class="kw">ENDIF</span>
+<span class="kw">ENDFUNCTION</span>
+        </div>
+        <p><strong>Base case:</strong> n = 0 → return 0 (empty sum).<br>
+        <strong>Recursive case:</strong> return Data[n] + SumArray(Data, n-1).</p>
+        <p><strong>Trace for [3,7,2,5], n=4:</strong><br>
+        SumArray(4) = 5 + SumArray(3)<br>
+        SumArray(3) = 2 + SumArray(2)<br>
+        SumArray(2) = 7 + SumArray(1)<br>
+        SumArray(1) = 3 + SumArray(0)<br>
+        SumArray(0) = 0 (base case)<br>
+        → 3+0=3 → 7+3=10 → 2+10=12 → 5+12 = <strong>17</strong></p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question 3 — 4 marks</div>
+      <p>A program reads student names from a file <strong>"students.txt"</strong> and writes those whose names start with the letter 'A' to a new file <strong>"anames.txt"</strong>. Write the pseudocode for this task.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <div class="code-block" style="margin:.5rem 0">
+          <span class="code-lang">Cambridge Pseudocode</span>
+<span class="kw">DECLARE</span> Name : <span class="fn">STRING</span>
+
+<span class="kw">OPENFILE</span> <span class="str">"students.txt"</span> <span class="kw">FOR</span> READ
+<span class="kw">OPENFILE</span> <span class="str">"anames.txt"</span> <span class="kw">FOR</span> WRITE
+<span class="kw">WHILE NOT</span> <span class="fn">EOF</span>(<span class="str">"students.txt"</span>) <span class="kw">DO</span>
+    <span class="kw">READFILE</span> <span class="str">"students.txt"</span>, Name
+    <span class="kw">IF</span> <span class="fn">UCASE</span>(<span class="fn">SUBSTRING</span>(Name, <span class="num">1</span>, <span class="num">1</span>)) = <span class="str">'A'</span> <span class="kw">THEN</span>
+        <span class="kw">WRITEFILE</span> <span class="str">"anames.txt"</span>, Name
+    <span class="kw">ENDIF</span>
+<span class="kw">ENDWHILE</span>
+<span class="kw">CLOSEFILE</span> <span class="str">"students.txt"</span>
+<span class="kw">CLOSEFILE</span> <span class="str">"anames.txt"</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question 4 — 4 marks</div>
+      <p>The following procedure has a bug related to parameter passing. Identify the bug, explain why it occurs, and state how to fix it.</p>
+      <div class="code-block" style="margin:.5rem 0">
+        <span class="code-lang">Cambridge Pseudocode</span>
+<span class="kw">PROCEDURE</span> <span class="fn">Swap</span>(<span class="kw">BYVAL</span> A : <span class="fn">INTEGER</span>, <span class="kw">BYVAL</span> B : <span class="fn">INTEGER</span>)
+    <span class="kw">DECLARE</span> Temp : <span class="fn">INTEGER</span>
+    Temp <span class="op">←</span> A
+    A    <span class="op">←</span> B
+    B    <span class="op">←</span> Temp
+<span class="kw">ENDPROCEDURE</span>
+      </div>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Bug:</strong> The parameters are declared BYVAL instead of BYREF.</p>
+        <p><strong>Why it occurs:</strong> BYVAL passes copies of A and B into the procedure. The swap operates on those copies — when the procedure ends, the copies are discarded and the caller's original variables remain unchanged. The swap has no effect outside the procedure.</p>
+        <p><strong>Fix:</strong> Change both parameters to BYREF:</p>
+        <div class="code-block" style="margin:.5rem 0">
+          <span class="code-lang">Cambridge Pseudocode</span>
+<span class="kw">PROCEDURE</span> <span class="fn">Swap</span>(<span class="kw">BYREF</span> A : <span class="fn">INTEGER</span>, <span class="kw">BYREF</span> B : <span class="fn">INTEGER</span>)
+        </div>
+        <p>Now A and B refer to the caller's original variables. Changes inside the procedure modify the originals directly.</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question 5 — 5 marks</div>
+      <p>A subclass <strong>SavingsAccount</strong> inherits from <strong>BankAccount</strong> (from Section 1). It adds a REAL attribute <em>InterestRate</em> and a method <strong>AddInterest()</strong> that increases the balance by InterestRate percent. Write the class definition in pseudocode.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <div class="code-block" style="margin:.5rem 0">
+          <span class="code-lang">Cambridge Pseudocode</span>
+<span class="kw">CLASS</span> <span class="fn">SavingsAccount</span> <span class="kw">INHERITS</span> <span class="fn">BankAccount</span>
+    <span class="kw">PRIVATE</span> InterestRate : <span class="fn">REAL</span>
+
+    <span class="kw">PUBLIC PROCEDURE</span> <span class="fn">NEW</span>(AccNum : <span class="fn">STRING</span>, InitBalance : <span class="fn">REAL</span>, OwnerName : <span class="fn">STRING</span>, Rate : <span class="fn">REAL</span>)
+        <span class="kw">SUPER</span>.<span class="fn">NEW</span>(AccNum, InitBalance, OwnerName)
+        InterestRate <span class="op">←</span> Rate
+    <span class="kw">ENDPROCEDURE</span>
+
+    <span class="kw">PUBLIC FUNCTION</span> <span class="fn">GetInterestRate</span>() <span class="kw">RETURNS</span> <span class="fn">REAL</span>
+        <span class="kw">RETURN</span> InterestRate
+    <span class="kw">ENDFUNCTION</span>
+
+    <span class="kw">PUBLIC PROCEDURE</span> <span class="fn">AddInterest</span>()
+        <span class="kw">DECLARE</span> Interest : <span class="fn">REAL</span>
+        Interest <span class="op">←</span> <span class="fn">GetBalance</span>() * InterestRate / <span class="num">100</span>
+        <span class="kw">CALL</span> <span class="fn">Deposit</span>(Interest)
+    <span class="kw">ENDPROCEDURE</span>
+
+<span class="kw">ENDCLASS</span>
+        </div>
+        <p>Note: AddInterest uses the inherited <code>GetBalance()</code> and <code>Deposit()</code> methods — it cannot directly access the private <code>Balance</code> attribute of BankAccount.</p>
+      </div>
+    </div>
+
+    <h3>Revision Checklist</h3>
+    <ul class="checklist">
+      <li>I can define class, object, attribute, method, constructor, and encapsulation</li>
+      <li>I can write a class in pseudocode with PRIVATE attributes and PUBLIC getter/setter methods</li>
+      <li>I can instantiate an object using NEW and call its methods</li>
+      <li>I can implement inheritance with INHERITS and call the parent constructor using SUPER</li>
+      <li>I can explain method overriding and give an example of polymorphism</li>
+      <li>I can identify the base case and recursive case in a recursive function</li>
+      <li>I can trace recursive calls and show the values returned at each stage</li>
+      <li>I can explain how the call stack supports recursion and what stack overflow means</li>
+      <li>I can write pseudocode to open, read, write, and append to a text file</li>
+      <li>I can use EOF() correctly in a WHILE loop to process all lines of a file</li>
+      <li>I can write a TRY…EXCEPT block in pseudocode and a try/except/finally in Python</li>
+      <li>I can distinguish local from global variables and explain scope</li>
+      <li>I can explain BYVAL vs BYREF and justify which to use for a given parameter</li>
+    </ul>
+  </div>
+
+</main>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+
+  <div class="sidebar-box">
+    <h3>Contents</h3>
+    <ul class="toc-list">
+      <li><a href="#oop">1. OOP</a></li>
+      <li><a href="#inheritance">2. Inheritance &amp; Polymorphism</a></li>
+      <li><a href="#recursion">3. Recursion</a></li>
+      <li><a href="#file-handling">4. File Handling</a></li>
+      <li><a href="#exception-handling">5. Exceptions</a></li>
+      <li><a href="#scope">6. Scope &amp; Parameters</a></li>
+      <li><a href="#exam-practice">📝 Exam Practice</a></li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>OOP Key Terms</h3>
+    <ul style="font-size:.78rem;padding-left:0;list-style:none;color:var(--text)">
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>Class</strong> — blueprint/template</li>
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>Object</strong> — instance of a class</li>
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>Encapsulation</strong> — private data + public methods</li>
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>Inheritance</strong> — subclass gets superclass members</li>
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>Polymorphism</strong> — same name, different behaviour</li>
+      <li style="padding:.2rem 0"><strong>Constructor</strong> — NEW / __init__</li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>Recursion Rules</h3>
+    <ul style="font-size:.78rem;padding-left:1.1rem;color:var(--text)">
+      <li style="margin:.3rem 0">Must have a <strong>base case</strong></li>
+      <li style="margin:.3rem 0">Recursive case must move toward base</li>
+      <li style="margin:.3rem 0">Each call uses a stack frame</li>
+      <li style="margin:.3rem 0">No base case → stack overflow</li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>File Pseudocode</h3>
+    <ul style="font-size:.78rem;padding-left:0;list-style:none;color:var(--text);font-family:'Courier New',Courier,monospace">
+      <li style="margin:.3rem 0"><code>OPENFILE "f" FOR READ</code></li>
+      <li style="margin:.3rem 0"><code>OPENFILE "f" FOR WRITE</code></li>
+      <li style="margin:.3rem 0"><code>OPENFILE "f" FOR APPEND</code></li>
+      <li style="margin:.3rem 0"><code>READFILE "f", Var</code></li>
+      <li style="margin:.3rem 0"><code>WRITEFILE "f", Var</code></li>
+      <li style="margin:.3rem 0"><code>EOF("f")</code> → BOOLEAN</li>
+      <li style="margin:.3rem 0"><code>CLOSEFILE "f"</code></li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box" style="border-left:4px solid #880e4f">
+    <h3 style="color:#880e4f">Common Mistakes</h3>
+    <ul style="font-size:.78rem;padding-left:1.1rem;color:var(--text)">
+      <li style="margin:.3rem 0">Using BYVAL when the routine must change the caller's variable</li>
+      <li style="margin:.3rem 0">Accessing a superclass's PRIVATE attribute directly from a subclass — use inherited getters</li>
+      <li style="margin:.3rem 0">Forgetting CLOSEFILE — always close after use</li>
+      <li style="margin:.3rem 0">Missing base case in recursion — causes infinite recursion</li>
+      <li style="margin:.3rem 0">Forgetting to call SUPER.NEW() in a subclass constructor</li>
+      <li style="margin:.3rem 0">Using FOR WRITE on a file you want to append — it overwrites everything</li>
+    </ul>
+  </div>
+
+  <a href="topic11-data-structures.html" style="display:block;text-align:center;background:var(--surface2);color:var(--primary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.65rem;font-weight:700;font-size:.82rem;text-decoration:none;margin-top:.25rem">
+    ← Topic 11: Data Structures
+  </a>
+  <a href="index.html" style="display:block;text-align:center;background:var(--primary);color:#fff;border-radius:var(--radius-sm);padding:.75rem;font-weight:700;font-size:.875rem;text-decoration:none;margin-top:.5rem">
+    ← Back to All Topics
+  </a>
+
+</aside>
+
+</div><!-- /lesson-wrap -->
+
+<footer style="background:var(--surface);border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;font-size:.8rem;color:var(--text-muted)">
+  Cambridge International AS &amp; A Level Computer Science 9618 — Topic 12: Programming Concepts &nbsp;|&nbsp;
+  Not affiliated with Cambridge Assessment International Education.
+</footer>
+
+<script src="script.js"></script>
+<script>
+  const sections = document.querySelectorAll('.lesson-section[id]');
+  const navLinks = document.querySelectorAll('.toc-list a, .page-nav a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+  document.querySelectorAll('.reveal-btn').forEach(btn => { btn.textContent = 'Show Answer'; });
+</script>
+</body>
+</html>
