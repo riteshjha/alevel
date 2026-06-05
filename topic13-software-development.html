@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Topic 13: Software Development — CS 9618</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .page-nav { background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:64px; z-index:90; overflow-x:auto; }
+    .page-nav-inner { max-width:1100px; margin:0 auto; padding:0 2rem; display:flex; gap:0; }
+    .page-nav a { display:block; padding:.75rem 1.1rem; font-size:.82rem; font-weight:600; color:var(--text-muted); text-decoration:none; white-space:nowrap; border-bottom:3px solid transparent; transition:color .2s,border-color .2s; }
+    .page-nav a:hover,.page-nav a.active { color:var(--primary); border-bottom-color:var(--primary); }
+
+    .lesson-wrap { max-width:1100px; margin:0 auto; padding:2.5rem 2rem 4rem; display:grid; grid-template-columns:1fr 280px; gap:2.5rem; align-items:start; }
+    @media(max-width:900px){ .lesson-wrap{grid-template-columns:1fr} .sidebar{display:none} }
+
+    .sidebar { position:sticky; top:120px; }
+    .sidebar-box { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; margin-bottom:1rem; box-shadow:var(--shadow); }
+    .sidebar-box h3 { font-size:.85rem; font-weight:700; margin-bottom:.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; }
+    .toc-list { list-style:none; }
+    .toc-list li { padding:.2rem 0; }
+    .toc-list a { font-size:.82rem; color:var(--text-muted); text-decoration:none; display:block; padding:.25rem .5rem; border-radius:4px; transition:background .15s,color .15s; }
+    .toc-list a:hover { background:var(--surface2); color:var(--primary); }
+    .toc-list a.active { background:var(--accent-light); color:var(--primary); font-weight:600; }
+
+    .lesson-section { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:2rem 2.25rem; margin-bottom:2rem; box-shadow:var(--shadow); scroll-margin-top:130px; }
+    .lesson-section h2 { font-size:1.5rem; font-weight:800; color:var(--primary); margin-bottom:.4rem; display:flex; align-items:center; gap:.6rem; }
+    .section-num { background:var(--primary); color:#fff; width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:.9rem; font-weight:800; flex-shrink:0; }
+    .lesson-section h3 { font-size:1.1rem; font-weight:700; margin:1.75rem 0 .75rem; padding-bottom:.4rem; border-bottom:2px solid var(--border); color:var(--text); }
+    .lesson-section h4 { font-size:.95rem; font-weight:700; margin:1.25rem 0 .5rem; color:var(--primary-light); }
+    .lesson-section p { font-size:.9rem; line-height:1.75; color:var(--text); margin-bottom:.75rem; }
+    .lesson-section ul,.lesson-section ol { padding-left:1.5rem; margin-bottom:.75rem; }
+    .lesson-section li { font-size:.9rem; line-height:1.75; color:var(--text); }
+
+    /* Worked example */
+    .worked { background:linear-gradient(135deg,#e3f2fd,#e8eaf6); border:1px solid #90caf9; border-left:5px solid #1565c0; border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:1.25rem 1.5rem; margin:1rem 0; }
+    [data-theme="dark"] .worked { background:#0a1929; border-color:#1565c0; }
+    .worked .worked-title { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#1565c0; margin-bottom:.6rem; }
+    [data-theme="dark"] .worked .worked-title { color:#90caf9; }
+    .worked p,.worked li { font-size:.875rem; color:var(--text); }
+    .worked .step { display:flex; gap:.75rem; margin:.4rem 0; align-items:flex-start; }
+    .worked .step-num { background:#1565c0; color:#fff; min-width:22px; height:22px; border-radius:50%; font-size:.72rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+    .worked .step-text { font-size:.875rem; line-height:1.6; }
+
+    /* Practice question */
+    .practice { background:var(--surface2); border:1px solid var(--border); border-left:5px solid #2e7d32; border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:1.25rem 1.5rem; margin:1rem 0; }
+    .practice .pq-title { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#2e7d32; margin-bottom:.6rem; }
+    .practice p,.practice li { font-size:.875rem; }
+    .practice .reveal-btn { background:#2e7d32; color:#fff; border:none; border-radius:6px; padding:.4rem 1rem; font-size:.8rem; font-weight:700; cursor:pointer; margin-top:.75rem; transition:background .2s; }
+    .practice .reveal-btn:hover { background:#1b5e20; }
+    .practice .answer-reveal { display:none; margin-top:.75rem; padding:.75rem 1rem; background:#e8f5e9; border-radius:var(--radius-sm); font-size:.875rem; }
+    [data-theme="dark"] .practice .answer-reveal { background:#1b2e1c; color:#c8e6c9; }
+    .practice .answer-reveal.open { display:block; }
+
+    /* Callouts */
+    .callout { background:var(--surface2); border-left:4px solid var(--accent); border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:.85rem 1.1rem; margin:.75rem 0; font-size:.875rem; color:var(--text); }
+    .callout.warn { border-color:#f59e0b; }
+    .callout.tip  { border-color:#22c55e; }
+    .callout.exam { border-color:#7c3aed; }
+
+    /* Key term */
+    .key-term { background:linear-gradient(transparent 60%,rgba(21,101,192,.15) 60%); font-weight:700; }
+
+    /* Objectives & breadcrumb */
+    .objectives-list { list-style:none; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:.5rem; }
+    .objectives-list li { font-size:.85rem; display:flex; align-items:flex-start; gap:.5rem; padding:.4rem 0; color:var(--text); }
+    .objectives-list li::before { content:'✦'; color:var(--accent); flex-shrink:0; }
+    .breadcrumb { display:flex; align-items:center; gap:.4rem; font-size:.82rem; color:var(--text-muted); margin-bottom:1.5rem; }
+    .breadcrumb a { color:var(--primary-light); text-decoration:none; }
+    .breadcrumb a:hover { text-decoration:underline; }
+
+    /* Checklist */
+    .checklist { list-style:none; padding:0; }
+    .checklist li { display:flex; align-items:flex-start; gap:.6rem; padding:.35rem 0; font-size:.875rem; color:var(--text); }
+    .checklist li::before { content:'☐'; color:var(--primary-light); font-size:1rem; flex-shrink:0; }
+
+    /* Comparison table */
+    .plain-table { width:100%; border-collapse:collapse; font-size:.875rem; margin:.75rem 0; }
+    .plain-table th { background:var(--primary); color:#fff; padding:.45rem .8rem; text-align:left; }
+    .plain-table td { border:1px solid var(--border); padding:.4rem .8rem; color:var(--text); vertical-align:top; }
+    .plain-table tr:nth-child(even) td { background:var(--surface2); }
+
+    /* Code block */
+    .code-block { background:#1e1e2e; color:#f8f8f2; white-space:pre; border-radius:var(--radius-sm); padding:1.1rem 1.35rem; margin:.75rem 0; font-family:'Courier New',Courier,monospace; font-size:.83rem; line-height:1.7; overflow-x:auto; position:relative; }
+    .code-lang { position:absolute; top:.5rem; right:.75rem; font-size:.68rem; font-weight:700; color:#6272a4; text-transform:uppercase; letter-spacing:.08em; }
+    .kw  { color:#ff79c6; }
+    .fn  { color:#50fa7b; }
+    .str { color:#f1fa8c; }
+    .num { color:#bd93f9; }
+    .cm  { color:#6272a4; font-style:italic; }
+    .op  { color:#ff79c6; }
+
+    /* SDLC cycle diagram */
+    .sdlc-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:.85rem; margin:.75rem 0; }
+    .sdlc-card { background:var(--surface2); border:1px solid var(--border); border-top:3px solid #1565c0; border-radius:var(--radius-sm); padding:1rem 1.1rem; }
+    .sdlc-card .sdlc-num { font-size:.72rem; font-weight:800; color:#1565c0; text-transform:uppercase; letter-spacing:.08em; margin-bottom:.3rem; }
+    [data-theme="dark"] .sdlc-card .sdlc-num { color:#90caf9; }
+    .sdlc-card h4 { font-size:.9rem; font-weight:800; color:var(--text); margin-bottom:.4rem; }
+    .sdlc-card p { font-size:.82rem; line-height:1.6; color:var(--text); margin:0; }
+
+    /* Testing type cards */
+    .test-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:.85rem; margin:.75rem 0; }
+    .test-card { background:var(--surface2); border:1px solid var(--border); border-top:3px solid #2e7d32; border-radius:var(--radius-sm); padding:1rem 1.1rem; }
+    .test-card h4 { font-size:.9rem; font-weight:800; color:#2e7d32; margin-bottom:.4rem; }
+    [data-theme="dark"] .test-card h4 { color:#a5d6a7; }
+    .test-card p { font-size:.82rem; line-height:1.6; color:var(--text); margin:0; }
+
+    /* Test data table highlight */
+    .td-normal { background:#e8f5e9; color:#1b5e20; font-weight:700; }
+    .td-boundary { background:#fff3e0; color:#e65100; font-weight:700; }
+    .td-erroneous { background:#fce4ec; color:#880e4f; font-weight:700; }
+    [data-theme="dark"] .td-normal { background:#1b2e1c; color:#c8e6c9; }
+    [data-theme="dark"] .td-boundary { background:#2e1f00; color:#ffcc80; }
+    [data-theme="dark"] .td-erroneous { background:#1a0011; color:#f48fb1; }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="header-inner">
+    <a class="logo" href="index.html">
+      <div class="logo-icon">💻</div>
+      <div>
+        <div class="logo-text">CS 9618</div>
+        <div class="logo-sub">Cambridge AS &amp; A Level</div>
+      </div>
+    </a>
+    <div class="header-actions">
+      <button class="btn-icon" id="theme-btn" title="Toggle theme">🌙</button>
+    </div>
+  </div>
+</header>
+
+<!-- Section nav -->
+<nav class="page-nav" aria-label="Sections">
+  <div class="page-nav-inner">
+    <a href="#sdlc" class="active">1. SDLC</a>
+    <a href="#analysis-design">2. Analysis &amp; Design</a>
+    <a href="#testing">3. Testing Strategies</a>
+    <a href="#test-data">4. Test Data</a>
+    <a href="#debugging">5. Debugging</a>
+    <a href="#documentation">6. Documentation</a>
+    <a href="#exam-practice">📝 Exam Practice</a>
+  </div>
+</nav>
+
+<div class="lesson-wrap">
+<main>
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="index.html">Home</a>
+    <span>›</span>
+    <a href="index.html#tab-as">Paper 2 — Programming</a>
+    <span>›</span>
+    <strong style="color:var(--text)">Topic 13: Software Development</strong>
+  </div>
+
+  <!-- Hero -->
+  <div class="lesson-section" style="background:linear-gradient(135deg,#003c8f,#1565c0,#1976d2);color:#fff;border:none">
+    <div style="display:flex;align-items:flex-start;gap:1.25rem">
+      <div style="font-size:3rem;flex-shrink:0">🛠️</div>
+      <div>
+        <div style="font-size:.75rem;font-weight:700;opacity:.7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem">Paper 2 · Topic 13</div>
+        <h1 style="font-size:1.9rem;font-weight:900;margin-bottom:.5rem;color:#fff">Software Development</h1>
+        <p style="opacity:.85;font-size:.95rem;max-width:620px;margin-bottom:1rem;color:#fff">The Software Development Life Cycle, analysis and design methods, testing strategies, test data categories, debugging techniques, and documentation — everything needed to produce and maintain reliable software.</p>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+          <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">Paper 2 · AS &amp; A Level</span>
+          <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">~15% of Paper 2 marks</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Learning objectives -->
+  <div class="lesson-section">
+    <h2><span class="section-num">✦</span> Learning Objectives</h2>
+    <p>By the end of this topic you should be able to:</p>
+    <ul class="objectives-list">
+      <li>Name and describe all stages of the Software Development Life Cycle</li>
+      <li>Compare waterfall and iterative/agile development models</li>
+      <li>Identify inputs, outputs, and processes during the analysis stage</li>
+      <li>Produce and interpret structure charts and data flow diagrams</li>
+      <li>Distinguish white-box, black-box, alpha, beta, and acceptance testing</li>
+      <li>Construct a test plan with normal, boundary, and erroneous test data</li>
+      <li>Apply trace tables to trace and debug code</li>
+      <li>Describe dry runs and the use of debugging tools</li>
+      <li>Explain the purpose of user and technical documentation</li>
+      <li>Distinguish adaptive, perfective, and corrective maintenance</li>
+    </ul>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 1: SDLC                        -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="sdlc">
+    <h2><span class="section-num">1</span> The Software Development Life Cycle (SDLC)</h2>
+
+    <p>The <span class="key-term">Software Development Life Cycle (SDLC)</span> is a structured process that guides how software is planned, created, tested, and maintained. It provides a systematic approach that reduces errors, controls costs, and ensures the final product meets user needs.</p>
+
+    <div class="sdlc-grid">
+      <div class="sdlc-card">
+        <div class="sdlc-num">Stage 1</div>
+        <h4>Analysis</h4>
+        <p>Identify the problem, define requirements, and document what the system must do. Produces a requirements specification.</p>
+      </div>
+      <div class="sdlc-card">
+        <div class="sdlc-num">Stage 2</div>
+        <h4>Design</h4>
+        <p>Plan the solution structure — data structures, algorithms, interfaces, and system architecture — before writing any code.</p>
+      </div>
+      <div class="sdlc-card">
+        <div class="sdlc-num">Stage 3</div>
+        <h4>Coding</h4>
+        <p>Translate the design into actual program code using an appropriate language and following coding standards.</p>
+      </div>
+      <div class="sdlc-card">
+        <div class="sdlc-num">Stage 4</div>
+        <h4>Testing</h4>
+        <p>Verify the program works correctly, handles errors, and meets the original requirements. Uses a structured test plan.</p>
+      </div>
+      <div class="sdlc-card">
+        <div class="sdlc-num">Stage 5</div>
+        <h4>Implementation</h4>
+        <p>Deploy the software to users. Includes installation, data migration, staff training, and system changeover.</p>
+      </div>
+      <div class="sdlc-card">
+        <div class="sdlc-num">Stage 6</div>
+        <h4>Maintenance</h4>
+        <p>Fix bugs that appear after release, adapt to changing requirements, and improve performance over time.</p>
+      </div>
+    </div>
+
+    <h3>Development Models</h3>
+
+    <h4>Waterfall Model</h4>
+    <p>Each stage is completed fully before the next begins. The flow is strictly sequential — like water falling over a series of steps. Changes late in the process are expensive because earlier stages must be revisited.</p>
+    <table class="plain-table">
+      <tr><th>Advantage</th><th>Disadvantage</th></tr>
+      <tr><td>Clear documentation at each stage</td><td>Inflexible — hard to go back to a previous stage</td></tr>
+      <tr><td>Easy to manage and estimate timescales</td><td>Users don't see the product until the end</td></tr>
+      <tr><td>Works well when requirements are fixed from the start</td><td>Late discovery of errors is very costly to fix</td></tr>
+    </table>
+
+    <h4>Iterative / Agile Model</h4>
+    <p>Development happens in short repeated <span class="key-term">iterations</span> (sprints). Each iteration delivers a working subset of features. User feedback shapes the next iteration, allowing requirements to evolve throughout the project.</p>
+    <table class="plain-table">
+      <tr><th>Advantage</th><th>Disadvantage</th></tr>
+      <tr><td>Users see and test working software early</td><td>Harder to predict overall cost and timeline</td></tr>
+      <tr><td>Flexible — requirements can change between iterations</td><td>Requires continuous user involvement</td></tr>
+      <tr><td>Errors discovered and fixed quickly</td><td>Documentation can lag behind development</td></tr>
+    </table>
+
+    <div class="callout exam">
+      <strong>Exam tip:</strong> You may be asked to recommend a model for a given scenario. Choose <strong>waterfall</strong> when requirements are fully defined upfront (e.g., safety-critical systems). Choose <strong>iterative</strong> when requirements are likely to evolve or when early user feedback is valuable.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 2: Analysis & Design           -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="analysis-design">
+    <h2><span class="section-num">2</span> Analysis &amp; Design</h2>
+
+    <h3>Analysis Stage</h3>
+    <p>The goal of analysis is to understand the current system (if one exists) and precisely define what the new system must achieve. Techniques include:</p>
+    <ul>
+      <li><strong>Interviewing stakeholders</strong> — ask users and managers what they need</li>
+      <li><strong>Questionnaires</strong> — gather information from many users efficiently</li>
+      <li><strong>Observation</strong> — watch how the current system is used in practice</li>
+      <li><strong>Examining existing documentation</strong> — review current forms, reports, and processes</li>
+    </ul>
+
+    <p>The output is a <span class="key-term">requirements specification</span> listing both:</p>
+    <ul>
+      <li><strong>Functional requirements</strong> — what the system must <em>do</em> (e.g., "the system must calculate the total price including VAT")</li>
+      <li><strong>Non-functional requirements</strong> — constraints on <em>how</em> it works (e.g., response time under 2 seconds, 99.9% uptime)</li>
+    </ul>
+
+    <h3>Structure Charts</h3>
+    <p>A <span class="key-term">structure chart</span> (also called a hierarchy chart) shows the modular decomposition of a system — how a large task is broken into smaller sub-tasks, and how those sub-tasks call each other. Each box represents a module (procedure or function).</p>
+
+    <div class="worked">
+      <div class="worked-title">Structure Chart: Student Registration System</div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:.4rem;font-size:.82rem;margin:.5rem 0">
+        <div style="background:var(--primary);color:#fff;padding:.4rem 1.2rem;border-radius:6px;font-weight:700">Student Registration</div>
+        <div style="color:var(--text-muted)">↓</div>
+        <div style="display:flex;gap:2rem;justify-content:center;flex-wrap:wrap">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:.3rem">
+            <div style="background:var(--surface2);border:2px solid var(--primary);padding:.35rem .9rem;border-radius:6px;font-weight:600">Input Details</div>
+            <div style="color:var(--text-muted);font-size:.8rem">↓</div>
+            <div style="display:flex;gap:.75rem">
+              <div style="background:var(--surface2);border:1px solid var(--border);padding:.3rem .7rem;border-radius:4px">Get Name</div>
+              <div style="background:var(--surface2);border:1px solid var(--border);padding:.3rem .7rem;border-radius:4px">Get DOB</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:.3rem">
+            <div style="background:var(--surface2);border:2px solid var(--primary);padding:.35rem .9rem;border-radius:6px;font-weight:600">Validate</div>
+            <div style="color:var(--text-muted);font-size:.8rem">↓</div>
+            <div style="display:flex;gap:.75rem">
+              <div style="background:var(--surface2);border:1px solid var(--border);padding:.3rem .7rem;border-radius:4px">Check Age</div>
+              <div style="background:var(--surface2);border:1px solid var(--border);padding:.3rem .7rem;border-radius:4px">Check ID</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:.3rem">
+            <div style="background:var(--surface2);border:2px solid var(--primary);padding:.35rem .9rem;border-radius:6px;font-weight:600">Save Record</div>
+          </div>
+        </div>
+      </div>
+      <p style="font-size:.82rem;margin-top:.5rem">Arrows on connectors can show data passed between modules. A looped arrow on a module indicates it is called repeatedly.</p>
+    </div>
+
+    <h3>Data Flow Diagrams (DFDs)</h3>
+    <p>A <span class="key-term">Data Flow Diagram (DFD)</span> shows how data moves through a system. It uses four symbols:</p>
+    <table class="plain-table">
+      <tr><th>Symbol</th><th>Name</th><th>Description</th></tr>
+      <tr><td>Rectangle</td><td>External Entity</td><td>An entity outside the system that sends or receives data (e.g., a customer, a bank)</td></tr>
+      <tr><td>Rounded rectangle / circle</td><td>Process</td><td>A transformation of data — labelled with a verb phrase (e.g., "Validate login")</td></tr>
+      <tr><td>Open-ended rectangle</td><td>Data Store</td><td>A repository where data is held (e.g., a database table, a file)</td></tr>
+      <tr><td>Arrow</td><td>Data Flow</td><td>The direction data moves; labelled with what data is flowing</td></tr>
+    </table>
+
+    <div class="callout tip">
+      <strong>Remember:</strong> DFDs show <em>data flow</em>, not control flow. They do not show decisions or loops — those belong in flowcharts or pseudocode.
+    </div>
+
+    <h3>Feasibility Study</h3>
+    <p>Before committing to a project, a <span class="key-term">feasibility study</span> assesses whether the proposed system is worth building. It considers:</p>
+    <ul>
+      <li><strong>Technical feasibility</strong> — can the technology required actually be built?</li>
+      <li><strong>Economic feasibility</strong> — will the benefits justify the cost?</li>
+      <li><strong>Time feasibility</strong> — can it be delivered within the required timescale?</li>
+      <li><strong>Legal feasibility</strong> — does the system comply with relevant laws (e.g., GDPR)?</li>
+    </ul>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 3: Testing Strategies          -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="testing">
+    <h2><span class="section-num">3</span> Testing Strategies</h2>
+
+    <p>Testing verifies that software behaves correctly under all expected (and unexpected) conditions. A good test plan covers <em>all</em> paths through the code and all categories of input.</p>
+
+    <h3>White-Box vs Black-Box Testing</h3>
+    <div class="test-grid">
+      <div class="test-card">
+        <h4>White-Box Testing</h4>
+        <p>The tester has full knowledge of the internal code structure. Tests are designed to exercise every statement, branch, and loop path. Also called <em>structural</em> or <em>glass-box</em> testing.</p>
+      </div>
+      <div class="test-card">
+        <h4>Black-Box Testing</h4>
+        <p>The tester has no knowledge of the internal code. Tests are based purely on the specification — inputs and expected outputs. Also called <em>functional</em> or <em>specification-based</em> testing.</p>
+      </div>
+      <div class="test-card" style="border-top-color:#1565c0">
+        <h4 style="color:#1565c0">Alpha Testing</h4>
+        <p>Carried out by the development team (or in-house testers) before the software is released externally. Typically white-box or structured black-box testing in a controlled environment.</p>
+      </div>
+      <div class="test-card" style="border-top-color:#6a1b9a">
+        <h4 style="color:#6a1b9a">Beta Testing</h4>
+        <p>The software is released to a limited group of real external users who use it in their normal environment and report bugs. Uncontrolled — testers follow their own usage patterns.</p>
+      </div>
+      <div class="test-card" style="border-top-color:#e65100">
+        <h4 style="color:#e65100">Acceptance Testing</h4>
+        <p>Performed by the client to confirm the system meets the requirements specification. Also called <em>User Acceptance Testing (UAT)</em>. Passes sign-off before go-live.</p>
+      </div>
+      <div class="test-card" style="border-top-color:#00838f">
+        <h4 style="color:#00838f">Integration Testing</h4>
+        <p>Tests that separately developed modules work correctly together when combined into the larger system. Finds interface mismatches between modules.</p>
+      </div>
+      <div class="test-card" style="border-top-color:#558b2f">
+        <h4 style="color:#558b2f">Unit Testing</h4>
+        <p>Tests individual modules (functions or procedures) in isolation to verify each one works correctly on its own. Usually performed by the programmer who wrote the unit.</p>
+      </div>
+      <div class="test-card" style="border-top-color:#c62828">
+        <h4 style="color:#c62828">Regression Testing</h4>
+        <p>Re-running previously passed tests after a change to ensure new code has not broken existing functionality. Critical during iterative development.</p>
+      </div>
+    </div>
+
+    <h3>Comparison Table</h3>
+    <table class="plain-table">
+      <tr><th>Type</th><th>Who tests?</th><th>Based on?</th><th>When?</th></tr>
+      <tr><td>White-box</td><td>Developer</td><td>Internal code structure</td><td>During coding</td></tr>
+      <tr><td>Black-box</td><td>Tester / user</td><td>Requirements / specification</td><td>After coding</td></tr>
+      <tr><td>Alpha</td><td>In-house team</td><td>Mixed</td><td>Before release</td></tr>
+      <tr><td>Beta</td><td>External users</td><td>Real-world use</td><td>Near release</td></tr>
+      <tr><td>Acceptance (UAT)</td><td>Client</td><td>Requirements specification</td><td>Before sign-off</td></tr>
+      <tr><td>Unit</td><td>Developer</td><td>Individual module specification</td><td>During coding</td></tr>
+      <tr><td>Integration</td><td>Developer / tester</td><td>Interface specifications</td><td>After unit testing</td></tr>
+      <tr><td>Regression</td><td>Developer / tester</td><td>Existing test suite</td><td>After every change</td></tr>
+    </table>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 4: Test Data                   -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="test-data">
+    <h2><span class="section-num">4</span> Test Data</h2>
+
+    <p>Choosing the right test data is essential for thorough testing. Cambridge requires three categories:</p>
+
+    <table class="plain-table">
+      <tr>
+        <th>Category</th>
+        <th>Definition</th>
+        <th>Purpose</th>
+      </tr>
+      <tr>
+        <td class="td-normal">Normal</td>
+        <td>Valid data within the accepted range</td>
+        <td>Confirms the system produces correct output for typical inputs</td>
+      </tr>
+      <tr>
+        <td class="td-boundary">Boundary</td>
+        <td>Values at the exact edges of the accepted range (and one either side)</td>
+        <td>Tests the limits of validation logic — common site of off-by-one errors</td>
+      </tr>
+      <tr>
+        <td class="td-erroneous">Erroneous</td>
+        <td>Invalid data — wrong type, out of range, or deliberately incorrect</td>
+        <td>Confirms the system rejects bad input and handles errors gracefully</td>
+      </tr>
+    </table>
+
+    <div class="callout warn">
+      <strong>Note:</strong> Some syllabi also list <em>extreme data</em> (valid but at the very edge of what the system can handle — e.g., an empty list, or exactly 1000 records). Cambridge 9618 primarily uses Normal / Boundary / Erroneous.
+    </div>
+
+    <h3>Worked Example: Age Validation (16 ≤ age ≤ 65)</h3>
+
+    <div class="worked">
+      <div class="worked-title">Worked Example — Test Plan</div>
+      <p>A program accepts an integer age. It must reject any age outside the range 16 to 65 inclusive. Design test data.</p>
+      <table class="plain-table" style="margin-top:.5rem">
+        <tr>
+          <th>Test No.</th>
+          <th>Category</th>
+          <th>Input</th>
+          <th>Expected Output</th>
+          <th>Reason</th>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td class="td-normal">Normal</td>
+          <td>30</td>
+          <td>Accepted</td>
+          <td>Valid, well within range</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td class="td-normal">Normal</td>
+          <td>25</td>
+          <td>Accepted</td>
+          <td>Another typical valid value</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td class="td-boundary">Boundary</td>
+          <td>16</td>
+          <td>Accepted</td>
+          <td>Lower boundary — must be accepted</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td class="td-boundary">Boundary</td>
+          <td>15</td>
+          <td>Rejected</td>
+          <td>One below lower boundary — must be rejected</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td class="td-boundary">Boundary</td>
+          <td>65</td>
+          <td>Accepted</td>
+          <td>Upper boundary — must be accepted</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td class="td-boundary">Boundary</td>
+          <td>66</td>
+          <td>Rejected</td>
+          <td>One above upper boundary — must be rejected</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td class="td-erroneous">Erroneous</td>
+          <td>-5</td>
+          <td>Rejected / error message</td>
+          <td>Negative age is invalid</td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td class="td-erroneous">Erroneous</td>
+          <td>"abc"</td>
+          <td>Rejected / error message</td>
+          <td>Wrong data type — string not integer</td>
+        </tr>
+        <tr>
+          <td>9</td>
+          <td class="td-erroneous">Erroneous</td>
+          <td>200</td>
+          <td>Rejected / error message</td>
+          <td>Far outside valid range</td>
+        </tr>
+      </table>
+    </div>
+
+    <h3>Writing a Test Plan in Pseudocode Context</h3>
+    <p>When a question gives you a function and asks for a test plan, always include:</p>
+    <ul>
+      <li>At least one normal value (mid-range)</li>
+      <li>The exact boundary values and those immediately outside</li>
+      <li>At least one erroneous value (wrong type or clearly invalid)</li>
+      <li>The <em>expected</em> output — not just "pass" or "fail"</li>
+    </ul>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question</div>
+      <p>A procedure accepts a password string. Valid passwords are between 8 and 20 characters (inclusive). Write a test plan with at least six test cases covering all three categories.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <table class="plain-table">
+          <tr><th>Category</th><th>Input (length)</th><th>Example Input</th><th>Expected</th></tr>
+          <tr><td class="td-normal">Normal</td><td>12</td><td>"MyPass12#$"</td><td>Accepted</td></tr>
+          <tr><td class="td-normal">Normal</td><td>16</td><td>"SecurePassword1!"</td><td>Accepted</td></tr>
+          <tr><td class="td-boundary">Boundary</td><td>8 (lower)</td><td>"Pass123!"</td><td>Accepted</td></tr>
+          <tr><td class="td-boundary">Boundary</td><td>7 (below lower)</td><td>"Pass12!"</td><td>Rejected</td></tr>
+          <tr><td class="td-boundary">Boundary</td><td>20 (upper)</td><td>"MySecurePassword123!"</td><td>Accepted</td></tr>
+          <tr><td class="td-boundary">Boundary</td><td>21 (above upper)</td><td>"MySecurePassword1234!"</td><td>Rejected</td></tr>
+          <tr><td class="td-erroneous">Erroneous</td><td>0 (empty string)</td><td>""</td><td>Rejected</td></tr>
+          <tr><td class="td-erroneous">Erroneous</td><td>N/A (wrong type)</td><td>12345</td><td>Rejected / type error</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 5: Debugging                   -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="debugging">
+    <h2><span class="section-num">5</span> Debugging</h2>
+
+    <p><span class="key-term">Debugging</span> is the process of finding and fixing errors (bugs) in a program. There are three main types of error:</p>
+
+    <table class="plain-table">
+      <tr><th>Error Type</th><th>When Detected</th><th>Description</th><th>Example</th></tr>
+      <tr>
+        <td><strong>Syntax Error</strong></td>
+        <td>Compile time / translation</td>
+        <td>Code that violates the grammar rules of the language. The translator cannot convert it to machine code.</td>
+        <td><code>IF x = 5</code> without <code>THEN</code> in pseudocode</td>
+      </tr>
+      <tr>
+        <td><strong>Runtime Error</strong></td>
+        <td>During execution</td>
+        <td>Code is syntactically correct but causes a crash or exception when it runs (e.g., division by zero, accessing an array out of bounds).</td>
+        <td>Dividing by a variable that happens to be 0</td>
+      </tr>
+      <tr>
+        <td><strong>Logic Error</strong></td>
+        <td>During testing</td>
+        <td>Code runs without crashing but produces incorrect results. The algorithm is wrong. These are the hardest to find.</td>
+        <td>Using <code>&gt;</code> instead of <code>&gt;=</code> in a boundary check</td>
+      </tr>
+    </table>
+
+    <h3>Dry Run (Trace Table)</h3>
+    <p>A <span class="key-term">dry run</span> means manually stepping through code line-by-line without running it on a computer. A <span class="key-term">trace table</span> records the value of each variable at each step — it is the standard way to show a dry run in an exam.</p>
+
+    <div class="worked">
+      <div class="worked-title">Worked Example — Trace Table</div>
+      <p>Trace the following pseudocode and complete the trace table.</p>
+      <div class="code-block" style="margin-bottom:.75rem">
+        <span class="code-lang">Cambridge Pseudocode</span>
+<span class="kw">DECLARE</span> Total : <span class="fn">INTEGER</span>
+<span class="kw">DECLARE</span> Count : <span class="fn">INTEGER</span>
+Total <span class="op">←</span> <span class="num">0</span>
+Count <span class="op">←</span> <span class="num">1</span>
+<span class="kw">WHILE</span> Count <span class="op">&lt;=</span> <span class="num">4</span>
+    Total <span class="op">←</span> Total + Count
+    Count <span class="op">←</span> Count + <span class="num">1</span>
+<span class="kw">ENDWHILE</span>
+<span class="kw">OUTPUT</span> Total
+      </div>
+      <table class="plain-table">
+        <tr><th>Line</th><th>Count</th><th>Total</th><th>Count &lt;= 4?</th><th>Output</th></tr>
+        <tr><td>Total ← 0</td><td>—</td><td>0</td><td>—</td><td></td></tr>
+        <tr><td>Count ← 1</td><td>1</td><td>0</td><td>—</td><td></td></tr>
+        <tr><td>WHILE check</td><td>1</td><td>0</td><td>TRUE</td><td></td></tr>
+        <tr><td>Total ← 0 + 1</td><td>1</td><td>1</td><td></td><td></td></tr>
+        <tr><td>Count ← 1 + 1</td><td>2</td><td>1</td><td></td><td></td></tr>
+        <tr><td>WHILE check</td><td>2</td><td>1</td><td>TRUE</td><td></td></tr>
+        <tr><td>Total ← 1 + 2</td><td>2</td><td>3</td><td></td><td></td></tr>
+        <tr><td>Count ← 2 + 1</td><td>3</td><td>3</td><td></td><td></td></tr>
+        <tr><td>WHILE check</td><td>3</td><td>3</td><td>TRUE</td><td></td></tr>
+        <tr><td>Total ← 3 + 3</td><td>3</td><td>6</td><td></td><td></td></tr>
+        <tr><td>Count ← 3 + 1</td><td>4</td><td>6</td><td></td><td></td></tr>
+        <tr><td>WHILE check</td><td>4</td><td>6</td><td>TRUE</td><td></td></tr>
+        <tr><td>Total ← 6 + 4</td><td>4</td><td>10</td><td></td><td></td></tr>
+        <tr><td>Count ← 4 + 1</td><td>5</td><td>10</td><td></td><td></td></tr>
+        <tr><td>WHILE check</td><td>5</td><td>10</td><td>FALSE — exit</td><td></td></tr>
+        <tr><td>OUTPUT Total</td><td>5</td><td>10</td><td></td><td><strong>10</strong></td></tr>
+      </table>
+    </div>
+
+    <h3>Debugging Tools</h3>
+    <p>Modern IDEs provide tools that assist in debugging:</p>
+    <table class="plain-table">
+      <tr><th>Tool</th><th>Description</th></tr>
+      <tr><td><strong>Breakpoint</strong></td><td>Pauses execution at a specific line so the programmer can inspect the current state of all variables</td></tr>
+      <tr><td><strong>Step (Step Over / Step Into)</strong></td><td>Execute one line at a time; <em>step into</em> enters a called function, <em>step over</em> treats it as a single step</td></tr>
+      <tr><td><strong>Watch / Variable Inspector</strong></td><td>Displays the current value of selected variables, updating as execution proceeds</td></tr>
+      <tr><td><strong>Call Stack Viewer</strong></td><td>Shows which functions have been called and in what order — essential for debugging recursion</td></tr>
+      <tr><td><strong>Error / Exception Messages</strong></td><td>Runtime error messages from the interpreter/compiler indicating the type of error and the line number</td></tr>
+    </table>
+
+    <div class="callout tip">
+      <strong>Exam tip:</strong> "Describe how a programmer could find a logic error" — a common answer is: use a dry run / trace table, insert <code>OUTPUT</code> statements to print variable values at key points, or use an IDE debugger with breakpoints and a variable watch.
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question</div>
+      <p>A programmer writes a function to find the maximum value in an array. During testing, the function always returns the first element. Name the type of error and describe two methods the programmer could use to find and fix it.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Type of error:</strong> Logic error — the program runs without crashing but produces an incorrect result.</p>
+        <p><strong>Method 1:</strong> Dry run / trace table — manually trace through the function with a small test array, recording the value of the loop counter, current element, and current maximum at each step to identify where the logic fails.</p>
+        <p><strong>Method 2:</strong> Use an IDE debugger — set a breakpoint inside the loop, then use step-through execution and a variable watch to observe the maximum variable updating (or failing to update) on each iteration.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 6: Documentation & Maintenance -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="documentation">
+    <h2><span class="section-num">6</span> Documentation &amp; Maintenance</h2>
+
+    <h3>User Documentation</h3>
+    <p><span class="key-term">User documentation</span> is written for the end-users of the software — people who use the system but may have no programming knowledge. Its purpose is to help users operate the software correctly and efficiently.</p>
+    <p>User documentation typically includes:</p>
+    <ul>
+      <li>Getting started guide / installation instructions</li>
+      <li>Step-by-step instructions for common tasks with screenshots</li>
+      <li>Explanation of all menus, buttons, and input fields</li>
+      <li>Troubleshooting / FAQ section for common problems</li>
+      <li>Glossary of terms used in the software</li>
+    </ul>
+
+    <h3>Technical Documentation</h3>
+    <p><span class="key-term">Technical documentation</span> is written for developers and system administrators who need to maintain, extend, or support the software. It assumes programming knowledge.</p>
+    <p>Technical documentation typically includes:</p>
+    <ul>
+      <li>System requirements and dependencies</li>
+      <li>Installation and configuration guide for developers</li>
+      <li>Annotated source code explaining algorithms and non-obvious logic</li>
+      <li>Data dictionary describing all variables, data structures, and file formats</li>
+      <li>Entity-relationship diagrams, structure charts, data flow diagrams</li>
+      <li>API documentation — descriptions of all modules, their parameters, and return values</li>
+      <li>Known issues and limitations</li>
+    </ul>
+
+    <table class="plain-table">
+      <tr><th></th><th>User Documentation</th><th>Technical Documentation</th></tr>
+      <tr><td><strong>Audience</strong></td><td>End users</td><td>Developers / administrators</td></tr>
+      <tr><td><strong>Technical level</strong></td><td>Non-technical language, lots of screenshots</td><td>Technical language, code listings, diagrams</td></tr>
+      <tr><td><strong>Contents</strong></td><td>How to use features</td><td>How the system is built</td></tr>
+      <tr><td><strong>Purpose</strong></td><td>Enable correct use of the software</td><td>Enable maintenance and development</td></tr>
+    </table>
+
+    <h3>Software Maintenance</h3>
+    <p>After a system is deployed, it will need ongoing maintenance. There are three types:</p>
+
+    <table class="plain-table">
+      <tr><th>Type</th><th>Description</th><th>Example</th></tr>
+      <tr>
+        <td><strong>Corrective</strong></td>
+        <td>Fixing bugs that were not caught during testing and are discovered after release</td>
+        <td>A bank calculates interest incorrectly due to a logic error in the rate formula</td>
+      </tr>
+      <tr>
+        <td><strong>Adaptive</strong></td>
+        <td>Modifying the system to work in a new environment or to meet changing external requirements</td>
+        <td>Updating the software to comply with new GDPR regulations, or to run on a new operating system</td>
+      </tr>
+      <tr>
+        <td><strong>Perfective</strong></td>
+        <td>Improving the system's performance or adding new features requested by users, without fixing a specific bug</td>
+        <td>Adding a search filter feature that users have requested, or optimising a slow database query</td>
+      </tr>
+    </table>
+
+    <div class="callout exam">
+      <strong>Exam tip:</strong> Given a scenario, identify the maintenance type: <em>corrective</em> = fix a known bug; <em>adaptive</em> = respond to external change (law, OS, hardware); <em>perfective</em> = user wants new/improved functionality.
+    </div>
+
+    <h3>System Changeover Methods</h3>
+    <p>When replacing an old system with a new one, the organisation must choose how to switch over:</p>
+    <table class="plain-table">
+      <tr><th>Method</th><th>Description</th><th>Risk</th></tr>
+      <tr>
+        <td><strong>Direct changeover</strong></td>
+        <td>Old system is switched off and new system is switched on simultaneously</td>
+        <td>High — if the new system fails there is no fallback</td>
+      </tr>
+      <tr>
+        <td><strong>Parallel running</strong></td>
+        <td>Both old and new systems run together; outputs are compared until confidence is established</td>
+        <td>Low — but expensive (double the resources)</td>
+      </tr>
+      <tr>
+        <td><strong>Pilot changeover</strong></td>
+        <td>New system is introduced in one part of the organisation (e.g., one branch) first</td>
+        <td>Medium — limited exposure if the new system fails</td>
+      </tr>
+      <tr>
+        <td><strong>Phased changeover</strong></td>
+        <td>The new system replaces the old one module by module, one piece at a time</td>
+        <td>Low — but requires both systems to coexist during transition</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 7: Exam Practice               -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="exam-practice">
+    <h2><span class="section-num">📝</span> Exam Practice</h2>
+
+    <div class="practice">
+      <div class="pq-title">Question 1 — 4 marks</div>
+      <p>State <strong>four</strong> stages of the Software Development Life Cycle and for each stage, give one task that takes place during it.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p>Any four of the following (one mark per stage + task pair):</p>
+        <ul>
+          <li><strong>Analysis</strong> — gather and document user requirements (requirements specification)</li>
+          <li><strong>Design</strong> — produce structure charts / data flow diagrams / algorithm design</li>
+          <li><strong>Coding</strong> — write the program code in a chosen programming language</li>
+          <li><strong>Testing</strong> — run the program against a test plan with normal, boundary, and erroneous data</li>
+          <li><strong>Implementation</strong> — install the system and train users</li>
+          <li><strong>Maintenance</strong> — fix bugs and adapt the system to new requirements</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Question 2 — 3 marks</div>
+      <p>Explain the difference between <strong>white-box</strong> and <strong>black-box</strong> testing. For each, give one example of when it would be used.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>White-box testing:</strong> The tester has knowledge of the internal code structure and designs tests to exercise every path through the code. Used during <em>unit testing</em> by the developer to ensure every branch is executed at least once. (1 mark)</p>
+        <p><strong>Black-box testing:</strong> The tester has no knowledge of the internal code; tests are based solely on the requirements specification — given these inputs, expect these outputs. Used during <em>acceptance testing</em> by the client to verify the system meets the agreed requirements. (1 mark)</p>
+        <p><strong>Key difference:</strong> White-box is based on code structure; black-box is based on the specification. (1 mark)</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Question 3 — 6 marks</div>
+      <p>A program reads a student's exam score (an integer from 0 to 100 inclusive). Design a <strong>test plan</strong> with appropriate test data. For each test, state the category, the input value, and the expected output.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <table class="plain-table">
+          <tr><th>Category</th><th>Input</th><th>Expected Output</th><th>Reason</th></tr>
+          <tr><td class="td-normal">Normal</td><td>55</td><td>Accepted</td><td>Typical valid score</td></tr>
+          <tr><td class="td-normal">Normal</td><td>72</td><td>Accepted</td><td>Another typical valid value</td></tr>
+          <tr><td class="td-boundary">Boundary</td><td>0</td><td>Accepted</td><td>Lower boundary</td></tr>
+          <tr><td class="td-boundary">Boundary</td><td>-1</td><td>Rejected</td><td>One below lower boundary</td></tr>
+          <tr><td class="td-boundary">Boundary</td><td>100</td><td>Accepted</td><td>Upper boundary</td></tr>
+          <tr><td class="td-boundary">Boundary</td><td>101</td><td>Rejected</td><td>One above upper boundary</td></tr>
+          <tr><td class="td-erroneous">Erroneous</td><td>"A+"</td><td>Rejected / error</td><td>Wrong data type</td></tr>
+          <tr><td class="td-erroneous">Erroneous</td><td>-50</td><td>Rejected / error</td><td>Clearly invalid negative value</td></tr>
+        </table>
+        <p style="margin-top:.5rem">Mark scheme: 1 mark per correct category (up to 3 categories), plus 1 mark each for correct boundary values, 1 mark for erroneous type test. Accept equivalent valid answers.</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Question 4 — 4 marks</div>
+      <p>A school's student records system is being replaced. Explain the difference between <strong>parallel running</strong> and <strong>direct changeover</strong>, and justify which method would be more appropriate for this system.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Direct changeover:</strong> The old system is switched off and the new system is switched on at the same time. If the new system fails, there is no fallback — this is high risk. (1 mark)</p>
+        <p><strong>Parallel running:</strong> Both old and new systems operate simultaneously. Outputs from both are compared. Once confidence in the new system is established, the old system is retired. Lower risk but more expensive due to duplicated work. (1 mark)</p>
+        <p><strong>Recommendation:</strong> Parallel running is more appropriate for a student records system because the data (student records, grades) is critical. If the new system has errors, the old system acts as a reliable fallback, preventing loss of important data. The extra cost is justified by the reduced risk. (2 marks)</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Question 5 — 3 marks</div>
+      <p>A hospital's billing software was updated to comply with new government tax regulations. Six months later, users report that a specific discount calculation produces the wrong result. A year after that, users request a new feature to generate monthly summary reports.</p>
+      <p>For each of the three situations, identify the type of maintenance being carried out.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <ol>
+          <li><strong>Complying with new tax regulations</strong> → <em>Adaptive maintenance</em> — responding to an external change in requirements (legislation). (1 mark)</li>
+          <li><strong>Fixing the discount calculation bug</strong> → <em>Corrective maintenance</em> — fixing a fault discovered after release. (1 mark)</li>
+          <li><strong>Adding monthly summary reports</strong> → <em>Perfective maintenance</em> — adding new functionality requested by users to improve the system. (1 mark)</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Question 6 — 5 marks</div>
+      <p>Complete the trace table for the following pseudocode. State the final output.</p>
+      <div class="code-block" style="margin:.5rem 0">
+        <span class="code-lang">Cambridge Pseudocode</span>
+<span class="kw">DECLARE</span> x : <span class="fn">INTEGER</span>
+<span class="kw">DECLARE</span> y : <span class="fn">INTEGER</span>
+x <span class="op">←</span> <span class="num">10</span>
+y <span class="op">←</span> <span class="num">3</span>
+<span class="kw">WHILE</span> x > y
+    x <span class="op">←</span> x - <span class="num">2</span>
+    y <span class="op">←</span> y + <span class="num">1</span>
+<span class="kw">ENDWHILE</span>
+<span class="kw">OUTPUT</span> x, <span class="str">" "</span>, y
+      </div>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <table class="plain-table">
+          <tr><th>x</th><th>y</th><th>x &gt; y?</th><th>Output</th></tr>
+          <tr><td>10</td><td>3</td><td>TRUE</td><td></td></tr>
+          <tr><td>8</td><td>4</td><td>TRUE</td><td></td></tr>
+          <tr><td>6</td><td>5</td><td>TRUE</td><td></td></tr>
+          <tr><td>4</td><td>6</td><td>FALSE — exit</td><td></td></tr>
+          <tr><td>4</td><td>6</td><td></td><td><strong>4 6</strong></td></tr>
+        </table>
+        <p>Final output: <strong>4 6</strong></p>
+      </div>
+    </div>
+
+    <h3>Revision Checklist</h3>
+    <ul class="checklist">
+      <li>Name all six stages of the SDLC and describe what happens at each</li>
+      <li>Compare waterfall and iterative models — advantages and disadvantages of each</li>
+      <li>Describe techniques used during the analysis stage</li>
+      <li>Explain what a structure chart shows and how to read one</li>
+      <li>Identify the four symbols used in data flow diagrams</li>
+      <li>Distinguish between white-box and black-box testing with examples</li>
+      <li>Explain alpha, beta, and acceptance testing and when each is used</li>
+      <li>Define normal, boundary, and erroneous test data and give examples for a given range</li>
+      <li>Complete a trace table for given pseudocode with a WHILE loop</li>
+      <li>Describe the purpose of breakpoints, step-through, and variable watches</li>
+      <li>Distinguish between syntax, runtime, and logic errors</li>
+      <li>Compare user documentation and technical documentation</li>
+      <li>Classify a maintenance scenario as corrective, adaptive, or perfective</li>
+      <li>Compare the four changeover methods and recommend one for a given context</li>
+    </ul>
+  </div>
+
+</main>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-box">
+    <h3>Contents</h3>
+    <ul class="toc-list">
+      <li><a href="#sdlc" class="active">1. SDLC</a></li>
+      <li><a href="#analysis-design">2. Analysis &amp; Design</a></li>
+      <li><a href="#testing">3. Testing Strategies</a></li>
+      <li><a href="#test-data">4. Test Data</a></li>
+      <li><a href="#debugging">5. Debugging</a></li>
+      <li><a href="#documentation">6. Documentation</a></li>
+      <li><a href="#exam-practice">📝 Exam Practice</a></li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>SDLC Stages</h3>
+    <ul style="font-size:.78rem;padding-left:0;list-style:none;color:var(--text)">
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>1</strong> Analysis</li>
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>2</strong> Design</li>
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>3</strong> Coding</li>
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>4</strong> Testing</li>
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>5</strong> Implementation</li>
+      <li style="padding:.2rem 0"><strong>6</strong> Maintenance</li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>Test Data Types</h3>
+    <ul style="font-size:.78rem;padding-left:0;list-style:none;color:var(--text)">
+      <li style="padding:.25rem 0;border-bottom:1px solid var(--border)"><span style="background:#e8f5e9;color:#1b5e20;padding:.1rem .4rem;border-radius:3px;font-weight:700">Normal</span> — valid, typical value</li>
+      <li style="padding:.25rem 0;border-bottom:1px solid var(--border)"><span style="background:#fff3e0;color:#e65100;padding:.1rem .4rem;border-radius:3px;font-weight:700">Boundary</span> — exact edge + one either side</li>
+      <li style="padding:.25rem 0"><span style="background:#fce4ec;color:#880e4f;padding:.1rem .4rem;border-radius:3px;font-weight:700">Erroneous</span> — invalid / wrong type</li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>Maintenance Types</h3>
+    <ul style="font-size:.78rem;padding-left:1.1rem;color:var(--text)">
+      <li style="margin:.3rem 0"><strong>Corrective</strong> — fix bugs post-release</li>
+      <li style="margin:.3rem 0"><strong>Adaptive</strong> — respond to external change</li>
+      <li style="margin:.3rem 0"><strong>Perfective</strong> — add/improve features</li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box" style="border-left:4px solid #1565c0">
+    <h3 style="color:#1565c0">Common Mistakes</h3>
+    <ul style="font-size:.78rem;padding-left:1.1rem;color:var(--text)">
+      <li style="margin:.3rem 0">Forgetting the value <em>one outside</em> each boundary, not just the boundary values themselves</li>
+      <li style="margin:.3rem 0">Confusing alpha (internal) and beta (external user) testing</li>
+      <li style="margin:.3rem 0">Calling adaptive maintenance "corrective" — adaptive is about external change, not bugs</li>
+      <li style="margin:.3rem 0">Writing logic errors as "syntax errors" — logic errors only appear in output, not during compilation</li>
+      <li style="margin:.3rem 0">DFDs show data flow, not control flow — no loops or decisions</li>
+    </ul>
+  </div>
+
+  <a href="topic12-programming.html" style="display:block;text-align:center;background:var(--surface2);color:var(--primary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.65rem;font-weight:700;font-size:.82rem;text-decoration:none;margin-top:.25rem">
+    ← Topic 12: Programming Concepts
+  </a>
+  <a href="index.html" style="display:block;text-align:center;background:var(--primary);color:#fff;border-radius:var(--radius-sm);padding:.75rem;font-weight:700;font-size:.875rem;text-decoration:none;margin-top:.5rem">
+    ← Back to All Topics
+  </a>
+
+</aside>
+
+</div><!-- /lesson-wrap -->
+
+<footer style="background:var(--surface);border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;font-size:.8rem;color:var(--text-muted)">
+  Cambridge International AS &amp; A Level Computer Science 9618 — Topic 13: Software Development &nbsp;|&nbsp;
+  Not affiliated with Cambridge Assessment International Education.
+</footer>
+
+<script src="script.js"></script>
+<script>
+  const sections = document.querySelectorAll('.lesson-section[id]');
+  const navLinks = document.querySelectorAll('.toc-list a, .page-nav a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+  document.querySelectorAll('.reveal-btn').forEach(btn => { btn.textContent = 'Show Answer'; });
+</script>
+</body>
+</html>

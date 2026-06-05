@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Topic 15: Further Hardware — CS 9618</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .page-nav { background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:64px; z-index:90; overflow-x:auto; }
+    .page-nav-inner { max-width:1100px; margin:0 auto; padding:0 2rem; display:flex; gap:0; }
+    .page-nav a { display:block; padding:.75rem 1.1rem; font-size:.82rem; font-weight:600; color:var(--text-muted); text-decoration:none; white-space:nowrap; border-bottom:3px solid transparent; transition:color .2s,border-color .2s; }
+    .page-nav a:hover,.page-nav a.active { color:var(--primary); border-bottom-color:var(--primary); }
+
+    .lesson-wrap { max-width:1100px; margin:0 auto; padding:2.5rem 2rem 4rem; display:grid; grid-template-columns:1fr 280px; gap:2.5rem; align-items:start; }
+    @media(max-width:900px){ .lesson-wrap{grid-template-columns:1fr} .sidebar{display:none} }
+
+    .sidebar { position:sticky; top:120px; }
+    .sidebar-box { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; margin-bottom:1rem; box-shadow:var(--shadow); }
+    .sidebar-box h3 { font-size:.85rem; font-weight:700; margin-bottom:.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; }
+    .toc-list { list-style:none; }
+    .toc-list li { padding:.2rem 0; }
+    .toc-list a { font-size:.82rem; color:var(--text-muted); text-decoration:none; display:block; padding:.25rem .5rem; border-radius:4px; transition:background .15s,color .15s; }
+    .toc-list a:hover { background:var(--surface2); color:var(--primary); }
+    .toc-list a.active { background:var(--accent-light); color:var(--primary); font-weight:600; }
+
+    .lesson-section { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:2rem 2.25rem; margin-bottom:2rem; box-shadow:var(--shadow); scroll-margin-top:130px; }
+    .lesson-section h2 { font-size:1.5rem; font-weight:800; color:var(--primary); margin-bottom:.4rem; display:flex; align-items:center; gap:.6rem; }
+    .section-num { background:var(--primary); color:#fff; width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:.9rem; font-weight:800; flex-shrink:0; }
+    .lesson-section h3 { font-size:1.1rem; font-weight:700; margin:1.75rem 0 .75rem; padding-bottom:.4rem; border-bottom:2px solid var(--border); color:var(--text); }
+    .lesson-section h4 { font-size:.95rem; font-weight:700; margin:1.25rem 0 .5rem; color:var(--primary-light); }
+    .lesson-section p { font-size:.9rem; line-height:1.75; color:var(--text); margin-bottom:.75rem; }
+    .lesson-section ul,.lesson-section ol { padding-left:1.5rem; margin-bottom:.75rem; }
+    .lesson-section li { font-size:.9rem; line-height:1.75; color:var(--text); }
+
+    /* Worked example */
+    .worked { background:linear-gradient(135deg,#fbe9e7,#fce4ec); border:1px solid #ef9a9a; border-left:5px solid #b71c1c; border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:1.25rem 1.5rem; margin:1rem 0; }
+    [data-theme="dark"] .worked { background:#1a0000; border-color:#b71c1c; }
+    .worked .worked-title { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#b71c1c; margin-bottom:.6rem; }
+    [data-theme="dark"] .worked .worked-title { color:#ef9a9a; }
+    .worked p,.worked li { font-size:.875rem; color:var(--text); }
+    .worked .step { display:flex; gap:.75rem; margin:.4rem 0; align-items:flex-start; }
+    .worked .step-num { background:#b71c1c; color:#fff; min-width:22px; height:22px; border-radius:50%; font-size:.72rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+    .worked .step-text { font-size:.875rem; line-height:1.6; }
+
+    /* Practice question */
+    .practice { background:var(--surface2); border:1px solid var(--border); border-left:5px solid #2e7d32; border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:1.25rem 1.5rem; margin:1rem 0; }
+    .practice .pq-title { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#2e7d32; margin-bottom:.6rem; }
+    .practice p,.practice li { font-size:.875rem; }
+    .practice .reveal-btn { background:#2e7d32; color:#fff; border:none; border-radius:6px; padding:.4rem 1rem; font-size:.8rem; font-weight:700; cursor:pointer; margin-top:.75rem; transition:background .2s; }
+    .practice .reveal-btn:hover { background:#1b5e20; }
+    .practice .answer-reveal { display:none; margin-top:.75rem; padding:.75rem 1rem; background:#e8f5e9; border-radius:var(--radius-sm); font-size:.875rem; }
+    [data-theme="dark"] .practice .answer-reveal { background:#1b2e1c; color:#c8e6c9; }
+    .practice .answer-reveal.open { display:block; }
+
+    /* Callouts */
+    .callout { background:var(--surface2); border-left:4px solid var(--accent); border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:.85rem 1.1rem; margin:.75rem 0; font-size:.875rem; color:var(--text); }
+    .callout.warn { border-color:#f59e0b; }
+    .callout.tip  { border-color:#22c55e; }
+    .callout.exam { border-color:#7c3aed; }
+
+    /* Key term */
+    .key-term { background:linear-gradient(transparent 60%,rgba(183,28,28,.15) 60%); font-weight:700; }
+
+    /* Objectives & breadcrumb */
+    .objectives-list { list-style:none; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:.5rem; }
+    .objectives-list li { font-size:.85rem; display:flex; align-items:flex-start; gap:.5rem; padding:.4rem 0; color:var(--text); }
+    .objectives-list li::before { content:'✦'; color:var(--accent); flex-shrink:0; }
+    .breadcrumb { display:flex; align-items:center; gap:.4rem; font-size:.82rem; color:var(--text-muted); margin-bottom:1.5rem; }
+    .breadcrumb a { color:var(--primary-light); text-decoration:none; }
+    .breadcrumb a:hover { text-decoration:underline; }
+
+    /* Checklist */
+    .checklist { list-style:none; padding:0; }
+    .checklist li { display:flex; align-items:flex-start; gap:.6rem; padding:.35rem 0; font-size:.875rem; color:var(--text); }
+    .checklist li::before { content:'☐'; color:var(--primary-light); font-size:1rem; flex-shrink:0; }
+
+    /* Comparison table */
+    .plain-table { width:100%; border-collapse:collapse; font-size:.875rem; margin:.75rem 0; }
+    .plain-table th { background:var(--primary); color:#fff; padding:.45rem .8rem; text-align:left; }
+    .plain-table td { border:1px solid var(--border); padding:.4rem .8rem; color:var(--text); vertical-align:top; }
+    .plain-table tr:nth-child(even) td { background:var(--surface2); }
+
+    /* Feature cards */
+    .feature-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:.85rem; margin:.75rem 0; }
+    .feature-card { background:var(--surface2); border:1px solid var(--border); border-top:3px solid #b71c1c; border-radius:var(--radius-sm); padding:1rem 1.1rem; }
+    .feature-card h4 { font-size:.9rem; font-weight:800; color:#b71c1c; margin-bottom:.4rem; }
+    [data-theme="dark"] .feature-card h4 { color:#ef9a9a; }
+    .feature-card p { font-size:.82rem; line-height:1.6; color:var(--text); margin:0; }
+
+    /* Pipeline diagram */
+    .pipeline { margin:.75rem 0; overflow-x:auto; }
+    .pipeline-table { border-collapse:collapse; font-size:.78rem; font-family:'Courier New',Courier,monospace; min-width:560px; }
+    .pipeline-table th { background:var(--surface2); border:1px solid var(--border); padding:.35rem .7rem; color:var(--text-muted); font-weight:700; text-align:center; }
+    .pipeline-table td { border:1px solid var(--border); padding:.35rem .7rem; text-align:center; font-weight:600; }
+    .p-fetch   { background:#e3f2fd; color:#1565c0; }
+    .p-decode  { background:#ede7f6; color:#4a148c; }
+    .p-execute { background:#e8f5e9; color:#1b5e20; }
+    .p-store   { background:#fff3e0; color:#e65100; }
+    .p-empty   { background:var(--surface2); color:var(--text-muted); }
+    [data-theme="dark"] .p-fetch   { background:#0a1929; color:#90caf9; }
+    [data-theme="dark"] .p-decode  { background:#12001f; color:#ce93d8; }
+    [data-theme="dark"] .p-execute { background:#1b2e1c; color:#c8e6c9; }
+    [data-theme="dark"] .p-store   { background:#2e1f00; color:#ffcc80; }
+
+    /* Cache pyramid */
+    .cache-pyramid { display:flex; flex-direction:column; align-items:center; gap:4px; margin:.75rem auto; max-width:400px; }
+    .cache-level { display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.82rem; border-radius:4px; color:#fff; }
+
+    /* Parallel processing diagrams */
+    .arch-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:.85rem; margin:.75rem 0; }
+    .arch-card { background:var(--surface2); border:1px solid var(--border); border-top:3px solid #b71c1c; border-radius:var(--radius-sm); padding:1rem 1.1rem; }
+    .arch-card h4 { font-size:.88rem; font-weight:800; color:#b71c1c; margin-bottom:.35rem; }
+    [data-theme="dark"] .arch-card h4 { color:#ef9a9a; }
+    .arch-card p { font-size:.8rem; line-height:1.6; color:var(--text); margin:0; }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="header-inner">
+    <a class="logo" href="index.html">
+      <div class="logo-icon">💻</div>
+      <div>
+        <div class="logo-text">CS 9618</div>
+        <div class="logo-sub">Cambridge AS &amp; A Level</div>
+      </div>
+    </a>
+    <div class="header-actions">
+      <button class="btn-icon" id="theme-btn" title="Toggle theme">🌙</button>
+    </div>
+  </div>
+</header>
+
+<!-- Section nav -->
+<nav class="page-nav" aria-label="Sections">
+  <div class="page-nav-inner">
+    <a href="#risc-cisc" class="active">1. RISC vs CISC</a>
+    <a href="#pipelining">2. Pipelining</a>
+    <a href="#parallel">3. Parallel Processing</a>
+    <a href="#cache">4. Cache Memory</a>
+    <a href="#memory-hierarchy">5. Memory Hierarchy</a>
+    <a href="#exam-practice">📝 Exam Practice</a>
+  </div>
+</nav>
+
+<div class="lesson-wrap">
+<main>
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="index.html">Home</a>
+    <span>›</span>
+    <a href="index.html#tab-al">Paper 3 — Advanced Theory</a>
+    <span>›</span>
+    <strong style="color:var(--text)">Topic 15: Further Hardware</strong>
+  </div>
+
+  <!-- Hero -->
+  <div class="lesson-section" style="background:linear-gradient(135deg,#4a0000,#b71c1c,#c62828);color:#fff;border:none">
+    <div style="display:flex;align-items:flex-start;gap:1.25rem">
+      <div style="font-size:3rem;flex-shrink:0">🖥️</div>
+      <div>
+        <div style="font-size:.75rem;font-weight:700;opacity:.7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem">Paper 3 · Topic 15 · A Level Only</div>
+        <h1 style="font-size:1.9rem;font-weight:900;margin-bottom:.5rem;color:#fff">Further Hardware</h1>
+        <p style="opacity:.85;font-size:.95rem;max-width:620px;margin-bottom:1rem;color:#fff">RISC and CISC processor architectures, instruction pipelining and hazards, parallel and multi-core processing, cache memory levels and hit rates, and the full memory hierarchy — how modern hardware achieves high performance.</p>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+          <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">Paper 3 · A Level Only</span>
+          <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">~12% of Paper 3 marks</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Learning objectives -->
+  <div class="lesson-section">
+    <h2><span class="section-num">✦</span> Learning Objectives</h2>
+    <p>By the end of this topic you should be able to:</p>
+    <ul class="objectives-list">
+      <li>Describe the key features of RISC and CISC processor architectures</li>
+      <li>Compare RISC and CISC in terms of instruction set, cycles per instruction, and design approach</li>
+      <li>Explain what pipelining is and how it improves processor throughput</li>
+      <li>Describe and give an example of a pipeline hazard (data, structural, control)</li>
+      <li>Explain how out-of-order execution and branch prediction reduce pipeline stalls</li>
+      <li>Describe multi-core, SIMD, MIMD, and GPU parallel processing architectures</li>
+      <li>Explain the purpose of cache memory and the concept of hit rate</li>
+      <li>Distinguish between L1, L2, and L3 cache in terms of size, speed, and location</li>
+      <li>Explain the principles of temporal and spatial locality of reference</li>
+      <li>Describe the full memory hierarchy from registers to secondary storage</li>
+    </ul>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 1: RISC vs CISC                -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="risc-cisc">
+    <h2><span class="section-num">1</span> RISC vs CISC Architectures</h2>
+
+    <p>Two competing design philosophies have shaped how processors are built. The debate goes back to the 1970s and continues to influence chip design today (ARM processors are RISC; x86 processors used in most PCs are CISC).</p>
+
+    <h3>CISC — Complex Instruction Set Computer</h3>
+    <p>The <span class="key-term">CISC</span> approach provides a large instruction set where individual instructions can perform complex, multi-step operations (e.g., a single instruction can fetch a value from memory, add it to a register, and store the result). The philosophy is to make the assembly programmer's life easier and reduce code size.</p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h4>Large Instruction Set</h4>
+        <p>Hundreds of different instructions, many of which are rarely used. Reduces the number of instructions a programmer needs to write.</p>
+      </div>
+      <div class="feature-card">
+        <h4>Variable Instruction Length</h4>
+        <p>Instructions can be 1 to 15 bytes long (e.g., x86). Makes decoding more complex but reduces program memory usage.</p>
+      </div>
+      <div class="feature-card">
+        <h4>Many Addressing Modes</h4>
+        <p>A single instruction can reference memory in many different ways — immediate, direct, indirect, indexed, etc.</p>
+      </div>
+      <div class="feature-card">
+        <h4>Complex Hardware</h4>
+        <p>The control unit is large and complex (often microprogrammed). Transistors are used for decoding logic rather than registers.</p>
+      </div>
+      <div class="feature-card">
+        <h4>Multiple Cycles</h4>
+        <p>Many instructions take multiple clock cycles to complete. Performance gains come from the richness of individual instructions.</p>
+      </div>
+      <div class="feature-card">
+        <h4>Examples</h4>
+        <p>Intel x86, x86-64 (used in most desktop/laptop CPUs). Backwards compatibility has kept x86 CISC even as performance grew.</p>
+      </div>
+    </div>
+
+    <h3>RISC — Reduced Instruction Set Computer</h3>
+    <p>The <span class="key-term">RISC</span> approach strips the instruction set down to a small number of simple instructions that each execute in exactly one clock cycle. The philosophy is that simpler hardware can be clocked faster and pipelined more effectively.</p>
+
+    <div class="feature-grid" style="--card-top:#1565c0">
+      <div class="feature-card" style="border-top-color:#1565c0">
+        <h4 style="color:#1565c0">Small Instruction Set</h4>
+        <p>Typically fewer than 100 instructions. Each instruction does one simple, well-defined operation.</p>
+      </div>
+      <div class="feature-card" style="border-top-color:#1565c0">
+        <h4 style="color:#1565c0">Fixed Instruction Length</h4>
+        <p>All instructions are the same number of bits (e.g., 32 bits in ARM). Makes fetch and decode stages fast and predictable.</p>
+      </div>
+      <div class="feature-card" style="border-top-color:#1565c0">
+        <h4 style="color:#1565c0">Load/Store Architecture</h4>
+        <p>Only dedicated LOAD and STORE instructions can access memory. All arithmetic is performed on values already in registers.</p>
+      </div>
+      <div class="feature-card" style="border-top-color:#1565c0">
+        <h4 style="color:#1565c0">Large Register File</h4>
+        <p>Many general-purpose registers (e.g., 32 in ARM). Reduces memory accesses — values stay in registers between operations.</p>
+      </div>
+      <div class="feature-card" style="border-top-color:#1565c0">
+        <h4 style="color:#1565c0">One Cycle per Instruction</h4>
+        <p>Designed so that each instruction completes in one clock cycle. Enables effective pipelining — the pipeline never stalls due to instruction complexity.</p>
+      </div>
+      <div class="feature-card" style="border-top-color:#1565c0">
+        <h4 style="color:#1565c0">Examples</h4>
+        <p>ARM (used in smartphones, tablets, Apple M-series chips), MIPS, RISC-V. Dominant in mobile and embedded systems.</p>
+      </div>
+    </div>
+
+    <h3>RISC vs CISC Comparison</h3>
+    <table class="plain-table">
+      <tr><th>Feature</th><th>RISC</th><th>CISC</th></tr>
+      <tr><td>Instruction set size</td><td>Small (~50–100 instructions)</td><td>Large (hundreds of instructions)</td></tr>
+      <tr><td>Instruction length</td><td>Fixed (e.g., 32 bits)</td><td>Variable (e.g., 1–15 bytes in x86)</td></tr>
+      <tr><td>Cycles per instruction</td><td>Typically 1</td><td>Typically many (1–15+)</td></tr>
+      <tr><td>Memory access</td><td>LOAD/STORE only (register-register arithmetic)</td><td>Many instructions can access memory directly</td></tr>
+      <tr><td>Number of registers</td><td>Many (e.g., 32)</td><td>Fewer (e.g., 8 in original x86)</td></tr>
+      <tr><td>Hardware complexity</td><td>Simpler — more transistors for registers/cache</td><td>Complex — large decode unit, microcode ROM</td></tr>
+      <tr><td>Code size</td><td>Larger (more instructions needed per task)</td><td>Smaller (complex instructions do more per line)</td></tr>
+      <tr><td>Pipelining</td><td>Highly efficient (fixed-length, 1-cycle instructions)</td><td>Harder (variable-length, multi-cycle instructions)</td></tr>
+      <tr><td>Power consumption</td><td>Lower — preferred in mobile/embedded</td><td>Higher — typical in high-performance desktops</td></tr>
+    </table>
+
+    <div class="callout exam">
+      <strong>Exam tip:</strong> A common question is "Explain two features of a RISC processor." Focus on: fixed-length instructions (enables fast decode), load/store architecture (all arithmetic on registers), and one clock cycle per instruction (enables efficient pipelining).
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question</div>
+      <p>A software company is designing an embedded processor for a battery-powered IoT sensor. Explain, with reasons, whether a RISC or CISC architecture would be more suitable.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>RISC</strong> is more suitable. (1 mark)</p>
+        <p>RISC processors have simpler hardware — fewer transistors needed for the control unit — which reduces power consumption, extending battery life. (1 mark)</p>
+        <p>Fixed-length instructions and a load/store architecture make RISC designs easier to pipeline efficiently, improving performance per watt. (1 mark)</p>
+        <p>The simpler design also generates less heat, which is important in a compact embedded device. (1 mark — accept any valid relevant reason)</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 2: Pipelining                  -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="pipelining">
+    <h2><span class="section-num">2</span> Pipelining</h2>
+
+    <p><span class="key-term">Pipelining</span> is a technique where the processor begins fetching the next instruction before it has finished executing the current one — similar to an assembly line in a factory. Each instruction passes through a series of stages, and different instructions occupy different stages simultaneously.</p>
+
+    <h3>The Four-Stage Pipeline</h3>
+    <p>The classic pipeline has four stages:</p>
+    <table class="plain-table">
+      <tr><th>Stage</th><th>Name</th><th>What Happens</th></tr>
+      <tr><td style="background:#e3f2fd;color:#1565c0;font-weight:700">F</td><td><strong>Fetch</strong></td><td>The instruction is fetched from memory using the Program Counter (PC); PC is incremented</td></tr>
+      <tr><td style="background:#ede7f6;color:#4a148c;font-weight:700">D</td><td><strong>Decode</strong></td><td>The control unit decodes the instruction — determines the operation and identifies the operands</td></tr>
+      <tr><td style="background:#e8f5e9;color:#1b5e20;font-weight:700">E</td><td><strong>Execute</strong></td><td>The ALU performs the operation (arithmetic, logic, comparison)</td></tr>
+      <tr><td style="background:#fff3e0;color:#e65100;font-weight:700">S</td><td><strong>Store / Write-back</strong></td><td>The result is written back to a register or memory</td></tr>
+    </table>
+
+    <h3>Pipeline Diagram</h3>
+    <p>Without pipelining, instruction 2 cannot start until instruction 1 is completely finished — only 1 instruction every 4 clock cycles. With pipelining, a new instruction enters the pipeline every cycle — throughput approaches 1 instruction per cycle.</p>
+
+    <div class="pipeline">
+      <table class="pipeline-table">
+        <tr>
+          <th>Instruction</th>
+          <th>Cycle 1</th><th>Cycle 2</th><th>Cycle 3</th><th>Cycle 4</th>
+          <th>Cycle 5</th><th>Cycle 6</th><th>Cycle 7</th>
+        </tr>
+        <tr>
+          <td style="font-weight:700;color:var(--text)">Instr 1</td>
+          <td class="p-fetch">F</td><td class="p-decode">D</td><td class="p-execute">E</td><td class="p-store">S</td>
+          <td class="p-empty">—</td><td class="p-empty">—</td><td class="p-empty">—</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;color:var(--text)">Instr 2</td>
+          <td class="p-empty">—</td><td class="p-fetch">F</td><td class="p-decode">D</td><td class="p-execute">E</td>
+          <td class="p-store">S</td><td class="p-empty">—</td><td class="p-empty">—</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;color:var(--text)">Instr 3</td>
+          <td class="p-empty">—</td><td class="p-empty">—</td><td class="p-fetch">F</td><td class="p-decode">D</td>
+          <td class="p-execute">E</td><td class="p-store">S</td><td class="p-empty">—</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;color:var(--text)">Instr 4</td>
+          <td class="p-empty">—</td><td class="p-empty">—</td><td class="p-empty">—</td><td class="p-fetch">F</td>
+          <td class="p-decode">D</td><td class="p-execute">E</td><td class="p-store">S</td>
+        </tr>
+      </table>
+    </div>
+    <p>Without pipelining: 4 instructions × 4 cycles = <strong>16 cycles</strong>. With pipelining: all 4 instructions complete by cycle 7 — just <strong>7 cycles</strong>. For long programs the throughput approaches one instruction per cycle.</p>
+
+    <h3>Pipeline Hazards</h3>
+    <p>A <span class="key-term">pipeline hazard</span> is any situation that prevents the next instruction from executing in its designated pipeline stage. Hazards cause <em>pipeline stalls</em> (also called bubbles) — wasted cycles where a stage does no useful work.</p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h4>Data Hazard</h4>
+        <p>Occurs when an instruction depends on the result of a previous instruction that has not yet finished. The second instruction must wait until the first writes its result.</p>
+        <p style="font-size:.78rem;margin-top:.5rem"><em>Example:</em> ADD R1, R2, R3 followed immediately by SUB R4, R1, R5 — SUB needs R1 but ADD hasn't written it yet.</p>
+      </div>
+      <div class="feature-card">
+        <h4>Structural Hazard</h4>
+        <p>Occurs when two instructions need the same hardware resource at the same time — for example, two instructions both trying to access memory in the same cycle (one to fetch, one to read data).</p>
+      </div>
+      <div class="feature-card">
+        <h4>Control Hazard</h4>
+        <p>Occurs after a branch instruction. The processor doesn't know which instruction to fetch next until the branch condition is evaluated. Instructions already in the pipeline may need to be discarded (flushed).</p>
+      </div>
+    </div>
+
+    <h3>Handling Hazards</h3>
+    <table class="plain-table">
+      <tr><th>Technique</th><th>Description</th><th>Hazard addressed</th></tr>
+      <tr>
+        <td><strong>Stalling (bubble insertion)</strong></td>
+        <td>The pipeline is paused — NOP (no-operation) instructions are inserted to create a gap while waiting for data</td>
+        <td>Data hazard</td>
+      </tr>
+      <tr>
+        <td><strong>Operand Forwarding (bypassing)</strong></td>
+        <td>The result of an instruction is passed directly to the next instruction's execute stage without waiting for a write-back — an extra internal data path bypasses the register file</td>
+        <td>Data hazard</td>
+      </tr>
+      <tr>
+        <td><strong>Out-of-Order Execution</strong></td>
+        <td>The processor reorders instructions so that independent instructions execute while waiting for a stalled instruction to complete</td>
+        <td>Data hazard</td>
+      </tr>
+      <tr>
+        <td><strong>Branch Prediction</strong></td>
+        <td>The processor predicts whether a branch will be taken and fetches instructions speculatively. If the prediction is wrong, the pipeline is flushed (speculative instructions are discarded)</td>
+        <td>Control hazard</td>
+      </tr>
+      <tr>
+        <td><strong>Delayed Branch</strong></td>
+        <td>The instruction immediately after a branch is always executed (delay slot). The compiler fills this slot with a useful instruction that doesn't depend on the branch outcome</td>
+        <td>Control hazard</td>
+      </tr>
+    </table>
+
+    <div class="worked">
+      <div class="worked-title">Worked Example — Identifying a Data Hazard</div>
+      <p>Consider these two instructions:</p>
+      <div style="font-family:'Courier New',Courier,monospace;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:.75rem 1rem;font-size:.88rem;margin:.5rem 0">
+        Instruction 1: &nbsp;ADD R1, R2, R3 &nbsp;&nbsp;&nbsp;// R1 ← R2 + R3<br>
+        Instruction 2: &nbsp;MUL R4, R1, R5 &nbsp;&nbsp;&nbsp;// R4 ← R1 × R5
+      </div>
+      <p>In a 4-stage pipeline, Instruction 1 writes R1 in cycle 4 (store stage). But Instruction 2 needs R1 in cycle 3 (execute stage, one cycle after Instruction 1 was fetched). This is a <strong>data hazard (RAW — Read After Write)</strong>.</p>
+      <p><strong>Resolution using stalling:</strong> Insert 1 NOP bubble between the two instructions, delaying Instruction 2 by one cycle so it reads R1 after it has been written.</p>
+      <p><strong>Resolution using forwarding:</strong> Route the ALU output of Instruction 1 directly to the ALU input of Instruction 2 in the same cycle — no stall needed.</p>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question</div>
+      <p>Explain what a <strong>control hazard</strong> is, and describe how <strong>branch prediction</strong> reduces its impact.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Control hazard:</strong> When the processor encounters a conditional branch instruction, it does not know which instruction to fetch next until the branch condition has been evaluated in the execute stage. Instructions already fetched into the pipeline may be wrong — they must be flushed (discarded), wasting cycles. (2 marks)</p>
+        <p><strong>Branch prediction:</strong> The processor predicts whether the branch will be taken (based on past behaviour or static rules) and continues fetching instructions along the predicted path speculatively. If the prediction is correct, no cycles are wasted. If incorrect, the speculatively fetched instructions are flushed and the correct instructions are fetched — this still costs cycles, but far less often than if prediction were not used. (2 marks)</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 3: Parallel Processing         -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="parallel">
+    <h2><span class="section-num">3</span> Parallel Processing</h2>
+
+    <p>Pipelining achieves <em>instruction-level</em> parallelism within a single core. <span class="key-term">Parallel processing</span> extends this idea by using multiple processing units to execute instructions or data operations simultaneously, dramatically increasing throughput for suitable workloads.</p>
+
+    <h3>Flynn's Taxonomy</h3>
+    <p>Flynn's taxonomy classifies computer architectures by the number of instruction streams and data streams they handle simultaneously:</p>
+
+    <div class="arch-grid">
+      <div class="arch-card">
+        <h4>SISD — Single Instruction, Single Data</h4>
+        <p>The classic von Neumann model. One processor executes one instruction on one piece of data at a time. No parallelism.</p>
+        <p style="font-size:.78rem;margin-top:.4rem"><em>Example:</em> A simple 8-bit microcontroller.</p>
+      </div>
+      <div class="arch-card">
+        <h4>SIMD — Single Instruction, Multiple Data</h4>
+        <p>One instruction is broadcast to multiple processing units, each applying it to a different piece of data simultaneously. Ideal when the same operation is applied to large datasets.</p>
+        <p style="font-size:.78rem;margin-top:.4rem"><em>Example:</em> Adding 8 pairs of numbers in one cycle using vector/SSE registers. Used in graphics, scientific simulations, machine learning.</p>
+      </div>
+      <div class="arch-card">
+        <h4>MISD — Multiple Instruction, Single Data</h4>
+        <p>Multiple processors each execute different instructions on the same data. Rare in practice — used mainly in fault-tolerant systems where the same data is processed redundantly.</p>
+        <p style="font-size:.78rem;margin-top:.4rem"><em>Example:</em> Redundant flight control computers.</p>
+      </div>
+      <div class="arch-card">
+        <h4>MIMD — Multiple Instruction, Multiple Data</h4>
+        <p>Multiple processors each execute different instruction streams on different data simultaneously. The most general and widely used parallel model.</p>
+        <p style="font-size:.78rem;margin-top:.4rem"><em>Example:</em> Multi-core CPUs, server clusters, distributed computing systems.</p>
+      </div>
+    </div>
+
+    <h3>Multi-Core Processors</h3>
+    <p>A <span class="key-term">multi-core processor</span> integrates two or more independent processor cores onto a single chip. Each core has its own pipeline, registers, and typically its own L1/L2 cache. The cores share L3 cache and main memory.</p>
+
+    <table class="plain-table">
+      <tr><th>Advantage</th><th>Limitation</th></tr>
+      <tr><td>Multiple tasks can run truly in parallel — improved throughput and responsiveness</td><td>Not all software is written to exploit multiple cores (serial code gets no speedup)</td></tr>
+      <tr><td>Better performance per watt than a single very fast core</td><td>Sharing memory and cache can create bottlenecks (memory bandwidth)</td></tr>
+      <tr><td>One core can handle OS tasks while others run applications</td><td>Synchronisation between cores (avoiding race conditions) is complex to program</td></tr>
+    </table>
+
+    <h3>GPU Parallel Processing</h3>
+    <p>A <span class="key-term">GPU (Graphics Processing Unit)</span> contains thousands of small, simpler cores designed for SIMD-style parallelism. While a CPU has 4–32 powerful cores optimised for sequential tasks, a GPU has thousands of smaller cores optimised for simultaneously processing many identical operations — originally for rendering pixels, now widely used for AI and scientific computing.</p>
+    <table class="plain-table">
+      <tr><th></th><th>CPU</th><th>GPU</th></tr>
+      <tr><td><strong>Core count</strong></td><td>4–32 powerful cores</td><td>Thousands of simpler cores (e.g., 4096 CUDA cores)</td></tr>
+      <tr><td><strong>Best for</strong></td><td>Sequential, complex, branchy tasks</td><td>Highly parallel, data-parallel tasks</td></tr>
+      <tr><td><strong>Use cases</strong></td><td>OS, applications, databases</td><td>Graphics, AI training, scientific simulation</td></tr>
+    </table>
+
+    <h3>Amdahl's Law</h3>
+    <p><span class="key-term">Amdahl's Law</span> states that the speedup from parallelisation is limited by the fraction of the program that must remain sequential. Even with an infinite number of processors, the maximum speedup is bounded by:</p>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.5rem;text-align:center;font-size:1rem;margin:.75rem 0;font-family:'Courier New',Courier,monospace">
+      Max speedup = 1 / (1 − P)
+    </div>
+    <p>where <em>P</em> is the fraction of the program that can be parallelised. If 90% of code can be parallelised (P = 0.9), the maximum speedup is 1/(1−0.9) = <strong>10×</strong>, regardless of how many processors are added.</p>
+
+    <div class="callout tip">
+      <strong>Key implication:</strong> Adding more cores gives diminishing returns. Doubling cores from 2 to 4 gives a bigger speedup than doubling from 100 to 200. The serial portion of code ultimately dominates performance.
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question</div>
+      <p>Explain, using Flynn's taxonomy, why SIMD processing is well-suited to rendering a 3D scene in a video game.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p>SIMD (Single Instruction, Multiple Data) applies the same instruction to multiple data items simultaneously. (1 mark)</p>
+        <p>When rendering a 3D scene, the same transformation operations (e.g., applying a rotation matrix, computing lighting) must be applied independently to thousands or millions of pixels/vertices simultaneously. (1 mark)</p>
+        <p>SIMD allows one instruction (e.g., "multiply by this matrix") to be broadcast to many GPU cores, each processing a different pixel at the same time. This is far faster than applying the operation sequentially to each pixel. (1 mark)</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 4: Cache Memory                -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="cache">
+    <h2><span class="section-num">4</span> Cache Memory</h2>
+
+    <p><span class="key-term">Cache memory</span> is a small, very fast memory built close to (or directly on) the processor chip. It stores copies of the most recently or most frequently used instructions and data from main memory (RAM). Its purpose is to bridge the speed gap between the fast CPU and the comparatively slow RAM.</p>
+
+    <h3>Why Cache is Needed</h3>
+    <p>Modern CPUs can execute billions of instructions per second. Main memory (DRAM) has a latency of 50–100 nanoseconds — the CPU would spend most of its time waiting for data if it fetched everything from RAM. Cache memory (SRAM) has latency of 1–10 nanoseconds and can supply data fast enough to keep the CPU busy.</p>
+
+    <h3>Cache Levels</h3>
+    <p>Cache is organised into levels. Smaller and faster caches are closer to the processor core; larger and slower caches are further away:</p>
+
+    <div class="cache-pyramid">
+      <div class="cache-level" style="background:#b71c1c;width:140px;padding:.5rem">L1 Cache</div>
+      <div class="cache-level" style="background:#c62828;width:200px;padding:.45rem">L2 Cache</div>
+      <div class="cache-level" style="background:#d32f2f;width:260px;padding:.4rem">L3 Cache</div>
+      <div class="cache-level" style="background:#546e7a;width:320px;padding:.4rem">Main Memory (RAM)</div>
+      <div class="cache-level" style="background:#37474f;width:380px;padding:.4rem">Secondary Storage (SSD/HDD)</div>
+    </div>
+
+    <table class="plain-table">
+      <tr><th>Level</th><th>Location</th><th>Typical Size</th><th>Typical Latency</th><th>Shared?</th></tr>
+      <tr>
+        <td><strong>L1</strong></td>
+        <td>On-core (each core has its own)</td>
+        <td>16–64 KB per core</td>
+        <td>~1–4 cycles (1 ns)</td>
+        <td>No — private to each core</td>
+      </tr>
+      <tr>
+        <td><strong>L2</strong></td>
+        <td>On-core or very close to core</td>
+        <td>128 KB – 2 MB per core</td>
+        <td>~10–20 cycles (5–10 ns)</td>
+        <td>Usually private to each core</td>
+      </tr>
+      <tr>
+        <td><strong>L3</strong></td>
+        <td>On-chip, outside individual cores</td>
+        <td>4–64 MB (shared)</td>
+        <td>~30–50 cycles (15–30 ns)</td>
+        <td>Yes — shared across all cores</td>
+      </tr>
+      <tr>
+        <td><strong>RAM</strong></td>
+        <td>On motherboard</td>
+        <td>4 GB – 128 GB</td>
+        <td>~100–200 cycles (50–100 ns)</td>
+        <td>Shared by all cores</td>
+      </tr>
+    </table>
+
+    <h3>Cache Hit and Miss</h3>
+    <p>When the CPU requests data, it first checks the cache:</p>
+    <ul>
+      <li><span class="key-term">Cache hit</span> — the requested data is in the cache. The CPU receives it quickly.</li>
+      <li><span class="key-term">Cache miss</span> — the data is not in the cache. It must be fetched from a lower (slower) level, causing a delay (stall).</li>
+    </ul>
+
+    <p>The <span class="key-term">hit rate</span> is the proportion of memory accesses that are served from the cache:</p>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.85rem 1.25rem;text-align:center;font-size:.95rem;margin:.75rem 0;font-family:'Courier New',Courier,monospace">
+      Hit rate = (Number of cache hits) ÷ (Total memory accesses)
+    </div>
+
+    <div class="worked">
+      <div class="worked-title">Worked Example — Hit Rate Calculation</div>
+      <p>A program makes 10,000 memory accesses. 9,200 are served from cache; 800 require a fetch from RAM. Calculate the hit rate.</p>
+      <p>Hit rate = 9,200 ÷ 10,000 = <strong>0.92 (92%)</strong></p>
+      <p>A hit rate of 92% means the CPU avoids going to the slow RAM for 92% of accesses — a significant performance benefit.</p>
+    </div>
+
+    <h3>Locality of Reference</h3>
+    <p>Cache works because programs tend to access the <em>same</em> memory locations repeatedly — a property called <span class="key-term">locality of reference</span>. There are two types:</p>
+
+    <table class="plain-table">
+      <tr><th>Type</th><th>Definition</th><th>Why it helps cache</th><th>Example</th></tr>
+      <tr>
+        <td><strong>Temporal locality</strong></td>
+        <td>A recently accessed memory location is likely to be accessed again soon</td>
+        <td>Keeping recently used data in cache pays off — it will probably be needed again</td>
+        <td>A loop variable is accessed on every iteration</td>
+      </tr>
+      <tr>
+        <td><strong>Spatial locality</strong></td>
+        <td>If one memory location is accessed, nearby locations are likely to be accessed soon</td>
+        <td>Cache loads a whole <em>cache line</em> (e.g., 64 bytes) at once — nearby data is brought in proactively</td>
+        <td>Iterating through an array accesses consecutive addresses</td>
+      </tr>
+    </table>
+
+    <h3>Cache Replacement Policies</h3>
+    <p>When the cache is full and a new block must be loaded, an existing entry must be evicted. Common policies include:</p>
+    <ul>
+      <li><strong>LRU (Least Recently Used)</strong> — evict the block that has not been accessed for the longest time. Exploits temporal locality. Most commonly used.</li>
+      <li><strong>FIFO (First In, First Out)</strong> — evict the block that has been in the cache the longest, regardless of access recency.</li>
+      <li><strong>Random replacement</strong> — evict a randomly chosen block. Simple to implement; performance close to LRU in practice.</li>
+    </ul>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question</div>
+      <p>Explain why iterating through a large array in sequential order results in a higher cache hit rate than accessing array elements in a random order.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p>When the first element of the array is accessed, the cache loads not just that element but the entire <strong>cache line</strong> containing it (typically 64 bytes = 8–16 integers). The following elements in the array are in adjacent memory locations — they are already in the cache when they are needed. This is <strong>spatial locality of reference</strong>. (2 marks)</p>
+        <p>In contrast, random access jumps to arbitrary locations. Each access is likely to be a <strong>cache miss</strong> because the data at that address was not recently used and the cache line loaded for the previous access does not contain the next element. The CPU must fetch from RAM each time, resulting in many slow cache misses. (2 marks)</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 5: Memory Hierarchy            -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="memory-hierarchy">
+    <h2><span class="section-num">5</span> Memory Hierarchy</h2>
+
+    <p>No single memory technology is simultaneously fast, large, and cheap. The <span class="key-term">memory hierarchy</span> organises different storage technologies into a pyramid — the fastest and most expensive storage is at the top (small capacity, close to the CPU), and the slowest and cheapest is at the bottom (large capacity, far from the CPU).</p>
+
+    <table class="plain-table">
+      <tr><th>Level</th><th>Technology</th><th>Speed</th><th>Capacity</th><th>Cost/GB</th><th>Volatile?</th></tr>
+      <tr>
+        <td><strong>Registers</strong></td>
+        <td>Flip-flops inside CPU</td>
+        <td>Fastest (~0.25 ns)</td>
+        <td>Bytes (e.g., 32 × 64-bit)</td>
+        <td>Extremely high</td>
+        <td>Yes</td>
+      </tr>
+      <tr>
+        <td><strong>L1 Cache</strong></td>
+        <td>SRAM on-core</td>
+        <td>~1 ns</td>
+        <td>16–64 KB</td>
+        <td>Very high</td>
+        <td>Yes</td>
+      </tr>
+      <tr>
+        <td><strong>L2 Cache</strong></td>
+        <td>SRAM on-chip</td>
+        <td>~5 ns</td>
+        <td>128 KB – 2 MB</td>
+        <td>High</td>
+        <td>Yes</td>
+      </tr>
+      <tr>
+        <td><strong>L3 Cache</strong></td>
+        <td>SRAM on-chip (shared)</td>
+        <td>~15–30 ns</td>
+        <td>4–64 MB</td>
+        <td>High</td>
+        <td>Yes</td>
+      </tr>
+      <tr>
+        <td><strong>Main Memory (RAM)</strong></td>
+        <td>DRAM on motherboard</td>
+        <td>~50–100 ns</td>
+        <td>4 GB – 128 GB</td>
+        <td>Moderate</td>
+        <td>Yes</td>
+      </tr>
+      <tr>
+        <td><strong>SSD</strong></td>
+        <td>Flash memory</td>
+        <td>~50–200 µs</td>
+        <td>256 GB – 4 TB</td>
+        <td>Low</td>
+        <td>No</td>
+      </tr>
+      <tr>
+        <td><strong>HDD</strong></td>
+        <td>Magnetic rotating disk</td>
+        <td>~5–10 ms</td>
+        <td>500 GB – 20 TB</td>
+        <td>Very low</td>
+        <td>No</td>
+      </tr>
+    </table>
+
+    <h3>Key Trade-offs</h3>
+    <ul>
+      <li><strong>Speed vs capacity:</strong> Faster memory has lower capacity. Registers are fastest but hold only a handful of values; an HDD is slowest but holds terabytes.</li>
+      <li><strong>Speed vs cost:</strong> SRAM (cache) is far more expensive per bit than DRAM (RAM). Providing terabytes of cache would be prohibitively expensive.</li>
+      <li><strong>Volatile vs non-volatile:</strong> All memories above secondary storage are volatile — their contents are lost when power is removed. SSDs and HDDs retain data without power.</li>
+    </ul>
+
+    <h3>Virtual Memory</h3>
+    <p><span class="key-term">Virtual memory</span> extends the apparent size of RAM by using a portion of secondary storage (the swap file or page file) as if it were additional RAM. When RAM is full, the operating system moves <em>pages</em> (fixed-size blocks) of data that have not been used recently from RAM to disk.</p>
+    <ul>
+      <li><strong>Benefit:</strong> Programs can use more memory than is physically installed.</li>
+      <li><strong>Cost:</strong> Accessing the swap file on disk is thousands of times slower than accessing RAM — called a <em>page fault</em>. Excessive swapping (<em>thrashing</em>) causes severe slowdowns.</li>
+    </ul>
+
+    <div class="callout exam">
+      <strong>Exam tip:</strong> If asked "why does a computer with virtual memory run slowly when many programs are open," the answer is <em>thrashing</em> — the OS spends more time swapping pages between RAM and disk than executing instructions. Each page fault is a slow disk access.
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question</div>
+      <p>Explain why it is not practical to build a computer that uses only register-speed memory for all storage, and describe how the memory hierarchy addresses this problem.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Why not all register-speed:</strong> SRAM (the technology used for registers and cache) is extremely expensive and physically large. Providing even 1 GB of register-speed memory would be prohibitively costly and would not fit on a chip. (1 mark)</p>
+        <p><strong>How the hierarchy helps:</strong> The hierarchy places a small amount of very fast, expensive memory (registers, cache) close to the CPU, and uses progressively larger but slower and cheaper technologies for the levels below. (1 mark)</p>
+        <p>Cache exploits locality of reference — it automatically stores the most recently/frequently used data, so the CPU accesses fast cache most of the time and only accesses slow RAM on a cache miss. This gives performance close to cache speed at the cost of RAM. (1 mark)</p>
+        <p>The hierarchy as a whole provides the illusion of large, fast, cheap memory by ensuring that active data migrates to the higher levels automatically. (1 mark)</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 6: Exam Practice               -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="exam-practice">
+    <h2><span class="section-num">📝</span> Exam Practice</h2>
+
+    <div class="practice">
+      <div class="pq-title">Question 1 — 6 marks</div>
+      <p>Compare RISC and CISC processor architectures. Your answer should refer to instruction set, instruction length, number of registers, and suitability for pipelining.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Instruction set:</strong> RISC has a small, simple instruction set (typically &lt;100 instructions); CISC has a large, complex set (hundreds of instructions, including complex multi-step operations). (1 mark)</p>
+        <p><strong>Instruction length:</strong> RISC uses fixed-length instructions (e.g., all 32 bits); CISC uses variable-length instructions (e.g., 1–15 bytes in x86). Fixed length makes fetch and decode faster. (1 mark)</p>
+        <p><strong>Registers:</strong> RISC has many general-purpose registers (e.g., 32), reducing memory accesses; CISC has fewer registers (e.g., 8 in original x86). (1 mark)</p>
+        <p><strong>Pipelining:</strong> RISC is better suited — each instruction takes one cycle and is the same length, so the pipeline stages are always the same duration and no stalls occur due to instruction complexity. CISC instructions take variable numbers of cycles, making pipeline stages uneven and harder to implement. (2 marks)</p>
+        <p><strong>Memory access:</strong> RISC uses a load/store model — only LOAD/STORE access memory; CISC allows any instruction to access memory directly. (1 mark)</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Question 2 — 4 marks</div>
+      <p>The following two instructions are executed in a pipelined processor:</p>
+      <div style="font-family:'Courier New',Courier,monospace;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:.75rem 1rem;font-size:.88rem;margin:.5rem 0">
+        Instruction 1: &nbsp;ADD R3, R1, R2 &nbsp;&nbsp;&nbsp;// R3 ← R1 + R2<br>
+        Instruction 2: &nbsp;SUB R5, R3, R4 &nbsp;&nbsp;&nbsp;// R5 ← R3 − R4
+      </div>
+      <p>(a) Identify the type of hazard that occurs. (1 mark)</p>
+      <p>(b) Describe two techniques the processor could use to resolve this hazard. (3 marks)</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>(a)</strong> Data hazard (RAW — Read After Write). Instruction 2 reads R3 before Instruction 1 has written the result of the ADD to R3. (1 mark)</p>
+        <p><strong>(b)</strong> Any two of:</p>
+        <ul>
+          <li><strong>Stalling (bubble insertion):</strong> A NOP instruction is inserted between the two instructions, pausing Instruction 2 by one cycle until R3 has been written. (1 mark) This wastes a pipeline cycle but ensures correctness. (1 mark)</li>
+          <li><strong>Operand forwarding (bypassing):</strong> The result from the ALU output of Instruction 1 is routed directly to the ALU input of Instruction 2 without waiting for a write-back to the register file. (1 mark) No pipeline stall is needed. (1 mark)</li>
+          <li><strong>Out-of-order execution:</strong> An independent instruction that does not depend on R3 is moved between Instructions 1 and 2, allowing Instruction 1 time to write R3 while useful work is done. (1 mark)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Question 3 — 4 marks</div>
+      <p>A processor has an L1 cache, an L2 cache, and main memory (RAM). Describe what happens when the processor needs to read a value and it is not in either cache level. Include in your answer what happens to the cache after the value is retrieved.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p>The processor first checks L1 cache — the data is not there (L1 miss). (1 mark)</p>
+        <p>It then checks L2 cache — the data is also not there (L2 miss). (1 mark)</p>
+        <p>The processor sends a request to main memory (RAM). This causes a pipeline stall while waiting for RAM to respond (RAM is much slower — typically 50–100 ns vs ~1 ns for L1). (1 mark)</p>
+        <p>When the data arrives from RAM, it is written into both the L1 and L2 caches (as a cache line — a block of adjacent memory). The requested value is forwarded to the processor. Future accesses to the same or nearby locations will now find the data in cache (a hit), exploiting spatial and temporal locality. (1 mark)</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Question 4 — 3 marks</div>
+      <p>A processor executes 50,000 memory accesses. The L1 cache has a hit rate of 85%. Accesses that miss L1 are served by L2, which has a hit rate of 90% for those remaining accesses. The rest go to RAM.</p>
+      <p>Calculate: (a) the number of L1 hits, (b) the number of L2 hits, (c) the number of RAM accesses.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>(a) L1 hits:</strong> 50,000 × 0.85 = <strong>42,500</strong> (1 mark)</p>
+        <p><strong>L1 misses:</strong> 50,000 − 42,500 = 7,500</p>
+        <p><strong>(b) L2 hits:</strong> 7,500 × 0.90 = <strong>6,750</strong> (1 mark)</p>
+        <p><strong>(c) RAM accesses:</strong> 7,500 − 6,750 = <strong>750</strong> (1 mark)</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Question 5 — 4 marks</div>
+      <p>Explain, using Flynn's taxonomy, the difference between SIMD and MIMD processing. Give one example of a use case for each.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>SIMD (Single Instruction, Multiple Data):</strong> One instruction stream is applied simultaneously to multiple data items. All processing units execute the same operation on different pieces of data at the same time. (1 mark) <em>Example:</em> Applying a brightness filter to every pixel in an image simultaneously using a GPU. (1 mark)</p>
+        <p><strong>MIMD (Multiple Instruction, Multiple Data):</strong> Multiple independent processors each execute their own instruction stream on their own data simultaneously. Each core operates independently. (1 mark) <em>Example:</em> A quad-core CPU where core 1 runs a browser, core 2 runs a video encoder, core 3 runs an antivirus scan, and core 4 handles OS tasks — all at the same time. (1 mark)</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Question 6 — 3 marks</div>
+      <p>Explain what is meant by <strong>thrashing</strong> in the context of virtual memory, and describe one consequence for the user.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p>Thrashing occurs when the computer is running more processes than its physical RAM can comfortably hold. (1 mark)</p>
+        <p>The operating system constantly swaps pages between RAM and the swap file on disk (page fault after page fault), spending more time moving data than executing program instructions. (1 mark)</p>
+        <p><strong>Consequence:</strong> The computer becomes extremely slow and unresponsive — the user experiences severe lag or the system appears almost frozen, because disk access (SSD/HDD) is thousands of times slower than RAM access. (1 mark)</p>
+      </div>
+    </div>
+
+    <h3>Revision Checklist</h3>
+    <ul class="checklist">
+      <li>State four distinguishing features of RISC vs CISC architectures</li>
+      <li>Explain why RISC is better suited to pipelining than CISC</li>
+      <li>Draw or interpret a pipeline diagram for 4 instructions over 7 cycles</li>
+      <li>Define and give an example of a data hazard, structural hazard, and control hazard</li>
+      <li>Describe how operand forwarding resolves a data hazard without stalling</li>
+      <li>Describe how branch prediction reduces the impact of control hazards</li>
+      <li>Classify a processing scenario using Flynn's taxonomy (SISD/SIMD/MISD/MIMD)</li>
+      <li>Compare CPU and GPU parallelism — core count, task type, use cases</li>
+      <li>State the trade-off described by Amdahl's Law</li>
+      <li>Describe L1, L2, and L3 cache — size, speed, and sharing between cores</li>
+      <li>Calculate cache hit rate given numbers of hits and total accesses</li>
+      <li>Explain temporal and spatial locality of reference with examples</li>
+      <li>Describe the memory hierarchy from registers to secondary storage</li>
+      <li>Explain virtual memory, page faults, and thrashing</li>
+    </ul>
+  </div>
+
+</main>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-box">
+    <h3>Contents</h3>
+    <ul class="toc-list">
+      <li><a href="#risc-cisc" class="active">1. RISC vs CISC</a></li>
+      <li><a href="#pipelining">2. Pipelining</a></li>
+      <li><a href="#parallel">3. Parallel Processing</a></li>
+      <li><a href="#cache">4. Cache Memory</a></li>
+      <li><a href="#memory-hierarchy">5. Memory Hierarchy</a></li>
+      <li><a href="#exam-practice">📝 Exam Practice</a></li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>RISC vs CISC</h3>
+    <ul style="font-size:.78rem;padding-left:0;list-style:none;color:var(--text)">
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>RISC:</strong> fixed length, load/store, many regs, 1 cycle/instr</li>
+      <li style="padding:.2rem 0"><strong>CISC:</strong> variable length, complex ops, fewer regs, multi-cycle</li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>Pipeline Stages</h3>
+    <ul style="font-size:.78rem;padding-left:0;list-style:none;color:var(--text);font-family:'Courier New',Courier,monospace">
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><span style="background:#e3f2fd;color:#1565c0;padding:.1rem .35rem;border-radius:3px;font-weight:700">F</span> Fetch</li>
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><span style="background:#ede7f6;color:#4a148c;padding:.1rem .35rem;border-radius:3px;font-weight:700">D</span> Decode</li>
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><span style="background:#e8f5e9;color:#1b5e20;padding:.1rem .35rem;border-radius:3px;font-weight:700">E</span> Execute</li>
+      <li style="padding:.2rem 0"><span style="background:#fff3e0;color:#e65100;padding:.1rem .35rem;border-radius:3px;font-weight:700">S</span> Store</li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>Flynn's Taxonomy</h3>
+    <ul style="font-size:.78rem;padding-left:0;list-style:none;color:var(--text)">
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>SISD</strong> — 1 instr, 1 data</li>
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>SIMD</strong> — 1 instr, many data</li>
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>MISD</strong> — many instr, 1 data</li>
+      <li style="padding:.2rem 0"><strong>MIMD</strong> — many instr, many data</li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>Cache Quick Ref</h3>
+    <ul style="font-size:.78rem;padding-left:0;list-style:none;color:var(--text)">
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>L1</strong> — fastest, 16–64 KB, per core</li>
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>L2</strong> — ~5 ns, 128 KB–2 MB, per core</li>
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>L3</strong> — ~20 ns, 4–64 MB, shared</li>
+      <li style="padding:.2rem 0">Hit rate = hits ÷ total accesses</li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box" style="border-left:4px solid #b71c1c">
+    <h3 style="color:#b71c1c">Common Mistakes</h3>
+    <ul style="font-size:.78rem;padding-left:1.1rem;color:var(--text)">
+      <li style="margin:.3rem 0">RISC means fewer instructions, not a slower processor — fewer, simpler instructions enable faster clocks</li>
+      <li style="margin:.3rem 0">A pipeline hazard slows throughput but does not mean the pipeline is broken — it inserts a stall (bubble)</li>
+      <li style="margin:.3rem 0">Cache miss costs depend on which level misses — an L1 miss that hits L2 is much cheaper than a full RAM fetch</li>
+      <li style="margin:.3rem 0">Virtual memory is not RAM — it uses disk, which is thousands of times slower</li>
+      <li style="margin:.3rem 0">Amdahl's Law: adding more cores only helps the parallel fraction — the serial fraction is the bottleneck</li>
+    </ul>
+  </div>
+
+  <a href="topic14-further-data-representation.html" style="display:block;text-align:center;background:var(--surface2);color:var(--primary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.65rem;font-weight:700;font-size:.82rem;text-decoration:none;margin-top:.25rem">
+    ← Topic 14: Further Data Representation
+  </a>
+  <a href="index.html" style="display:block;text-align:center;background:var(--primary);color:#fff;border-radius:var(--radius-sm);padding:.75rem;font-weight:700;font-size:.875rem;text-decoration:none;margin-top:.5rem">
+    ← Back to All Topics
+  </a>
+
+</aside>
+
+</div><!-- /lesson-wrap -->
+
+<footer style="background:var(--surface);border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;font-size:.8rem;color:var(--text-muted)">
+  Cambridge International AS &amp; A Level Computer Science 9618 — Topic 15: Further Hardware &nbsp;|&nbsp;
+  Not affiliated with Cambridge Assessment International Education.
+</footer>
+
+<script src="script.js"></script>
+<script>
+  const sections = document.querySelectorAll('.lesson-section[id]');
+  const navLinks = document.querySelectorAll('.toc-list a, .page-nav a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+  document.querySelectorAll('.reveal-btn').forEach(btn => { btn.textContent = 'Show Answer'; });
+</script>
+</body>
+</html>

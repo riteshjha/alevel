@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Topic 14: Further Data Representation — CS 9618</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .page-nav { background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:64px; z-index:90; overflow-x:auto; }
+    .page-nav-inner { max-width:1100px; margin:0 auto; padding:0 2rem; display:flex; gap:0; }
+    .page-nav a { display:block; padding:.75rem 1.1rem; font-size:.82rem; font-weight:600; color:var(--text-muted); text-decoration:none; white-space:nowrap; border-bottom:3px solid transparent; transition:color .2s,border-color .2s; }
+    .page-nav a:hover,.page-nav a.active { color:var(--primary); border-bottom-color:var(--primary); }
+
+    .lesson-wrap { max-width:1100px; margin:0 auto; padding:2.5rem 2rem 4rem; display:grid; grid-template-columns:1fr 280px; gap:2.5rem; align-items:start; }
+    @media(max-width:900px){ .lesson-wrap{grid-template-columns:1fr} .sidebar{display:none} }
+
+    .sidebar { position:sticky; top:120px; }
+    .sidebar-box { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; margin-bottom:1rem; box-shadow:var(--shadow); }
+    .sidebar-box h3 { font-size:.85rem; font-weight:700; margin-bottom:.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; }
+    .toc-list { list-style:none; }
+    .toc-list li { padding:.2rem 0; }
+    .toc-list a { font-size:.82rem; color:var(--text-muted); text-decoration:none; display:block; padding:.25rem .5rem; border-radius:4px; transition:background .15s,color .15s; }
+    .toc-list a:hover { background:var(--surface2); color:var(--primary); }
+    .toc-list a.active { background:var(--accent-light); color:var(--primary); font-weight:600; }
+
+    .lesson-section { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:2rem 2.25rem; margin-bottom:2rem; box-shadow:var(--shadow); scroll-margin-top:130px; }
+    .lesson-section h2 { font-size:1.5rem; font-weight:800; color:var(--primary); margin-bottom:.4rem; display:flex; align-items:center; gap:.6rem; }
+    .section-num { background:var(--primary); color:#fff; width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:.9rem; font-weight:800; flex-shrink:0; }
+    .lesson-section h3 { font-size:1.1rem; font-weight:700; margin:1.75rem 0 .75rem; padding-bottom:.4rem; border-bottom:2px solid var(--border); color:var(--text); }
+    .lesson-section h4 { font-size:.95rem; font-weight:700; margin:1.25rem 0 .5rem; color:var(--primary-light); }
+    .lesson-section p { font-size:.9rem; line-height:1.75; color:var(--text); margin-bottom:.75rem; }
+    .lesson-section ul,.lesson-section ol { padding-left:1.5rem; margin-bottom:.75rem; }
+    .lesson-section li { font-size:.9rem; line-height:1.75; color:var(--text); }
+
+    /* Worked example */
+    .worked { background:linear-gradient(135deg,#ede7f6,#e8eaf6); border:1px solid #b39ddb; border-left:5px solid #6a1b9a; border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:1.25rem 1.5rem; margin:1rem 0; }
+    [data-theme="dark"] .worked { background:#12001f; border-color:#6a1b9a; }
+    .worked .worked-title { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#6a1b9a; margin-bottom:.6rem; }
+    [data-theme="dark"] .worked .worked-title { color:#ce93d8; }
+    .worked p,.worked li { font-size:.875rem; color:var(--text); }
+    .worked .step { display:flex; gap:.75rem; margin:.4rem 0; align-items:flex-start; }
+    .worked .step-num { background:#6a1b9a; color:#fff; min-width:22px; height:22px; border-radius:50%; font-size:.72rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+    .worked .step-text { font-size:.875rem; line-height:1.6; }
+
+    /* Practice question */
+    .practice { background:var(--surface2); border:1px solid var(--border); border-left:5px solid #2e7d32; border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:1.25rem 1.5rem; margin:1rem 0; }
+    .practice .pq-title { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#2e7d32; margin-bottom:.6rem; }
+    .practice p,.practice li { font-size:.875rem; }
+    .practice .reveal-btn { background:#2e7d32; color:#fff; border:none; border-radius:6px; padding:.4rem 1rem; font-size:.8rem; font-weight:700; cursor:pointer; margin-top:.75rem; transition:background .2s; }
+    .practice .reveal-btn:hover { background:#1b5e20; }
+    .practice .answer-reveal { display:none; margin-top:.75rem; padding:.75rem 1rem; background:#e8f5e9; border-radius:var(--radius-sm); font-size:.875rem; }
+    [data-theme="dark"] .practice .answer-reveal { background:#1b2e1c; color:#c8e6c9; }
+    .practice .answer-reveal.open { display:block; }
+
+    /* Callouts */
+    .callout { background:var(--surface2); border-left:4px solid var(--accent); border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:.85rem 1.1rem; margin:.75rem 0; font-size:.875rem; color:var(--text); }
+    .callout.warn { border-color:#f59e0b; }
+    .callout.tip  { border-color:#22c55e; }
+    .callout.exam { border-color:#7c3aed; }
+
+    /* Key term */
+    .key-term { background:linear-gradient(transparent 60%,rgba(106,27,154,.15) 60%); font-weight:700; }
+
+    /* Objectives & breadcrumb */
+    .objectives-list { list-style:none; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:.5rem; }
+    .objectives-list li { font-size:.85rem; display:flex; align-items:flex-start; gap:.5rem; padding:.4rem 0; color:var(--text); }
+    .objectives-list li::before { content:'✦'; color:var(--accent); flex-shrink:0; }
+    .breadcrumb { display:flex; align-items:center; gap:.4rem; font-size:.82rem; color:var(--text-muted); margin-bottom:1.5rem; }
+    .breadcrumb a { color:var(--primary-light); text-decoration:none; }
+    .breadcrumb a:hover { text-decoration:underline; }
+
+    /* Checklist */
+    .checklist { list-style:none; padding:0; }
+    .checklist li { display:flex; align-items:flex-start; gap:.6rem; padding:.35rem 0; font-size:.875rem; color:var(--text); }
+    .checklist li::before { content:'☐'; color:var(--primary-light); font-size:1rem; flex-shrink:0; }
+
+    /* Comparison table */
+    .plain-table { width:100%; border-collapse:collapse; font-size:.875rem; margin:.75rem 0; }
+    .plain-table th { background:var(--primary); color:#fff; padding:.45rem .8rem; text-align:left; }
+    .plain-table td { border:1px solid var(--border); padding:.4rem .8rem; color:var(--text); vertical-align:top; }
+    .plain-table tr:nth-child(even) td { background:var(--surface2); }
+
+    /* Binary grid / bit layout */
+    .bit-row { display:flex; flex-wrap:wrap; gap:2px; margin:.6rem 0; font-family:'Courier New',Courier,monospace; }
+    .bit { width:36px; height:36px; display:flex; align-items:center; justify-content:center; border:1px solid var(--border); border-radius:4px; font-size:.9rem; font-weight:700; background:var(--surface2); color:var(--text); }
+    .bit.sign { background:#fce4ec; border-color:#e91e63; color:#880e4f; }
+    .bit.exp  { background:#e8eaf6; border-color:#7c3aed; color:#4a148c; }
+    .bit.man  { background:#e0f7fa; border-color:#00838f; color:#006064; }
+    [data-theme="dark"] .bit.sign { background:#1a0011; color:#f48fb1; border-color:#880e4f; }
+    [data-theme="dark"] .bit.exp  { background:#12001f; color:#ce93d8; border-color:#6a1b9a; }
+    [data-theme="dark"] .bit.man  { background:#00191c; color:#80deea; border-color:#00838f; }
+    .bit-legend { display:flex; gap:1rem; flex-wrap:wrap; font-size:.78rem; margin:.4rem 0 .8rem; }
+    .bit-legend span { display:flex; align-items:center; gap:.4rem; }
+    .bit-dot { width:12px; height:12px; border-radius:3px; }
+
+    /* Number line diagram */
+    .fp-struct { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:1rem 1.25rem; margin:.75rem 0; }
+    .fp-struct-row { display:flex; align-items:stretch; margin:.5rem 0; font-size:.82rem; }
+    .fp-field { display:flex; align-items:center; justify-content:center; padding:.5rem; font-weight:700; border:1px solid var(--border); font-family:'Courier New',Courier,monospace; }
+    .fp-field.s  { background:#fce4ec; color:#880e4f; min-width:50px; }
+    .fp-field.e  { background:#e8eaf6; color:#4a148c; flex:1; }
+    .fp-field.m  { background:#e0f7fa; color:#006064; flex:3; }
+    [data-theme="dark"] .fp-field.s  { background:#1a0011; color:#f48fb1; }
+    [data-theme="dark"] .fp-field.e  { background:#12001f; color:#ce93d8; }
+    [data-theme="dark"] .fp-field.m  { background:#00191c; color:#80deea; }
+
+    /* Concept cards */
+    .concept-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:.85rem; margin:.75rem 0; }
+    .concept-card { background:var(--surface2); border:1px solid var(--border); border-top:3px solid #6a1b9a; border-radius:var(--radius-sm); padding:1rem 1.1rem; }
+    .concept-card h4 { font-size:.9rem; font-weight:800; color:#6a1b9a; margin-bottom:.4rem; }
+    [data-theme="dark"] .concept-card h4 { color:#ce93d8; }
+    .concept-card p { font-size:.82rem; line-height:1.6; color:var(--text); margin:0; }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="header-inner">
+    <a class="logo" href="index.html">
+      <div class="logo-icon">💻</div>
+      <div>
+        <div class="logo-text">CS 9618</div>
+        <div class="logo-sub">Cambridge AS &amp; A Level</div>
+      </div>
+    </a>
+    <div class="header-actions">
+      <button class="btn-icon" id="theme-btn" title="Toggle theme">🌙</button>
+    </div>
+  </div>
+</header>
+
+<!-- Section nav -->
+<nav class="page-nav" aria-label="Sections">
+  <div class="page-nav-inner">
+    <a href="#fp-representation" class="active">1. Floating Point</a>
+    <a href="#fp-conversion">2. Conversion</a>
+    <a href="#normalisation">3. Normalisation</a>
+    <a href="#range-precision">4. Range &amp; Precision</a>
+    <a href="#errors">5. Errors</a>
+    <a href="#twos-complement">6. Two's Complement</a>
+    <a href="#exam-practice">📝 Exam Practice</a>
+  </div>
+</nav>
+
+<div class="lesson-wrap">
+<main>
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="index.html">Home</a>
+    <span>›</span>
+    <a href="index.html#tab-al">Paper 3 — Advanced Theory</a>
+    <span>›</span>
+    <strong style="color:var(--text)">Topic 14: Further Data Representation</strong>
+  </div>
+
+  <!-- Hero -->
+  <div class="lesson-section" style="background:linear-gradient(135deg,#12005e,#4a148c,#6a1b9a);color:#fff;border:none">
+    <div style="display:flex;align-items:flex-start;gap:1.25rem">
+      <div style="font-size:3rem;flex-shrink:0">🔢</div>
+      <div>
+        <div style="font-size:.75rem;font-weight:700;opacity:.7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem">Paper 3 · Topic 14 · A Level Only</div>
+        <h1 style="font-size:1.9rem;font-weight:900;margin-bottom:.5rem;color:#fff">Further Data Representation</h1>
+        <p style="opacity:.85;font-size:.95rem;max-width:620px;margin-bottom:1rem;color:#fff">Binary floating-point representation, normalisation, range vs precision trade-offs, rounding and truncation errors, overflow and underflow — the mathematics of how real numbers are stored in a computer.</p>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+          <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">Paper 3 · A Level Only</span>
+          <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">~12% of Paper 3 marks</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Learning objectives -->
+  <div class="lesson-section">
+    <h2><span class="section-num">✦</span> Learning Objectives</h2>
+    <p>By the end of this topic you should be able to:</p>
+    <ul class="objectives-list">
+      <li>Describe the structure of a binary floating-point number (sign, mantissa, exponent)</li>
+      <li>Convert a denary real number into binary floating-point form</li>
+      <li>Convert a binary floating-point number back to its denary value</li>
+      <li>Normalise a positive and negative binary floating-point number</li>
+      <li>Explain what normalisation achieves and why it is used</li>
+      <li>Explain the effect of increasing the number of bits allocated to the exponent vs the mantissa</li>
+      <li>Describe the effect of rounding and truncation on a stored value</li>
+      <li>Define and give an example of overflow and underflow</li>
+      <li>Represent positive and negative integers using two's complement</li>
+      <li>Perform addition and subtraction using two's complement</li>
+    </ul>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 1: Floating Point              -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="fp-representation">
+    <h2><span class="section-num">1</span> Floating-Point Representation</h2>
+
+    <p>Integers in binary are straightforward — each bit represents a power of 2. But real numbers (numbers with fractional parts, or very large/small numbers) cannot be stored efficiently as simple integers. <span class="key-term">Floating-point representation</span> solves this by separating a number into two parts: the <em>significant digits</em> and the <em>scale</em>.</p>
+
+    <p>The idea is analogous to scientific notation in decimal: the number 0.000345 is written as 3.45 × 10<sup>−4</sup>. The mantissa (3.45) holds the significant digits; the exponent (−4) sets the scale.</p>
+
+    <h3>Structure of a Floating-Point Number</h3>
+    <p>A binary floating-point number is stored in three fields:</p>
+
+    <div class="fp-struct">
+      <div class="fp-struct-row">
+        <div class="fp-field s">S</div>
+        <div class="fp-field e">Exponent (n bits)</div>
+        <div class="fp-field m">Mantissa (m bits)</div>
+      </div>
+    </div>
+
+    <div class="bit-legend">
+      <span><span class="bit-dot" style="background:#fce4ec;border:1px solid #e91e63"></span> Sign bit</span>
+      <span><span class="bit-dot" style="background:#e8eaf6;border:1px solid #7c3aed"></span> Exponent</span>
+      <span><span class="bit-dot" style="background:#e0f7fa;border:1px solid #00838f"></span> Mantissa</span>
+    </div>
+
+    <table class="plain-table">
+      <tr><th>Field</th><th>Purpose</th><th>Notes</th></tr>
+      <tr>
+        <td><strong>Sign bit</strong></td>
+        <td>Indicates positive (0) or negative (1)</td>
+        <td>The most significant bit of the mantissa — the sign of the <em>whole</em> number</td>
+      </tr>
+      <tr>
+        <td><strong>Mantissa</strong></td>
+        <td>Stores the significant digits of the number</td>
+        <td>More mantissa bits → more precision (more significant figures)</td>
+      </tr>
+      <tr>
+        <td><strong>Exponent</strong></td>
+        <td>Stores the power of 2 that scales the mantissa</td>
+        <td>More exponent bits → greater range (larger and smaller numbers representable); stored in two's complement</td>
+      </tr>
+    </table>
+
+    <h3>The Formula</h3>
+    <p>The value of a floating-point number is:</p>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.5rem;text-align:center;font-size:1.1rem;margin:.75rem 0;font-family:'Courier New',Courier,monospace">
+      Value = Mantissa × 2<sup>Exponent</sup>
+    </div>
+    <p>The mantissa is treated as a binary fraction — the binary point is assumed to be immediately after the sign bit. So a mantissa of <code>0.10110</code> represents the value ½ + ⅛ + 1/16 = 0.6875 in the positive case.</p>
+
+    <div class="callout warn">
+      <strong>Cambridge convention:</strong> In Cambridge 9618, the mantissa is a <em>two's complement fraction</em> with the binary point after the sign (leftmost) bit. The exponent is a <em>two's complement integer</em>. Always check your exam question for the exact format and number of bits specified.
+    </div>
+
+    <h3>A Concrete Example (8-bit: 4-bit mantissa, 4-bit exponent)</h3>
+    <p>Consider an 8-bit format with a 4-bit mantissa and 4-bit exponent. The bit pattern <code>0101 0011</code>:</p>
+
+    <div class="bit-row">
+      <div class="bit man">0</div>
+      <div class="bit man">1</div>
+      <div class="bit man">0</div>
+      <div class="bit man">1</div>
+      <div class="bit exp">0</div>
+      <div class="bit exp">0</div>
+      <div class="bit exp">1</div>
+      <div class="bit exp">1</div>
+    </div>
+    <div class="bit-legend">
+      <span><span class="bit-dot" style="background:#e0f7fa;border:1px solid #00838f"></span> Mantissa: 0101</span>
+      <span><span class="bit-dot" style="background:#e8eaf6;border:1px solid #7c3aed"></span> Exponent: 0011</span>
+    </div>
+
+    <ul>
+      <li><strong>Mantissa</strong> = <code>0.101</code> (binary point after sign bit) = ½ + ⅛ = 0.625</li>
+      <li><strong>Exponent</strong> = <code>0011</code> = +3 (two's complement)</li>
+      <li><strong>Value</strong> = 0.625 × 2<sup>3</sup> = 0.625 × 8 = <strong>5.0</strong></li>
+    </ul>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 2: Conversion                  -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="fp-conversion">
+    <h2><span class="section-num">2</span> Converting Between Denary and Floating-Point Binary</h2>
+
+    <h3>Denary → Binary Floating Point</h3>
+    <p>The general method is:</p>
+    <ol>
+      <li>Convert the denary number to binary (integer and fractional parts separately).</li>
+      <li>Write in the form <code>0.1…</code> (positive) or <code>1.0…</code> (negative) — this is the normalised form.</li>
+      <li>Count how many places the binary point moved to reach the normalised form — this is the exponent.</li>
+      <li>Store the mantissa bits and the exponent (in two's complement) in the allocated fields.</li>
+    </ol>
+
+    <div class="worked">
+      <div class="worked-title">Worked Example — Denary to Floating Point (positive)</div>
+      <p>Represent <strong>+6.5</strong> in an 8-bit format: 5-bit mantissa, 3-bit exponent.</p>
+      <div class="step"><span class="step-num">1</span><span class="step-text">Convert 6.5 to binary: 6 = 110₂, 0.5 = 0.1₂ → <strong>110.1</strong></span></div>
+      <div class="step"><span class="step-num">2</span><span class="step-text">Write in normalised form: move binary point 3 places left → <strong>0.1101</strong> × 2<sup>3</sup><br>
+        (normalised positive: starts with <code>0.1</code>)</span></div>
+      <div class="step"><span class="step-num">3</span><span class="step-text">Mantissa = <code>01101</code> (5 bits, binary point after sign bit — the <code>0.</code> prefix is implicit)</span></div>
+      <div class="step"><span class="step-num">4</span><span class="step-text">Exponent = +3 = <code>011</code> in 3-bit two's complement</span></div>
+      <div class="step"><span class="step-num">5</span><span class="step-text">Final stored bit pattern: <strong>01101 011</strong></span></div>
+    </div>
+
+    <div class="worked">
+      <div class="worked-title">Worked Example — Denary to Floating Point (negative)</div>
+      <p>Represent <strong>−6.5</strong> in an 8-bit format: 5-bit mantissa, 3-bit exponent.</p>
+      <div class="step"><span class="step-num">1</span><span class="step-text">Convert +6.5 to binary: <code>110.1</code></span></div>
+      <div class="step"><span class="step-num">2</span><span class="step-text">Convert to two's complement fraction. First write <code>0.1101</code>, then negate:<br>
+        Invert all bits: <code>1.0010</code>, add 1 to last bit: <code>1.0011</code><br>
+        (normalised negative: starts with <code>1.0</code>)</span></div>
+      <div class="step"><span class="step-num">3</span><span class="step-text">Mantissa = <code>10011</code></span></div>
+      <div class="step"><span class="step-num">4</span><span class="step-text">Exponent = +3 = <code>011</code> (same scale, only the mantissa is negated)</span></div>
+      <div class="step"><span class="step-num">5</span><span class="step-text">Final stored bit pattern: <strong>10011 011</strong></span></div>
+    </div>
+
+    <h3>Binary Floating Point → Denary</h3>
+    <ol>
+      <li>Read the exponent (two's complement integer) — call it <em>e</em>.</li>
+      <li>Read the mantissa (two's complement fraction with binary point after sign bit).</li>
+      <li>Shift the binary point of the mantissa <em>e</em> places to the right (positive e) or left (negative e).</li>
+      <li>Convert the resulting binary integer/fraction to denary.</li>
+    </ol>
+
+    <div class="worked">
+      <div class="worked-title">Worked Example — Binary Floating Point to Denary</div>
+      <p>Convert the 8-bit value <strong>01011 010</strong> (5-bit mantissa, 3-bit exponent) to denary.</p>
+      <div class="step"><span class="step-num">1</span><span class="step-text">Mantissa = <code>01011</code> → as a fraction: <code>0.1011</code><br>
+        = ½ + ⅛ + 1/16 = 0.5 + 0.125 + 0.0625 = <strong>0.6875</strong></span></div>
+      <div class="step"><span class="step-num">2</span><span class="step-text">Exponent = <code>010</code> = +2 (two's complement)</span></div>
+      <div class="step"><span class="step-num">3</span><span class="step-text">Value = 0.6875 × 2² = 0.6875 × 4 = <strong>2.75</strong></span></div>
+    </div>
+
+    <div class="worked">
+      <div class="worked-title">Worked Example — Negative Exponent</div>
+      <p>Convert <strong>01100 110</strong> (5-bit mantissa, 3-bit exponent) to denary.</p>
+      <div class="step"><span class="step-num">1</span><span class="step-text">Mantissa = <code>01100</code> → <code>0.1100</code> = ½ + ¼ = <strong>0.75</strong></span></div>
+      <div class="step"><span class="step-num">2</span><span class="step-text">Exponent = <code>110</code> in two's complement:<br>
+        MSB is 1 → negative. Invert: <code>001</code>, add 1: <code>010</code> = 2 → exponent = <strong>−2</strong></span></div>
+      <div class="step"><span class="step-num">3</span><span class="step-text">Value = 0.75 × 2<sup>−2</sup> = 0.75 ÷ 4 = <strong>0.1875</strong></span></div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question</div>
+      <p>An 8-bit floating-point format uses a 5-bit mantissa and a 3-bit exponent (both two's complement). Convert the bit pattern <strong>10101 001</strong> to denary.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Mantissa</strong> = <code>10101</code> — sign bit is 1, so this is a negative two's complement fraction.<br>
+        To find the value: invert <code>10101</code> → <code>01010</code>, add 1 → <code>01011</code><br>
+        As a fraction: <code>0.1011</code> = ½ + ⅛ + 1/16 = 0.6875<br>
+        So mantissa value = <strong>−0.6875</strong></p>
+        <p><strong>Exponent</strong> = <code>001</code> = +1</p>
+        <p><strong>Value</strong> = −0.6875 × 2<sup>1</sup> = −0.6875 × 2 = <strong>−1.375</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 3: Normalisation               -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="normalisation">
+    <h2><span class="section-num">3</span> Normalisation</h2>
+
+    <p><span class="key-term">Normalisation</span> is the process of adjusting a floating-point number so that the mantissa uses all available bits to represent significant digits — maximising precision for a given number of bits.</p>
+
+    <h3>Rules for a Normalised Mantissa</h3>
+    <p>A floating-point number (with the binary point after the sign bit) is normalised when:</p>
+
+    <table class="plain-table">
+      <tr><th>Sign of Number</th><th>Normalised Form Starts With</th><th>Meaning</th></tr>
+      <tr>
+        <td>Positive (sign bit = 0)</td>
+        <td><code>0.1…</code></td>
+        <td>The bit immediately after the binary point must be <strong>1</strong></td>
+      </tr>
+      <tr>
+        <td>Negative (sign bit = 1)</td>
+        <td><code>1.0…</code></td>
+        <td>The bit immediately after the binary point must be <strong>0</strong></td>
+      </tr>
+    </table>
+
+    <p>If a mantissa has leading zeros after the sign bit (positive) or leading ones (negative), it is <em>not</em> normalised and precision is being wasted.</p>
+
+    <div class="callout tip">
+      <strong>Why normalise?</strong> If the mantissa were <code>0.001011</code> instead of <code>0.101100</code>, the first two bits after the point carry no information — they are just padding. Normalisation shifts those significant bits into the high-order positions, maximising the precision representable with the given number of mantissa bits.
+    </div>
+
+    <h3>How to Normalise</h3>
+    <p>To normalise an un-normalised number:</p>
+    <ol>
+      <li>Shift the mantissa left until it starts with <code>0.1</code> (positive) or <code>1.0</code> (negative).</li>
+      <li>For each left-shift of the mantissa, <em>decrease</em> the exponent by 1.</li>
+      <li>Truncate or round the mantissa to fit in the allocated bits.</li>
+    </ol>
+
+    <div class="worked">
+      <div class="worked-title">Worked Example — Normalising a Positive Number</div>
+      <p>Normalise the mantissa <code>0.001011</code> with exponent <code>+5</code> (6-bit mantissa).</p>
+      <div class="step"><span class="step-num">1</span><span class="step-text">Mantissa starts <code>0.00…</code> — not normalised. Shift left 2 places:<br>
+        <code>0.001011</code> → shift 1: <code>0.01011</code> (exp → 4)<br>
+        → shift 2: <code>0.1011</code> (exp → 3) — now starts with <code>0.1</code> ✓</span></div>
+      <div class="step"><span class="step-num">2</span><span class="step-text">Normalised mantissa: <code>0.101100</code> (padded to 6 bits with trailing zero)</span></div>
+      <div class="step"><span class="step-num">3</span><span class="step-text">New exponent: <code>+3</code></span></div>
+      <p style="margin-top:.5rem">Value check: 0.101100 × 2³ = 0.6875 × 8 = 5.5 ✓ (same value, more precision used)</p>
+    </div>
+
+    <div class="worked">
+      <div class="worked-title">Worked Example — Normalising a Negative Number</div>
+      <p>Normalise the two's complement mantissa <code>1.11001</code> with exponent <code>+2</code> (6-bit mantissa).</p>
+      <div class="step"><span class="step-num">1</span><span class="step-text">Mantissa starts <code>1.1…</code> — not normalised (normalised negative starts <code>1.0…</code>). Shift left 1 place:<br>
+        <code>1.11001</code> → <code>1.10010</code> (exp → 1) — still starts <code>1.1…</code><br>
+        → shift again: <code>1.00100</code> (exp → 0) — starts <code>1.0…</code> ✓</span></div>
+      <div class="step"><span class="step-num">2</span><span class="step-text">Normalised mantissa: <code>1.00100</code></span></div>
+      <div class="step"><span class="step-num">3</span><span class="step-text">New exponent: <code>0</code></span></div>
+    </div>
+
+    <h3>Detecting an Unnormalised Number</h3>
+    <p>You can quickly check if a number is normalised by looking at just the first two bits of the mantissa:</p>
+    <ul>
+      <li><code>01…</code> — normalised positive ✓</li>
+      <li><code>10…</code> — normalised negative ✓</li>
+      <li><code>00…</code> — NOT normalised (positive with wasted leading zero)</li>
+      <li><code>11…</code> — NOT normalised (negative with wasted leading one)</li>
+    </ul>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question</div>
+      <p>State whether each mantissa is normalised and, if not, normalise it. Adjust the exponent accordingly.</p>
+      <p>(a) Mantissa: <code>0.010110</code>, Exponent: +4 &nbsp;&nbsp; (b) Mantissa: <code>1.10011</code>, Exponent: −1</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>(a)</strong> Starts <code>0.0…</code> — NOT normalised. Shift left 1:<br>
+        <code>0.010110</code> → <code>0.101100</code>, exponent becomes +3.<br>
+        Normalised mantissa: <code>0.101100</code>, exponent: <strong>+3</strong></p>
+        <p><strong>(b)</strong> Starts <code>1.1…</code> — NOT normalised. Shift left 1:<br>
+        <code>1.10011</code> → <code>1.00110</code>, exponent becomes −2.<br>
+        Normalised mantissa: <code>1.00110</code>, exponent: <strong>−2</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 4: Range and Precision         -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="range-precision">
+    <h2><span class="section-num">4</span> Range vs Precision</h2>
+
+    <p>A floating-point format has a fixed total number of bits. Those bits must be divided between the exponent and the mantissa. <strong>This is a trade-off</strong>: you cannot increase both range and precision simultaneously.</p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <h4>More Exponent Bits</h4>
+        <p>Increases the <strong>range</strong> of numbers that can be represented — very large and very small numbers become possible. But fewer bits remain for the mantissa, reducing precision.</p>
+      </div>
+      <div class="concept-card">
+        <h4>More Mantissa Bits</h4>
+        <p>Increases <strong>precision</strong> — more significant digits can be stored, reducing rounding errors. But fewer bits remain for the exponent, reducing range.</p>
+      </div>
+      <div class="concept-card">
+        <h4>Range</h4>
+        <p>The span of values that can be represented, from the most negative to the most positive number. Determined primarily by the number of exponent bits.</p>
+      </div>
+      <div class="concept-card">
+        <h4>Precision</h4>
+        <p>The number of significant digits that can be accurately stored. More mantissa bits = finer granularity between adjacent representable numbers.</p>
+      </div>
+    </div>
+
+    <h3>Effect of Changing the Number of Bits</h3>
+    <table class="plain-table">
+      <tr><th>Change</th><th>Effect on Range</th><th>Effect on Precision</th></tr>
+      <tr><td>Increase exponent bits (reduce mantissa bits)</td><td>Increases — larger/smaller numbers possible</td><td>Decreases — fewer significant figures</td></tr>
+      <tr><td>Increase mantissa bits (reduce exponent bits)</td><td>Decreases — fewer extreme values</td><td>Increases — more significant figures</td></tr>
+      <tr><td>Increase total bits (both)</td><td>Increases</td><td>Increases</td></tr>
+    </table>
+
+    <div class="callout exam">
+      <strong>Exam tip:</strong> A common question is "A programmer changes a floating-point format from 8 bits to 16 bits. State the effect on range and precision." Answer: <em>Both range and precision increase</em> because more bits are available for both fields. If the question says "the exponent is kept the same size but the total increases," only precision increases.
+    </div>
+
+    <h3>The IEEE 754 Standard</h3>
+    <p>Real processors use the <span class="key-term">IEEE 754</span> standard for floating-point arithmetic. Cambridge 9618 does not require you to memorise the full IEEE 754 format, but you should know its key features:</p>
+    <ul>
+      <li><strong>Single precision</strong>: 32 bits total — 1 sign bit, 8 exponent bits, 23 mantissa bits</li>
+      <li><strong>Double precision</strong>: 64 bits total — 1 sign bit, 11 exponent bits, 52 mantissa bits</li>
+      <li>The exponent is stored as a <em>biased</em> (offset) integer, not two's complement (the bias is 127 for single precision)</li>
+      <li>Special values: +∞, −∞, NaN (Not a Number) are encoded using reserved exponent patterns</li>
+      <li>Double precision has greater range and precision than single precision — used in scientific computing</li>
+    </ul>
+
+    <table class="plain-table">
+      <tr><th></th><th>Single Precision (32-bit)</th><th>Double Precision (64-bit)</th></tr>
+      <tr><td><strong>Sign bits</strong></td><td>1</td><td>1</td></tr>
+      <tr><td><strong>Exponent bits</strong></td><td>8</td><td>11</td></tr>
+      <tr><td><strong>Mantissa bits</strong></td><td>23</td><td>52</td></tr>
+      <tr><td><strong>Approx. decimal precision</strong></td><td>~7 significant figures</td><td>~15–16 significant figures</td></tr>
+      <tr><td><strong>Max positive value</strong></td><td>~3.4 × 10<sup>38</sup></td><td>~1.8 × 10<sup>308</sup></td></tr>
+    </table>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 5: Errors                      -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="errors">
+    <h2><span class="section-num">5</span> Errors in Floating-Point Representation</h2>
+
+    <p>Because a floating-point number uses a finite number of bits, not every real number can be represented exactly. This leads to several types of error.</p>
+
+    <h3>Rounding Error</h3>
+    <p>When a number cannot be represented exactly in the available mantissa bits, the stored value is <span class="key-term">rounded</span> to the nearest representable value. The difference between the true value and the stored value is a <em>rounding error</em>.</p>
+    <div class="worked">
+      <div class="worked-title">Example</div>
+      <p>In decimal: 1 ÷ 3 = 0.333333… The stored value (e.g., 0.3333) differs from the true value by 0.0000333… This tiny difference can accumulate over many calculations — known as <em>accumulation of rounding errors</em>.</p>
+      <p>In binary: the decimal fraction 0.1 has no exact binary representation (0.000110011… repeating). It is stored as an approximation, which is why <code>0.1 + 0.2 ≠ 0.3</code> in most programming languages.</p>
+    </div>
+
+    <h3>Truncation Error</h3>
+    <p>Instead of rounding, some systems simply discard (truncate) the extra bits that don't fit. This always produces an error in the same direction (the stored value is always smaller in magnitude than the true value for positive numbers).</p>
+    <table class="plain-table">
+      <tr><th></th><th>Rounding</th><th>Truncation</th></tr>
+      <tr><td><strong>Method</strong></td><td>Round to nearest representable value</td><td>Discard all bits beyond mantissa size</td></tr>
+      <tr><td><strong>Error direction</strong></td><td>Can go up or down</td><td>Always in same direction (magnitude reduced)</td></tr>
+      <tr><td><strong>Max error</strong></td><td>½ of least significant bit position</td><td>Up to 1 least significant bit</td></tr>
+    </table>
+
+    <h3>Absolute and Relative Error</h3>
+    <ul>
+      <li><span class="key-term">Absolute error</span> = |true value − stored value|</li>
+      <li><span class="key-term">Relative error</span> = absolute error ÷ |true value|</li>
+    </ul>
+    <p>Relative error is often more meaningful — a rounding error of 0.001 is tiny when the true value is 1000, but enormous when the true value is 0.001.</p>
+
+    <h3>Overflow</h3>
+    <p><span class="key-term">Overflow</span> occurs when the result of a calculation is too large (in magnitude) to be stored in the available exponent bits. The exponent required exceeds the maximum representable exponent.</p>
+    <div class="callout warn">
+      <strong>Effect:</strong> The result cannot be stored — typically the system produces a special value (∞ in IEEE 754) or an error flag. In exam context: state that the result is too large to be represented in the format and the stored value will be incorrect / the program may crash.
+    </div>
+
+    <h3>Underflow</h3>
+    <p><span class="key-term">Underflow</span> occurs when the result of a calculation is too small (too close to zero) to be represented — the exponent required is smaller than the minimum representable exponent. The value is effectively rounded down to zero.</p>
+    <table class="plain-table">
+      <tr><th></th><th>Overflow</th><th>Underflow</th></tr>
+      <tr><td><strong>What happens</strong></td><td>Result too large — exponent too big</td><td>Result too small — exponent too negative</td></tr>
+      <tr><td><strong>Effect</strong></td><td>Cannot store — infinity / error</td><td>Result rounded to zero / error</td></tr>
+      <tr><td><strong>Example</strong></td><td>10<sup>500</sup> in single precision</td><td>10<sup>−500</sup> in single precision</td></tr>
+    </table>
+
+    <h3>Accumulation of Errors</h3>
+    <p>In a long chain of arithmetic operations, rounding errors can accumulate. A small error at each step can grow to a significant error in the final result. This is particularly dangerous in:</p>
+    <ul>
+      <li>Iterative numerical methods (e.g., solving differential equations)</li>
+      <li>Subtraction of two nearly equal numbers (catastrophic cancellation)</li>
+      <li>Financial calculations (which is why dedicated decimal types are used instead of floating point in finance)</li>
+    </ul>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question</div>
+      <p>A programmer uses a 6-bit mantissa floating-point format. Explain why the denary value 0.1 cannot be stored exactly, and describe the type of error that results.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p>0.1 in binary is <code>0.000110011…</code> (repeating). It has an infinite binary expansion and therefore cannot be stored exactly in a finite number of mantissa bits. When stored in a 6-bit mantissa, the remaining bits are discarded — this is a <strong>truncation error</strong> (or rounding error, depending on the method used). The stored value is only an approximation of 0.1, and repeated use of this approximation in arithmetic can cause <strong>accumulation of errors</strong>.</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question</div>
+      <p>A floating-point number system uses a 4-bit exponent stored in two's complement. The maximum positive exponent is +7 and the minimum is −8. Explain what happens if the result of a multiplication gives an exponent of +9.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p>The required exponent (+9) exceeds the maximum representable exponent (+7) for this format. This is <strong>overflow</strong>. The result cannot be stored — the stored value will be incorrect (possibly set to the maximum representable value, zero, or a special error value, depending on the system). Any subsequent calculations using this incorrect value will also produce wrong results.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 6: Two's Complement            -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="twos-complement">
+    <h2><span class="section-num">6</span> Two's Complement (Review &amp; Extension)</h2>
+
+    <p>Two's complement is the standard way to represent <em>signed integers</em> in binary — and it is used for both the mantissa (as a fraction) and the exponent (as an integer) in floating-point numbers.</p>
+
+    <h3>Representing Integers in Two's Complement</h3>
+    <p>For an <em>n</em>-bit two's complement integer:</p>
+    <ul>
+      <li>The most significant bit (MSB) has a place value of <strong>−2<sup>n−1</sup></strong> (negative weight).</li>
+      <li>All other bits have their usual positive place values.</li>
+      <li>Range: −2<sup>n−1</sup> to +2<sup>n−1</sup> − 1</li>
+    </ul>
+
+    <table class="plain-table">
+      <tr><th>Bits</th><th>Range</th><th>Example: −5</th></tr>
+      <tr><td>4-bit</td><td>−8 to +7</td><td><code>1011</code> (−8 + 2 + 1 = −5)</td></tr>
+      <tr><td>8-bit</td><td>−128 to +127</td><td><code>11111011</code></td></tr>
+    </table>
+
+    <h3>Converting a Negative Number to Two's Complement</h3>
+    <p>To represent −<em>n</em> in two's complement:</p>
+    <ol>
+      <li>Write the positive value <em>n</em> in binary.</li>
+      <li>Invert all bits (flip 0s to 1s and 1s to 0s).</li>
+      <li>Add 1 to the result.</li>
+    </ol>
+
+    <div class="worked">
+      <div class="worked-title">Worked Example — Represent −19 in 8-bit Two's Complement</div>
+      <div class="step"><span class="step-num">1</span><span class="step-text">+19 in 8-bit binary: <code>00010011</code></span></div>
+      <div class="step"><span class="step-num">2</span><span class="step-text">Invert all bits: <code>11101100</code></span></div>
+      <div class="step"><span class="step-num">3</span><span class="step-text">Add 1: <code>11101101</code></span></div>
+      <p style="margin-top:.5rem">Check: −128 + 64 + 32 + 8 + 4 + 1 = −128 + 109 = −19 ✓</p>
+    </div>
+
+    <h3>Addition in Two's Complement</h3>
+    <p>Two's complement addition works just like normal binary addition. Any carry out of the MSB is discarded. The result is correct as long as overflow does not occur.</p>
+
+    <div class="worked">
+      <div class="worked-title">Worked Example — 25 + (−19) in 8-bit Two's Complement</div>
+      <p>+25 = <code>00011001</code> &nbsp;&nbsp; −19 = <code>11101101</code></p>
+      <div style="font-family:'Courier New',Courier,monospace;font-size:.9rem;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.85rem 1.1rem;margin:.5rem 0">
+        &nbsp;&nbsp;00011001 &nbsp;(+25)<br>
+        + 11101101 &nbsp;(−19)<br>
+        ──────────<br>
+        1 00000110 &nbsp;(carry out discarded)<br>
+        = 00000110 = +6 ✓
+      </div>
+    </div>
+
+    <h3>Subtraction Using Two's Complement</h3>
+    <p>To compute A − B using two's complement: convert B to its two's complement (negate it) and then add. This is why computers only need an adder circuit — subtraction is just addition of the negated value.</p>
+
+    <div class="worked">
+      <div class="worked-title">Worked Example — 12 − 30 in 8-bit Two's Complement</div>
+      <p>12 − 30 = 12 + (−30). First find −30:</p>
+      <p>+30 = <code>00011110</code> → invert: <code>11100001</code> → add 1: <code>11100010</code> = −30</p>
+      <div style="font-family:'Courier New',Courier,monospace;font-size:.9rem;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.85rem 1.1rem;margin:.5rem 0">
+        &nbsp;&nbsp;00001100 &nbsp;(+12)<br>
+        + 11100010 &nbsp;(−30)<br>
+        ──────────<br>
+        &nbsp;&nbsp;11101110 &nbsp;= −18 ✓
+      </div>
+      <p>Check: −128 + 64 + 32 + 8 + 4 + 2 = −128 + 110 = −18 ✓</p>
+    </div>
+
+    <h3>Overflow in Two's Complement Addition</h3>
+    <p>Overflow occurs when adding two numbers of the <em>same</em> sign produces a result with the <em>opposite</em> sign — the result exceeds the representable range.</p>
+    <ul>
+      <li>Adding two positives → result is negative: overflow</li>
+      <li>Adding two negatives → result is positive: overflow</li>
+      <li>Adding one positive and one negative: <em>never</em> overflows</li>
+    </ul>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question</div>
+      <p>Using 8-bit two's complement, calculate <strong>−85 + (−50)</strong>. State whether overflow occurs and explain your reasoning.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p>−85: +85 = <code>01010101</code> → invert: <code>10101010</code> → +1: <code>10101011</code></p>
+        <p>−50: +50 = <code>00110010</code> → invert: <code>11001101</code> → +1: <code>11001110</code></p>
+        <div style="font-family:'Courier New',Courier,monospace;font-size:.88rem;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:.75rem 1rem;margin:.5rem 0">
+          &nbsp;&nbsp;10101011 &nbsp;(−85)<br>
+          + 11001110 &nbsp;(−50)<br>
+          ──────────<br>
+          1 01111001 &nbsp;(carry discarded)<br>
+          = 01111001 = +121
+        </div>
+        <p><strong>Overflow has occurred.</strong> We added two negative numbers but got a positive result (+121). The true result is −135, which is outside the 8-bit two's complement range (−128 to +127). The carry out of the MSB is the symptom, but the real indicator is that two negative operands produced a positive result.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 7: Exam Practice               -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="exam-practice">
+    <h2><span class="section-num">📝</span> Exam Practice</h2>
+
+    <div class="practice">
+      <div class="pq-title">Question 1 — 4 marks</div>
+      <p>A floating-point number is stored using 10 bits: a 6-bit mantissa and a 4-bit exponent (both in two's complement, with the binary point after the sign bit of the mantissa).</p>
+      <p>Convert the bit pattern <strong>011010 0100</strong> to its denary value. Show your working.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Mantissa</strong> = <code>011010</code> → as fraction: <code>0.11010</code><br>
+        = ½ + ¼ + 1/16 = 0.5 + 0.25 + 0.0625 = <strong>0.8125</strong> (1 mark)</p>
+        <p><strong>Exponent</strong> = <code>0100</code> = +4 in two's complement (1 mark)</p>
+        <p><strong>Value</strong> = 0.8125 × 2<sup>4</sup> = 0.8125 × 16 = <strong>13.0</strong> (2 marks: method + answer)</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Question 2 — 5 marks</div>
+      <p>Using the same 10-bit format (6-bit mantissa, 4-bit exponent), represent the denary value <strong>−3.25</strong> in normalised floating-point binary. Show all working.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <div class="step"><span class="step-num">1</span><span class="step-text">+3.25 in binary: 3 = <code>11</code>, 0.25 = <code>.01</code> → <code>11.01</code></span></div>
+        <div class="step"><span class="step-num">2</span><span class="step-text">Normalised positive: <code>0.1101</code> × 2² &nbsp; (shift binary point 2 left, exponent = +2)</span></div>
+        <div class="step"><span class="step-num">3</span><span class="step-text">Negate mantissa for −3.25:<br>
+          <code>011010</code> → invert: <code>100101</code> → add 1: <code>100110</code><br>
+          Normalised negative starts <code>1.0…</code>: <code>1.00110</code> ✓</span></div>
+        <div class="step"><span class="step-num">4</span><span class="step-text">Exponent = +2 = <code>0010</code></span></div>
+        <div class="step"><span class="step-num">5</span><span class="step-text">Final bit pattern: <strong>100110 0010</strong></span></div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Question 3 — 3 marks</div>
+      <p>The mantissa of a floating-point number is <code>0.001011</code>. State whether this mantissa is normalised. If not, write the normalised form and state the adjustment needed to the exponent.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p>The mantissa <code>0.001011</code> is <strong>not normalised</strong> — a normalised positive mantissa must start with <code>0.1</code>, but this starts with <code>0.00</code>. (1 mark)</p>
+        <p>Shift left 2 places: <code>0.001011</code> → <code>0.101100</code>. (1 mark)</p>
+        <p>The exponent must be <strong>decreased by 2</strong> to compensate. (1 mark)</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Question 4 — 4 marks</div>
+      <p>A programmer is choosing between two floating-point formats, both using 16 bits total:</p>
+      <ul>
+        <li><strong>Format A:</strong> 10-bit mantissa, 6-bit exponent</li>
+        <li><strong>Format B:</strong> 6-bit mantissa, 10-bit exponent</li>
+      </ul>
+      <p>Compare the range and precision of the two formats. State which format would be more appropriate for a scientific simulation that involves very large and very small numbers, with only moderate accuracy needed.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Format A</strong> (10-bit mantissa, 6-bit exponent): Greater precision — more significant figures stored. Smaller range — fewer extreme values representable. (1 mark)</p>
+        <p><strong>Format B</strong> (6-bit mantissa, 10-bit exponent): Greater range — can represent very large and very small numbers. Less precision — fewer significant figures. (1 mark)</p>
+        <p><strong>Recommendation: Format B</strong> is more appropriate for the simulation. (1 mark) Because the numbers involved are very large and very small (requiring a wide range), and only moderate accuracy is needed (so the reduced precision of 6-bit mantissa is acceptable). (1 mark)</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Question 5 — 2 marks</div>
+      <p>Explain the difference between overflow and underflow in the context of floating-point representation.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Overflow</strong>: The result of a calculation is too large in magnitude to be represented — the required exponent exceeds the maximum that can be stored. The result cannot be stored correctly (1 mark).</p>
+        <p><strong>Underflow</strong>: The result of a calculation is too small in magnitude (too close to zero) to be represented — the required exponent is smaller (more negative) than the minimum that can be stored. The result is rounded to zero (1 mark).</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Question 6 — 6 marks</div>
+      <p>Using 8-bit two's complement, perform the following calculations. Show all working and state whether overflow occurs in each case.</p>
+      <p>(a) +45 + +70 &nbsp;&nbsp;&nbsp; (b) −60 + +25</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>(a) +45 + +70</strong></p>
+        <p>+45 = <code>00101101</code> &nbsp;&nbsp; +70 = <code>01000110</code></p>
+        <div style="font-family:'Courier New',Courier,monospace;font-size:.88rem;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:.75rem 1rem;margin:.4rem 0">
+          &nbsp;&nbsp;00101101<br>
+          + 01000110<br>
+          ──────────<br>
+          &nbsp;&nbsp;01110011 = +115
+        </div>
+        <p>No overflow — two positives produced a positive. Result = <strong>+115</strong> ✓ (2 marks)</p>
+
+        <p style="margin-top:.75rem"><strong>(b) −60 + +25</strong></p>
+        <p>−60: +60 = <code>00111100</code> → invert: <code>11000011</code> → +1: <code>11000100</code><br>
+        +25 = <code>00011001</code></p>
+        <div style="font-family:'Courier New',Courier,monospace;font-size:.88rem;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:.75rem 1rem;margin:.4rem 0">
+          &nbsp;&nbsp;11000100<br>
+          + 00011001<br>
+          ──────────<br>
+          &nbsp;&nbsp;11011101 = −35
+        </div>
+        <p>No overflow — different signs cannot overflow. Check: −128 + 64 + 16 + 8 + 4 + 1 = −128 + 93 = −35 ✓ (2 marks)</p>
+      </div>
+    </div>
+
+    <h3>Revision Checklist</h3>
+    <ul class="checklist">
+      <li>Describe the three fields of a binary floating-point number and the role of each</li>
+      <li>State the normalised form for positive (<code>0.1…</code>) and negative (<code>1.0…</code>) mantissas</li>
+      <li>Convert a positive denary real number to binary floating-point form with a given bit allocation</li>
+      <li>Convert a negative denary real number to binary floating-point (two's complement mantissa)</li>
+      <li>Convert a binary floating-point number back to denary, including negative exponents</li>
+      <li>Normalise an unnormalised mantissa and adjust the exponent accordingly</li>
+      <li>Explain the trade-off between mantissa bits (precision) and exponent bits (range)</li>
+      <li>Describe single and double precision IEEE 754 formats (bit allocations)</li>
+      <li>Distinguish between rounding error and truncation error with examples</li>
+      <li>Define overflow and underflow and describe what happens in each case</li>
+      <li>Represent a negative integer using 8-bit two's complement</li>
+      <li>Add two 8-bit two's complement numbers and detect overflow</li>
+    </ul>
+  </div>
+
+</main>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-box">
+    <h3>Contents</h3>
+    <ul class="toc-list">
+      <li><a href="#fp-representation" class="active">1. Floating Point</a></li>
+      <li><a href="#fp-conversion">2. Conversion</a></li>
+      <li><a href="#normalisation">3. Normalisation</a></li>
+      <li><a href="#range-precision">4. Range &amp; Precision</a></li>
+      <li><a href="#errors">5. Errors</a></li>
+      <li><a href="#twos-complement">6. Two's Complement</a></li>
+      <li><a href="#exam-practice">📝 Exam Practice</a></li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>FP Structure</h3>
+    <div style="font-size:.78rem;color:var(--text)">
+      <div style="display:flex;gap:2px;margin-bottom:.5rem;font-family:'Courier New',Courier,monospace;font-size:.8rem">
+        <div style="background:#fce4ec;border:1px solid #e91e63;color:#880e4f;padding:.2rem .4rem;border-radius:3px;font-weight:700">S</div>
+        <div style="background:#e0f7fa;border:1px solid #00838f;color:#006064;padding:.2rem .6rem;border-radius:3px;font-weight:700">Mantissa</div>
+        <div style="background:#e8eaf6;border:1px solid #7c3aed;color:#4a148c;padding:.2rem .6rem;border-radius:3px;font-weight:700">Exponent</div>
+      </div>
+      <p style="font-size:.78rem;margin:.3rem 0">Value = Mantissa × 2<sup>Exponent</sup></p>
+    </div>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>Normalised Forms</h3>
+    <ul style="font-size:.78rem;padding-left:0;list-style:none;color:var(--text);font-family:'Courier New',Courier,monospace">
+      <li style="padding:.3rem 0;border-bottom:1px solid var(--border)">Positive: <strong>0.1</strong>…</li>
+      <li style="padding:.3rem 0;border-bottom:1px solid var(--border)">Negative: <strong>1.0</strong>…</li>
+      <li style="padding:.3rem 0;border-bottom:1px solid var(--border)">00… → not normalised</li>
+      <li style="padding:.3rem 0">11… → not normalised</li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>IEEE 754 Quick Ref</h3>
+    <ul style="font-size:.78rem;padding-left:0;list-style:none;color:var(--text)">
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>Single (32-bit):</strong> 1 + 8 + 23</li>
+      <li style="padding:.2rem 0"><strong>Double (64-bit):</strong> 1 + 11 + 52</li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box" style="border-left:4px solid #6a1b9a">
+    <h3 style="color:#6a1b9a">Common Mistakes</h3>
+    <ul style="font-size:.78rem;padding-left:1.1rem;color:var(--text)">
+      <li style="margin:.3rem 0">Forgetting the binary point is after the sign bit, not before all bits</li>
+      <li style="margin:.3rem 0">Treating the exponent as unsigned — it uses two's complement</li>
+      <li style="margin:.3rem 0">Normalising positive numbers to <code>1.0…</code> — that is the negative normalised form</li>
+      <li style="margin:.3rem 0">Confusing overflow (too large) with underflow (too close to zero)</li>
+      <li style="margin:.3rem 0">When normalising, forgetting to update the exponent for every shift applied</li>
+    </ul>
+  </div>
+
+  <a href="topic13-software-development.html" style="display:block;text-align:center;background:var(--surface2);color:var(--primary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.65rem;font-weight:700;font-size:.82rem;text-decoration:none;margin-top:.25rem">
+    ← Topic 13: Software Development
+  </a>
+  <a href="index.html" style="display:block;text-align:center;background:var(--primary);color:#fff;border-radius:var(--radius-sm);padding:.75rem;font-weight:700;font-size:.875rem;text-decoration:none;margin-top:.5rem">
+    ← Back to All Topics
+  </a>
+
+</aside>
+
+</div><!-- /lesson-wrap -->
+
+<footer style="background:var(--surface);border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;font-size:.8rem;color:var(--text-muted)">
+  Cambridge International AS &amp; A Level Computer Science 9618 — Topic 14: Further Data Representation &nbsp;|&nbsp;
+  Not affiliated with Cambridge Assessment International Education.
+</footer>
+
+<script src="script.js"></script>
+<script>
+  const sections = document.querySelectorAll('.lesson-section[id]');
+  const navLinks = document.querySelectorAll('.toc-list a, .page-nav a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+  document.querySelectorAll('.reveal-btn').forEach(btn => { btn.textContent = 'Show Answer'; });
+</script>
+</body>
+</html>
