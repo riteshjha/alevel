@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Topic 18: Further Programming — CS 9618</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .page-nav { background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:64px; z-index:90; overflow-x:auto; }
+    .page-nav-inner { max-width:1100px; margin:0 auto; padding:0 2rem; display:flex; gap:0; }
+    .page-nav a { display:block; padding:.75rem 1.1rem; font-size:.82rem; font-weight:600; color:var(--text-muted); text-decoration:none; white-space:nowrap; border-bottom:3px solid transparent; transition:color .2s,border-color .2s; }
+    .page-nav a:hover,.page-nav a.active { color:var(--primary); border-bottom-color:var(--primary); }
+
+    .lesson-wrap { max-width:1100px; margin:0 auto; padding:2.5rem 2rem 4rem; display:grid; grid-template-columns:1fr 280px; gap:2.5rem; align-items:start; }
+    @media(max-width:900px){ .lesson-wrap{grid-template-columns:1fr} .sidebar{display:none} }
+
+    .sidebar { position:sticky; top:120px; }
+    .sidebar-box { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; margin-bottom:1rem; box-shadow:var(--shadow); }
+    .sidebar-box h3 { font-size:.85rem; font-weight:700; margin-bottom:.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; }
+    .toc-list { list-style:none; }
+    .toc-list li { padding:.2rem 0; }
+    .toc-list a { font-size:.82rem; color:var(--text-muted); text-decoration:none; display:block; padding:.25rem .5rem; border-radius:4px; transition:background .15s,color .15s; }
+    .toc-list a:hover { background:var(--surface2); color:var(--primary); }
+    .toc-list a.active { background:var(--accent-light); color:var(--primary); font-weight:600; }
+
+    .lesson-section { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:2rem 2.25rem; margin-bottom:2rem; box-shadow:var(--shadow); scroll-margin-top:130px; }
+    .lesson-section h2 { font-size:1.5rem; font-weight:800; color:var(--primary); margin-bottom:.4rem; display:flex; align-items:center; gap:.6rem; }
+    .section-num { background:var(--primary); color:#fff; width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:.9rem; font-weight:800; flex-shrink:0; }
+    .lesson-section h3 { font-size:1.1rem; font-weight:700; margin:1.75rem 0 .75rem; padding-bottom:.4rem; border-bottom:2px solid var(--border); color:var(--text); }
+    .lesson-section h4 { font-size:.95rem; font-weight:700; margin:1.25rem 0 .5rem; color:var(--primary-light); }
+    .lesson-section p { font-size:.9rem; line-height:1.75; color:var(--text); margin-bottom:.75rem; }
+    .lesson-section ul,.lesson-section ol { padding-left:1.5rem; margin-bottom:.75rem; }
+    .lesson-section li { font-size:.9rem; line-height:1.75; color:var(--text); }
+
+    /* Worked example */
+    .worked { background:linear-gradient(135deg,#fff3e0,#fbe9e7); border:1px solid #ffcc80; border-left:5px solid #e65100; border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:1.25rem 1.5rem; margin:1rem 0; }
+    [data-theme="dark"] .worked { background:#1a0e00; border-color:#e65100; }
+    .worked .worked-title { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#e65100; margin-bottom:.6rem; }
+    [data-theme="dark"] .worked .worked-title { color:#ffcc80; }
+    .worked p,.worked li { font-size:.875rem; color:var(--text); }
+    .worked .step { display:flex; gap:.75rem; margin:.4rem 0; align-items:flex-start; }
+    .worked .step-num { background:#e65100; color:#fff; min-width:22px; height:22px; border-radius:50%; font-size:.72rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+    .worked .step-text { font-size:.875rem; line-height:1.6; }
+
+    /* Practice question */
+    .practice { background:var(--surface2); border:1px solid var(--border); border-left:5px solid #2e7d32; border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:1.25rem 1.5rem; margin:1rem 0; }
+    .practice .pq-title { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#2e7d32; margin-bottom:.6rem; }
+    .practice p,.practice li { font-size:.875rem; }
+    .practice .reveal-btn { background:#2e7d32; color:#fff; border:none; border-radius:6px; padding:.4rem 1rem; font-size:.8rem; font-weight:700; cursor:pointer; margin-top:.75rem; transition:background .2s; }
+    .practice .reveal-btn:hover { background:#1b5e20; }
+    .practice .answer-reveal { display:none; margin-top:.75rem; padding:.75rem 1rem; background:#e8f5e9; border-radius:var(--radius-sm); font-size:.875rem; }
+    [data-theme="dark"] .practice .answer-reveal { background:#1b2e1c; color:#c8e6c9; }
+    .practice .answer-reveal.open { display:block; }
+
+    /* Callouts */
+    .callout { background:var(--surface2); border-left:4px solid var(--accent); border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:.85rem 1.1rem; margin:.75rem 0; font-size:.875rem; color:var(--text); }
+    .callout.warn { border-color:#f59e0b; }
+    .callout.tip  { border-color:#22c55e; }
+    .callout.exam { border-color:#7c3aed; }
+
+    /* Key term */
+    .key-term { background:linear-gradient(transparent 60%,rgba(230,81,0,.15) 60%); font-weight:700; }
+
+    /* Objectives & breadcrumb */
+    .objectives-list { list-style:none; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:.5rem; }
+    .objectives-list li { font-size:.85rem; display:flex; align-items:flex-start; gap:.5rem; padding:.4rem 0; color:var(--text); }
+    .objectives-list li::before { content:'✦'; color:var(--accent); flex-shrink:0; }
+    .breadcrumb { display:flex; align-items:center; gap:.4rem; font-size:.82rem; color:var(--text-muted); margin-bottom:1.5rem; }
+    .breadcrumb a { color:var(--primary-light); text-decoration:none; }
+    .breadcrumb a:hover { text-decoration:underline; }
+
+    /* Checklist */
+    .checklist { list-style:none; padding:0; }
+    .checklist li { display:flex; align-items:flex-start; gap:.6rem; padding:.35rem 0; font-size:.875rem; color:var(--text); }
+    .checklist li::before { content:'☐'; color:var(--primary-light); font-size:1rem; flex-shrink:0; }
+
+    /* Tables */
+    .plain-table { width:100%; border-collapse:collapse; font-size:.875rem; margin:.75rem 0; }
+    .plain-table th { background:var(--primary); color:#fff; padding:.45rem .8rem; text-align:left; }
+    .plain-table td { border:1px solid var(--border); padding:.4rem .8rem; color:var(--text); vertical-align:top; }
+    .plain-table tr:nth-child(even) td { background:var(--surface2); }
+
+    /* Feature cards */
+    .feature-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:.85rem; margin:.75rem 0; }
+    .feature-card { background:var(--surface2); border:1px solid var(--border); border-top:3px solid #e65100; border-radius:var(--radius-sm); padding:1rem 1.1rem; }
+    .feature-card h4 { font-size:.9rem; font-weight:800; color:#e65100; margin-bottom:.4rem; }
+    [data-theme="dark"] .feature-card h4 { color:#ffcc80; }
+    .feature-card p { font-size:.82rem; line-height:1.6; color:var(--text); margin:0; }
+
+    /* Code block */
+    .code-block { background:#1e1e2e; color:#cdd6f4; border-radius:var(--radius-sm); padding:1rem 1.25rem; font-family:'Courier New',Courier,monospace; font-size:.83rem; line-height:1.85; margin:.75rem 0; overflow-x:auto; position:relative; }
+    .code-lang { position:absolute; top:.45rem; right:.75rem; font-size:.68rem; font-weight:700; color:#6c7086; text-transform:uppercase; letter-spacing:.06em; }
+    .kw  { color:#cba6f7; font-weight:700; }
+    .fn  { color:#89b4fa; }
+    .str { color:#a6e3a1; }
+    .cm  { color:#6c7086; font-style:italic; }
+    .num { color:#fab387; }
+    .op  { color:#89dceb; }
+    .at  { color:#f38ba8; }
+
+    /* Prolog specific */
+    .prolog-fact  { color:#a6e3a1; }
+    .prolog-rule  { color:#89b4fa; }
+    .prolog-query { color:#fab387; }
+    .prolog-var   { color:#cba6f7; font-weight:700; }
+    .prolog-true  { color:#a6e3a1; font-weight:700; }
+    .prolog-false { color:#f38ba8; font-weight:700; }
+
+    /* Arch / concept cards */
+    .arch-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:.85rem; margin:.75rem 0; }
+    .arch-card { background:var(--surface2); border:1px solid var(--border); border-top:3px solid #e65100; border-radius:var(--radius-sm); padding:1rem 1.1rem; }
+    .arch-card h4 { font-size:.88rem; font-weight:800; color:#e65100; margin-bottom:.35rem; }
+    [data-theme="dark"] .arch-card h4 { color:#ffcc80; }
+    .arch-card p { font-size:.8rem; line-height:1.6; color:var(--text); margin:0; }
+
+    /* List processing diagram */
+    .list-diagram { display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; font-family:'Courier New',Courier,monospace; font-size:.88rem; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:.85rem 1.1rem; margin:.75rem 0; }
+    .list-head { background:#e65100; color:#fff; padding:.25rem .65rem; border-radius:4px; font-weight:700; }
+    .list-tail-bracket { color:var(--text-muted); }
+    .list-sep { color:var(--text-muted); font-size:.9rem; }
+    .list-item { background:var(--surface); border:1px solid var(--border); padding:.2rem .55rem; border-radius:4px; color:var(--text); }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="header-inner">
+    <a class="logo" href="index.html">
+      <div class="logo-icon">💻</div>
+      <div>
+        <div class="logo-text">CS 9618</div>
+        <div class="logo-sub">Cambridge AS &amp; A Level</div>
+      </div>
+    </a>
+    <div class="header-actions">
+      <button class="btn-icon" id="theme-btn" title="Toggle theme">🌙</button>
+    </div>
+  </div>
+</header>
+
+<!-- Section nav -->
+<nav class="page-nav" aria-label="Sections">
+  <div class="page-nav-inner">
+    <a href="#paradigms" class="active">1. Paradigms</a>
+    <a href="#declarative">2. Declarative &amp; Prolog</a>
+    <a href="#functional">3. Functional Programming</a>
+    <a href="#list-processing">4. List Processing</a>
+    <a href="#comparison">5. Comparing Paradigms</a>
+    <a href="#exam-practice">📝 Exam Practice</a>
+  </div>
+</nav>
+
+<div class="lesson-wrap">
+<main>
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="index.html">Home</a>
+    <span>›</span>
+    <a href="index.html#tab-al">Paper 3 — Advanced Theory</a>
+    <span>›</span>
+    <strong style="color:var(--text)">Topic 18: Further Programming</strong>
+  </div>
+
+  <!-- Hero -->
+  <div class="lesson-section" style="background:linear-gradient(135deg,#5d1500,#e65100,#f4511e);color:#fff;border:none">
+    <div style="display:flex;align-items:flex-start;gap:1.25rem">
+      <div style="font-size:3rem;flex-shrink:0">💻</div>
+      <div>
+        <div style="font-size:.75rem;font-weight:700;opacity:.7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem">Paper 3 · Topic 18 · A Level Only</div>
+        <h1 style="font-size:1.9rem;font-weight:900;margin-bottom:.5rem;color:#fff">Further Programming</h1>
+        <p style="opacity:.85;font-size:.95rem;max-width:620px;margin-bottom:1rem;color:#fff">Programming paradigms beyond the imperative — declarative programming and Prolog (facts, rules, queries, unification, backtracking), functional programming (pure functions, immutability, higher-order functions), and list processing with map, filter, and fold/reduce.</p>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+          <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">Paper 3 · A Level Only</span>
+          <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">~12% of Paper 3 marks</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Learning objectives -->
+  <div class="lesson-section">
+    <h2><span class="section-num">✦</span> Learning Objectives</h2>
+    <p>By the end of this topic you should be able to:</p>
+    <ul class="objectives-list">
+      <li>Name and describe four programming paradigms: procedural, OOP, declarative, functional</li>
+      <li>Explain what makes a language declarative — state <em>what</em> not <em>how</em></li>
+      <li>Write and read Prolog facts, rules, and queries using correct syntax</li>
+      <li>Trace how Prolog's inference engine uses unification and backtracking to answer a query</li>
+      <li>Explain what a pure function is and why immutability matters in functional programming</li>
+      <li>Describe and use higher-order functions: map, filter, and fold/reduce</li>
+      <li>Write recursive functions in a functional style (no mutable state)</li>
+      <li>Explain head–tail list structure and trace list-processing recursion</li>
+      <li>Define lambda (anonymous) functions and write simple lambda expressions</li>
+      <li>Explain what a closure is</li>
+      <li>Compare paradigms: choose the most appropriate for a given problem with justification</li>
+    </ul>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- SECTION 1: Programming Paradigms        -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="lesson-section" id="paradigms">
+    <h2><span class="section-num">1</span> Programming Paradigms</h2>
+
+    <p>A <span class="key-term">programming paradigm</span> is a fundamental style or approach to programming — a way of thinking about and structuring solutions. Different paradigms suit different types of problems. Most modern languages support multiple paradigms (multi-paradigm), but each paradigm has a distinct philosophy.</p>
+
+    <table class="plain-table">
+      <tr>
+        <th>Paradigm</th>
+        <th>Core idea</th>
+        <th>Key features</th>
+        <th>Examples</th>
+      </tr>
+      <tr>
+        <td><strong>Procedural / Imperative</strong></td>
+        <td>Tell the computer <em>how</em> to do things — step by step</td>
+        <td>Sequence, selection, iteration; mutable variables; procedures/subroutines</td>
+        <td>C, Pascal, early BASIC</td>
+      </tr>
+      <tr>
+        <td><strong>Object-Oriented (OOP)</strong></td>
+        <td>Model the world as interacting objects</td>
+        <td>Classes, objects, encapsulation, inheritance, polymorphism</td>
+        <td>Python, Java, C++, C#</td>
+      </tr>
+      <tr>
+        <td><strong>Declarative</strong></td>
+        <td>Describe <em>what</em> you want, not how to compute it</td>
+        <td>Facts and rules; inference engine; no explicit control flow; logic-based</td>
+        <td>Prolog, SQL, HTML, CSS</td>
+      </tr>
+      <tr>
+        <td><strong>Functional</strong></td>
+        <td>Compute by applying and composing pure functions</td>
+        <td>Immutable data; no side effects; higher-order functions; recursion instead of loops</td>
+        <td>Haskell, Erlang, F#, Clojure; functional features in Python &amp; JavaScript</td>
+      </tr>
+    </table>
+
+    <div class="callout tip">
+      <strong>Key distinction — imperative vs declarative:</strong> An imperative program says "first do this, then do that." A declarative program says "here are the facts and rules — find me the answer." The programmer does not specify the control flow; the runtime figures out how to derive the result.
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question</div>
+      <p>State the programming paradigm most associated with each of the following, and justify your choice. (4 marks)</p>
+      <p>(a) A program that uses IF statements, FOR loops, and variables to calculate a payroll.</p>
+      <p>(b) A database query that selects all customers whose balance exceeds £500.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>(a)</strong> Procedural / imperative. The program specifies step-by-step instructions using sequence (statements in order), selection (IF), and iteration (FOR loop) — the defining features of procedural programming. Mutable variables store intermediate results. (2 marks)</p>
+        <p><strong>(b)</strong> Declarative. A SQL SELECT statement describes <em>what data is wanted</em> (customers with balance &gt; 500) without specifying how the database engine should search — it does not write a loop to check each record. The database's query optimiser determines the execution plan. (2 marks)</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- SECTION 2: Declarative Programming      -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="lesson-section" id="declarative">
+    <h2><span class="section-num">2</span> Declarative Programming &amp; Prolog</h2>
+
+    <p>In a <span class="key-term">declarative language</span>, the programmer defines a set of facts and rules that describe a problem domain. The language's inference engine automatically determines how to use those facts and rules to answer queries. The programmer never writes explicit loops or conditional branching — the engine handles all control flow.</p>
+
+    <p><span class="key-term">Prolog</span> (Programming in Logic) is the most widely taught declarative language. It is used in AI, natural language processing, and logic puzzle solving.</p>
+
+    <h3>Prolog Syntax: Facts, Rules, and Queries</h3>
+
+    <div class="arch-grid">
+      <div class="arch-card">
+        <h4>Facts</h4>
+        <p>Unconditionally true statements about the world. The base-level knowledge in the program. End with a full stop.</p>
+        <p style="font-size:.78rem;margin-top:.4rem;font-family:'Courier New',Courier,monospace">parent(tom, bob).<br>parent(bob, ann).<br>likes(mary, food).</p>
+      </div>
+      <div class="arch-card">
+        <h4>Rules</h4>
+        <p>Conditional relationships: "Head is true IF Body is true." Use <code>:-</code> (read as "if"). Comma in body = AND; semicolon = OR.</p>
+        <p style="font-size:.78rem;margin-top:.4rem;font-family:'Courier New',Courier,monospace">grandparent(X,Z) :-<br>&nbsp;&nbsp;parent(X,Y),<br>&nbsp;&nbsp;parent(Y,Z).</p>
+      </div>
+      <div class="arch-card">
+        <h4>Queries</h4>
+        <p>Questions asked at the prompt using <code>?-</code>. Prolog attempts to prove the query true using facts and rules. Returns <code>true</code>, <code>false</code>, or a variable binding.</p>
+        <p style="font-size:.78rem;margin-top:.4rem;font-family:'Courier New',Courier,monospace">?- parent(tom, bob).<br>true.<br><br>?- parent(tom, X).<br>X = bob ;<br>X = liz.</p>
+      </div>
+      <div class="arch-card">
+        <h4>Variables</h4>
+        <p>Start with an uppercase letter (or underscore). Anonymous variable <code>_</code> matches anything without binding. Variables are local to each clause.</p>
+        <p style="font-size:.78rem;margin-top:.4rem;font-family:'Courier New',Courier,monospace">?- parent(_, ann).<br>true. <span style="color:#6c7086">% who is ann's parent?</span></p>
+      </div>
+    </div>
+
+    <h3>A Complete Prolog Program</h3>
+
+    <div class="code-block">
+      <span class="code-lang">Prolog</span>
+<span class="cm">% ── Facts ───────────────────────────────────────</span>
+<span class="prolog-fact">parent(tom, bob).</span>       <span class="cm">% tom is a parent of bob</span>
+<span class="prolog-fact">parent(tom, liz).</span>
+<span class="prolog-fact">parent(bob, ann).</span>
+<span class="prolog-fact">parent(bob, pat).</span>
+<span class="prolog-fact">female(liz).</span>
+<span class="prolog-fact">female(ann).</span>
+<span class="prolog-fact">male(tom).</span>
+<span class="prolog-fact">male(bob).</span>
+<span class="prolog-fact">male(pat).</span>
+
+<span class="cm">% ── Rules ───────────────────────────────────────</span>
+<span class="prolog-rule">grandparent(<span class="prolog-var">X</span>, <span class="prolog-var">Z</span>) :-</span>
+    <span class="prolog-rule">parent(<span class="prolog-var">X</span>, <span class="prolog-var">Y</span>),</span>
+    <span class="prolog-rule">parent(<span class="prolog-var">Y</span>, <span class="prolog-var">Z</span>).</span>
+
+<span class="prolog-rule">mother(<span class="prolog-var">X</span>, <span class="prolog-var">Y</span>) :-</span>
+    <span class="prolog-rule">parent(<span class="prolog-var">X</span>, <span class="prolog-var">Y</span>),</span>
+    <span class="prolog-rule">female(<span class="prolog-var">X</span>).</span>
+
+<span class="prolog-rule">sibling(<span class="prolog-var">X</span>, <span class="prolog-var">Y</span>) :-</span>
+    <span class="prolog-rule">parent(<span class="prolog-var">Z</span>, <span class="prolog-var">X</span>),</span>
+    <span class="prolog-rule">parent(<span class="prolog-var">Z</span>, <span class="prolog-var">Y</span>),</span>
+    <span class="prolog-rule"><span class="prolog-var">X</span> \= <span class="prolog-var">Y</span>.</span>       <span class="cm">% X and Y must be different</span>
+
+<span class="cm">% ── Queries (typed at ?- prompt) ────────────────</span>
+<span class="prolog-query">?- grandparent(tom, ann).</span>
+<span class="prolog-true">true.</span>
+
+<span class="prolog-query">?- grandparent(tom, X).</span>
+<span class="prolog-true">X = ann</span> ;
+<span class="prolog-true">X = pat.</span>
+
+<span class="prolog-query">?- mother(X, ann).</span>
+<span class="prolog-false">false.</span>         <span class="cm">% bob is male, so no mother fact applies</span>
+
+<span class="prolog-query">?- sibling(ann, pat).</span>
+<span class="prolog-true">true.</span>
+    </div>
+
+    <h3>Unification</h3>
+    <p><span class="key-term">Unification</span> is the process by which Prolog matches a query against facts and rules. Two terms unify if they can be made identical by substituting values for variables.</p>
+    <ul>
+      <li><code>parent(tom, X)</code> unifies with <code>parent(tom, bob)</code> by binding X = bob.</li>
+      <li><code>parent(X, Y)</code> unifies with <code>parent(tom, liz)</code> by binding X = tom, Y = liz.</li>
+      <li><code>parent(ann, X)</code> does <em>not</em> unify with <code>parent(tom, bob)</code> — <code>ann ≠ tom</code>.</li>
+    </ul>
+
+    <h3>Backtracking in Prolog</h3>
+    <p>When Prolog attempts to satisfy a query, it works through the database from top to bottom, trying each matching clause in order. If a chosen path fails later, Prolog <span class="key-term">backtracks</span> — undoes the last choice and tries the next alternative. This is automatic; the programmer does not write backtracking logic.</p>
+
+    <div class="worked">
+      <div class="worked-title">Worked Example — Tracing a Query with Backtracking</div>
+      <p><strong>Query:</strong> <code>?- grandparent(tom, X).</code></p>
+      <div class="step"><div class="step-num">1</div><div class="step-text">Try rule: <code>grandparent(tom, X) :- parent(tom, Y), parent(Y, X).</code> — matches. Bind X→?, Y→?</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Goal 1: <code>parent(tom, Y)</code>. Scan facts — first match: <code>parent(tom, bob)</code>. Bind Y = bob.</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Goal 2: <code>parent(bob, X)</code>. Scan facts — first match: <code>parent(bob, ann)</code>. Bind X = ann.</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text">Both goals satisfied. <strong>Return X = ann.</strong> User presses <code>;</code> to ask for more.</div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-text"><strong>Backtrack</strong> into Goal 2: try next <code>parent(bob, _)</code> fact → <code>parent(bob, pat)</code>. Bind X = pat.</div></div>
+      <div class="step"><div class="step-num">6</div><div class="step-text"><strong>Return X = pat.</strong> User presses <code>;</code> again.</div></div>
+      <div class="step"><div class="step-num">7</div><div class="step-text">No more <code>parent(bob, _)</code> facts. <strong>Backtrack</strong> into Goal 1: try next <code>parent(tom, _)</code> fact → <code>parent(tom, liz)</code>. Bind Y = liz.</div></div>
+      <div class="step"><div class="step-num">8</div><div class="step-text">Goal 2: <code>parent(liz, X)</code>. Scan facts — no match. <strong>Fail.</strong> No more alternatives. Query exhausted.</div></div>
+      <p style="margin-top:.5rem"><strong>Final results:</strong> X = ann, X = pat. (tom has no grandchildren through liz.)</p>
+    </div>
+
+    <h3>Arithmetic in Prolog</h3>
+    <p>Prolog does not evaluate arithmetic expressions automatically — you must use the <code>is</code> operator to force evaluation:</p>
+    <div class="code-block">
+      <span class="code-lang">Prolog</span>
+<span class="cm">% Wrong — this tries to unify X with the expression 3+2, not 5:</span>
+<span class="prolog-query">?- X = 3 + 2.</span>
+<span class="prolog-true">X = 3+2.</span>          <span class="cm">% X is bound to the term 3+2, not evaluated</span>
+
+<span class="cm">% Correct — use 'is' to evaluate:</span>
+<span class="prolog-query">?- X is 3 + 2.</span>
+<span class="prolog-true">X = 5.</span>
+
+<span class="cm">% Factorial using recursion:</span>
+<span class="prolog-rule">factorial(0, 1) :- !.</span>   <span class="cm">% base case — ! is "cut" (stop backtracking)</span>
+<span class="prolog-rule">factorial(<span class="prolog-var">N</span>, <span class="prolog-var">F</span>) :-</span>
+    <span class="prolog-rule"><span class="prolog-var">N</span> > 0,</span>
+    <span class="prolog-rule"><span class="prolog-var">N1</span> is <span class="prolog-var">N</span> - 1,</span>
+    <span class="prolog-rule">factorial(<span class="prolog-var">N1</span>, <span class="prolog-var">F1</span>),</span>
+    <span class="prolog-rule"><span class="prolog-var">F</span> is <span class="prolog-var">N</span> * <span class="prolog-var">F1</span>.</span>
+
+<span class="prolog-query">?- factorial(5, F).</span>
+<span class="prolog-true">F = 120.</span>
+    </div>
+
+    <div class="callout exam">
+      <strong>Exam tip:</strong> Cambridge exams commonly ask you to: (1) write Prolog facts and rules for a given scenario; (2) state what a query returns given a knowledge base; (3) trace how Prolog reaches a conclusion. Remember — variables start uppercase, facts end with a full stop, rules use <code>:-</code>, and Prolog searches top-to-bottom with automatic backtracking.
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question</div>
+      <p>Consider the following Prolog knowledge base:</p>
+      <div class="code-block" style="margin:.5rem 0">
+        <span class="code-lang">Prolog</span>
+<span class="prolog-fact">teaches(smith, maths).</span>
+<span class="prolog-fact">teaches(jones, physics).</span>
+<span class="prolog-fact">teaches(jones, chemistry).</span>
+<span class="prolog-fact">studies(alice, maths).</span>
+<span class="prolog-fact">studies(alice, physics).</span>
+<span class="prolog-fact">studies(bob, chemistry).</span>
+
+<span class="prolog-rule">taught_by(<span class="prolog-var">Student</span>, <span class="prolog-var">Teacher</span>) :-</span>
+    <span class="prolog-rule">studies(<span class="prolog-var">Student</span>, <span class="prolog-var">Subject</span>),</span>
+    <span class="prolog-rule">teaches(<span class="prolog-var">Teacher</span>, <span class="prolog-var">Subject</span>).</span>
+      </div>
+      <p>(a) What is returned by <code>?- taught_by(alice, T).</code>? (2 marks)</p>
+      <p>(b) Write a Prolog rule <code>classmates(X, Y)</code> that is true when X and Y are different students who both study the same subject. (2 marks)</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>(a)</strong> Prolog finds all solutions:</p>
+        <p>First: studies(alice, maths), teaches(smith, maths) → T = smith (1 mark)</p>
+        <p>Second: studies(alice, physics), teaches(jones, physics) → T = jones (1 mark)</p>
+        <p>So: <code>T = smith ; T = jones.</code></p>
+        <p><strong>(b)</strong></p>
+        <div style="font-family:'Courier New',Courier,monospace;font-size:.85rem;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:.6rem .9rem;margin:.4rem 0">
+          classmates(X, Y) :-<br>
+          &nbsp;&nbsp;studies(X, Subject),<br>
+          &nbsp;&nbsp;studies(Y, Subject),<br>
+          &nbsp;&nbsp;X \= Y.
+        </div>
+        <p>(1 mark for correct structure with shared Subject variable; 1 mark for X \= Y inequality check.)</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- SECTION 3: Functional Programming       -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="lesson-section" id="functional">
+    <h2><span class="section-num">3</span> Functional Programming</h2>
+
+    <p><span class="key-term">Functional programming (FP)</span> treats computation as the evaluation of mathematical functions. Programs are built by defining and composing functions — there are no mutable variables, no loops, and no side effects. Every function takes inputs and returns an output, and calling a function with the same inputs always returns the same output.</p>
+
+    <h3>Core Concepts</h3>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h4>Pure Functions</h4>
+        <p>Output depends <em>only</em> on inputs — no global state, no I/O, no side effects. Same input always gives same output. Easy to test, reason about, and parallelise.</p>
+      </div>
+      <div class="feature-card">
+        <h4>Immutability</h4>
+        <p>Once created, data cannot be modified. Instead of changing a value, you create a new value. Eliminates entire classes of bugs caused by unexpected mutation.</p>
+      </div>
+      <div class="feature-card">
+        <h4>No Side Effects</h4>
+        <p>A function does not modify any state outside itself — no writing to variables, files, or databases. Any "effect" is made explicit through the return value.</p>
+      </div>
+      <div class="feature-card">
+        <h4>First-Class Functions</h4>
+        <p>Functions are values — they can be passed as arguments, returned from other functions, and stored in variables. This is the foundation of higher-order functions.</p>
+      </div>
+      <div class="feature-card">
+        <h4>Recursion over Loops</h4>
+        <p>Since variables are immutable, loops (which require a mutable counter) are replaced by recursion. The base case terminates; the recursive case reduces the problem.</p>
+      </div>
+      <div class="feature-card">
+        <h4>Referential Transparency</h4>
+        <p>Any expression can be replaced by its value without changing program behaviour. Follows directly from pure functions — makes programs easy to reason about mathematically.</p>
+      </div>
+    </div>
+
+    <h3>Pure vs Impure Functions</h3>
+
+    <div class="code-block">
+      <span class="code-lang">Python</span>
+<span class="cm"># IMPURE — depends on external state (side effect: modifies global)</span>
+total = 0
+<span class="kw">def</span> <span class="fn">add_to_total</span>(x):
+    <span class="kw">global</span> total
+    total += x           <span class="cm"># modifies global state — IMPURE</span>
+    <span class="kw">return</span> total
+
+<span class="cm"># PURE — output depends only on inputs; no side effects</span>
+<span class="kw">def</span> <span class="fn">add</span>(a, b):
+    <span class="kw">return</span> a + b        <span class="cm"># always returns a+b; nothing else changes</span>
+
+<span class="cm"># IMPURE — print() is a side effect (I/O)</span>
+<span class="kw">def</span> <span class="fn">greet_impure</span>(name):
+    <span class="fn">print</span>(<span class="str">f"Hello, {name}"</span>)   <span class="cm"># side effect</span>
+
+<span class="cm"># PURE — returns the string instead of printing it</span>
+<span class="kw">def</span> <span class="fn">greet_pure</span>(name):
+    <span class="kw">return</span> <span class="str">f"Hello, {name}"</span>
+    </div>
+
+    <h3>Lambda (Anonymous) Functions</h3>
+    <p>A <span class="key-term">lambda function</span> is a small, unnamed function defined inline — useful when a short function is needed only once, especially as an argument to a higher-order function.</p>
+
+    <div class="code-block">
+      <span class="code-lang">Python</span>
+<span class="cm"># Named function</span>
+<span class="kw">def</span> <span class="fn">square</span>(x):
+    <span class="kw">return</span> x ** <span class="num">2</span>
+
+<span class="cm"># Equivalent lambda (anonymous) function</span>
+square = <span class="kw">lambda</span> x: x ** <span class="num">2</span>
+
+<span class="cm"># Lambda with two parameters</span>
+add = <span class="kw">lambda</span> a, b: a + b
+<span class="fn">print</span>(add(<span class="num">3</span>, <span class="num">4</span>))   <span class="cm"># 7</span>
+
+<span class="cm"># Most common use — passing directly to a higher-order function</span>
+numbers = [<span class="num">5</span>, <span class="num">2</span>, <span class="num">8</span>, <span class="num">1</span>, <span class="num">9</span>]
+sorted_nums = <span class="fn">sorted</span>(numbers, key=<span class="kw">lambda</span> x: -x)   <span class="cm"># sort descending</span>
+<span class="fn">print</span>(sorted_nums)  <span class="cm"># [9, 8, 5, 2, 1]</span>
+    </div>
+
+    <h3>Closures</h3>
+    <p>A <span class="key-term">closure</span> is a function that "remembers" the variables from its enclosing scope even after that scope has finished executing. The function closes over those variables — capturing them.</p>
+
+    <div class="code-block">
+      <span class="code-lang">Python</span>
+<span class="kw">def</span> <span class="fn">make_multiplier</span>(factor):
+    <span class="cm"># 'factor' is captured by the inner function</span>
+    <span class="kw">def</span> <span class="fn">multiply</span>(x):
+        <span class="kw">return</span> x * factor    <span class="cm"># 'factor' is closed over</span>
+    <span class="kw">return</span> multiply
+
+double = <span class="fn">make_multiplier</span>(<span class="num">2</span>)   <span class="cm"># double is a closure with factor=2</span>
+triple = <span class="fn">make_multiplier</span>(<span class="num">3</span>)   <span class="cm"># triple is a closure with factor=3</span>
+
+<span class="fn">print</span>(double(<span class="num">5</span>))   <span class="cm"># 10</span>
+<span class="fn">print</span>(triple(<span class="num">5</span>))   <span class="cm"># 15</span>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question</div>
+      <p>(a) Explain what is meant by a <strong>pure function</strong> and give one reason why pure functions are easier to test than impure functions. (2 marks)</p>
+      <p>(b) The following Python function is impure. Rewrite it as a pure function. (2 marks)</p>
+      <div class="code-block" style="margin:.5rem 0">
+        <span class="code-lang">Python</span>
+results = []
+<span class="kw">def</span> <span class="fn">add_result</span>(value):
+    results.<span class="fn">append</span>(value * <span class="num">2</span>)
+      </div>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>(a)</strong> A pure function's output depends only on its inputs — it does not read or modify any external state, and has no side effects (no I/O, no mutation of global variables). (1 mark)</p>
+        <p>Pure functions are easier to test because, given the same inputs, they always return the same output regardless of the program state — there is no need to set up or reset global state between test runs, and no external dependencies that could affect the result. (1 mark)</p>
+        <p><strong>(b)</strong> Rewritten as a pure function — takes the value as input and returns the result instead of modifying a global list:</p>
+        <div style="font-family:'Courier New',Courier,monospace;font-size:.85rem;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:.6rem .9rem;margin:.4rem 0">
+          def double_value(value):<br>
+          &nbsp;&nbsp;return value * 2
+        </div>
+        <p>(1 mark for removing the global side effect; 1 mark for returning the result instead.)</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- SECTION 4: List Processing & HOFs       -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="lesson-section" id="list-processing">
+    <h2><span class="section-num">4</span> List Processing &amp; Higher-Order Functions</h2>
+
+    <p>Lists are the fundamental data structure in functional programming. Rather than iterating with loops (which require mutable counters), functional languages process lists recursively using the <span class="key-term">head–tail</span> structure, and through built-in higher-order functions.</p>
+
+    <h3>Head and Tail</h3>
+    <p>Every non-empty list is decomposed into:</p>
+    <ul>
+      <li><strong>Head</strong> — the first element of the list.</li>
+      <li><strong>Tail</strong> — the rest of the list (itself a list, possibly empty).</li>
+    </ul>
+
+    <div class="list-diagram">
+      <span style="font-size:.8rem;color:var(--text-muted);margin-right:.25rem">List:</span>
+      <span class="list-head">3</span>
+      <span class="list-sep">|</span>
+      <span class="list-tail-bracket">[</span>
+      <span class="list-item">7</span>
+      <span class="list-item">1</span>
+      <span class="list-item">9</span>
+      <span class="list-item">4</span>
+      <span class="list-tail-bracket">]</span>
+      <span style="font-size:.78rem;color:var(--text-muted);margin-left:.5rem">Head = 3, Tail = [7, 1, 9, 4]</span>
+    </div>
+
+    <div class="code-block">
+      <span class="code-lang">Python (functional style)</span>
+<span class="cm"># Python lists support head/tail decomposition</span>
+lst = [<span class="num">3</span>, <span class="num">7</span>, <span class="num">1</span>, <span class="num">9</span>, <span class="num">4</span>]
+head = lst[<span class="num">0</span>]       <span class="cm"># 3</span>
+tail = lst[<span class="num">1</span>:]      <span class="cm"># [7, 1, 9, 4]</span>
+
+<span class="cm"># Recursive sum — no loop, no mutable variable</span>
+<span class="kw">def</span> <span class="fn">total</span>(lst):
+    <span class="kw">if</span> lst == []:
+        <span class="kw">return</span> <span class="num">0</span>                       <span class="cm"># base case</span>
+    <span class="kw">return</span> lst[<span class="num">0</span>] + <span class="fn">total</span>(lst[<span class="num">1</span>:])   <span class="cm"># head + total(tail)</span>
+
+<span class="fn">print</span>(<span class="fn">total</span>([<span class="num">3</span>, <span class="num">7</span>, <span class="num">1</span>, <span class="num">9</span>, <span class="num">4</span>]))  <span class="cm"># 24</span>
+    </div>
+
+    <div class="code-block" style="margin-top:.5rem">
+      <span class="code-lang">Prolog</span>
+<span class="cm">% Head-tail pattern in Prolog using [H|T] notation</span>
+<span class="prolog-rule">sum_list([], 0).</span>                     <span class="cm">% empty list sums to 0</span>
+<span class="prolog-rule">sum_list([<span class="prolog-var">H</span>|<span class="prolog-var">T</span>], <span class="prolog-var">Sum</span>) :-</span>
+    <span class="prolog-rule">sum_list(<span class="prolog-var">T</span>, <span class="prolog-var">Rest</span>),</span>
+    <span class="prolog-rule"><span class="prolog-var">Sum</span> is <span class="prolog-var">H</span> + <span class="prolog-var">Rest</span>.</span>
+
+<span class="prolog-query">?- sum_list([3, 7, 1, 9, 4], S).</span>
+<span class="prolog-true">S = 24.</span>
+    </div>
+
+    <h3>Higher-Order Functions: map, filter, reduce</h3>
+    <p>A <span class="key-term">higher-order function (HOF)</span> is a function that takes one or more functions as arguments, or returns a function as its result. The three most important HOFs in functional programming are <strong>map</strong>, <strong>filter</strong>, and <strong>fold/reduce</strong>.</p>
+
+    <h4>map — Transform Every Element</h4>
+    <p>Applies a function to every element of a list and returns a new list of the results. The original list is unchanged (immutability).</p>
+
+    <div class="code-block">
+      <span class="code-lang">Python</span>
+numbers = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>]
+
+<span class="cm"># Using map() with a lambda</span>
+squares = <span class="fn">list</span>(<span class="fn">map</span>(<span class="kw">lambda</span> x: x**<span class="num">2</span>, numbers))
+<span class="fn">print</span>(squares)   <span class="cm"># [1, 4, 9, 16, 25]</span>
+
+<span class="cm"># Using a named function with map()</span>
+<span class="kw">def</span> <span class="fn">celsius_to_fahrenheit</span>(c):
+    <span class="kw">return</span> c * <span class="num">9</span>/<span class="num">5</span> + <span class="num">32</span>
+
+temps_c = [<span class="num">0</span>, <span class="num">20</span>, <span class="num">37</span>, <span class="num">100</span>]
+temps_f = <span class="fn">list</span>(<span class="fn">map</span>(celsius_to_fahrenheit, temps_c))
+<span class="fn">print</span>(temps_f)   <span class="cm"># [32.0, 68.0, 98.6, 212.0]</span>
+
+<span class="cm"># Recursive implementation of map</span>
+<span class="kw">def</span> <span class="fn">my_map</span>(f, lst):
+    <span class="kw">if</span> lst == []:
+        <span class="kw">return</span> []
+    <span class="kw">return</span> [<span class="fn">f</span>(lst[<span class="num">0</span>])] + <span class="fn">my_map</span>(f, lst[<span class="num">1</span>:])   <span class="cm"># apply f to head, recurse on tail</span>
+    </div>
+
+    <h4>filter — Keep Matching Elements</h4>
+    <p>Returns a new list containing only those elements that satisfy a predicate function (a function that returns True or False).</p>
+
+    <div class="code-block">
+      <span class="code-lang">Python</span>
+numbers = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>, <span class="num">7</span>, <span class="num">8</span>]
+
+<span class="cm"># Keep only even numbers</span>
+evens = <span class="fn">list</span>(<span class="fn">filter</span>(<span class="kw">lambda</span> x: x % <span class="num">2</span> == <span class="num">0</span>, numbers))
+<span class="fn">print</span>(evens)    <span class="cm"># [2, 4, 6, 8]</span>
+
+<span class="cm"># Keep words longer than 4 characters</span>
+words = [<span class="str">"cat"</span>, <span class="str">"elephant"</span>, <span class="str">"dog"</span>, <span class="str">"hippopotamus"</span>, <span class="str">"ox"</span>]
+long_words = <span class="fn">list</span>(<span class="fn">filter</span>(<span class="kw">lambda</span> w: <span class="fn">len</span>(w) > <span class="num">4</span>, words))
+<span class="fn">print</span>(long_words)   <span class="cm"># ['elephant', 'hippopotamus']</span>
+
+<span class="cm"># Recursive implementation of filter</span>
+<span class="kw">def</span> <span class="fn">my_filter</span>(pred, lst):
+    <span class="kw">if</span> lst == []:
+        <span class="kw">return</span> []
+    <span class="kw">if</span> <span class="fn">pred</span>(lst[<span class="num">0</span>]):
+        <span class="kw">return</span> [lst[<span class="num">0</span>]] + <span class="fn">my_filter</span>(pred, lst[<span class="num">1</span>:])  <span class="cm"># keep head</span>
+    <span class="kw">return</span> <span class="fn">my_filter</span>(pred, lst[<span class="num">1</span>:])                  <span class="cm"># skip head</span>
+    </div>
+
+    <h4>fold / reduce — Accumulate to a Single Value</h4>
+    <p>Reduces a list to a single value by repeatedly applying a combining function. Takes an initial accumulator value and processes elements one by one.</p>
+
+    <div class="code-block">
+      <span class="code-lang">Python</span>
+<span class="kw">from</span> functools <span class="kw">import</span> reduce
+
+numbers = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>]
+
+<span class="cm"># Sum all elements (accumulator starts at 0)</span>
+total = <span class="fn">reduce</span>(<span class="kw">lambda</span> acc, x: acc + x, numbers, <span class="num">0</span>)
+<span class="fn">print</span>(total)   <span class="cm"># 15</span>
+
+<span class="cm"># Product of all elements (accumulator starts at 1)</span>
+product = <span class="fn">reduce</span>(<span class="kw">lambda</span> acc, x: acc * x, numbers, <span class="num">1</span>)
+<span class="fn">print</span>(product) <span class="cm"># 120</span>
+
+<span class="cm"># Find maximum element</span>
+maximum = <span class="fn">reduce</span>(<span class="kw">lambda</span> acc, x: acc <span class="kw">if</span> acc > x <span class="kw">else</span> x, numbers)
+<span class="fn">print</span>(maximum) <span class="cm"># 5</span>
+
+<span class="cm"># How reduce works step-by-step for sum [1,2,3,4,5]:</span>
+<span class="cm"># Step 1: acc=0,  x=1 → 0+1  = 1</span>
+<span class="cm"># Step 2: acc=1,  x=2 → 1+2  = 3</span>
+<span class="cm"># Step 3: acc=3,  x=3 → 3+3  = 6</span>
+<span class="cm"># Step 4: acc=6,  x=4 → 6+4  = 10</span>
+<span class="cm"># Step 5: acc=10, x=5 → 10+5 = 15  ← final result</span>
+    </div>
+
+    <h3>Composing Higher-Order Functions</h3>
+    <p>The real power of functional programming comes from chaining HOFs — applying map, filter, and reduce in sequence to transform data through a pipeline.</p>
+
+    <div class="code-block">
+      <span class="code-lang">Python</span>
+<span class="cm"># Problem: find the sum of squares of all odd numbers in a list</span>
+numbers = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>, <span class="num">7</span>, <span class="num">8</span>, <span class="num">9</span>, <span class="num">10</span>]
+
+result = <span class="fn">reduce</span>(
+    <span class="kw">lambda</span> acc, x: acc + x,
+    <span class="fn">map</span>(<span class="kw">lambda</span> x: x**<span class="num">2</span>,              <span class="cm"># Step 2: square each</span>
+        <span class="fn">filter</span>(<span class="kw">lambda</span> x: x % <span class="num">2</span> != <span class="num">0</span>,  <span class="cm"># Step 1: keep odds</span>
+               numbers)),
+    <span class="num">0</span>                                   <span class="cm"># initial accumulator</span>
+)
+<span class="fn">print</span>(result)  <span class="cm"># 1+9+25+49+81 = 165</span>
+    </div>
+
+    <div class="worked">
+      <div class="worked-title">Worked Example — Tracing map and filter</div>
+      <p><strong>Input:</strong> <code>[2, 5, 3, 8, 1, 6]</code></p>
+      <p><strong>Step 1 — filter(lambda x: x &gt; 3, ...):</strong></p>
+      <div class="list-diagram">
+        <span class="list-item" style="opacity:.4">2✗</span>
+        <span class="list-item" style="border-color:#2e7d32;color:#2e7d32">5✓</span>
+        <span class="list-item" style="opacity:.4">3✗</span>
+        <span class="list-item" style="border-color:#2e7d32;color:#2e7d32">8✓</span>
+        <span class="list-item" style="opacity:.4">1✗</span>
+        <span class="list-item" style="border-color:#2e7d32;color:#2e7d32">6✓</span>
+        <span style="color:var(--text-muted);margin-left:.5rem">→ [5, 8, 6]</span>
+      </div>
+      <p><strong>Step 2 — map(lambda x: x * 2, ...):</strong></p>
+      <div class="list-diagram">
+        <span class="list-item">5 → <strong>10</strong></span>
+        <span class="list-item">8 → <strong>16</strong></span>
+        <span class="list-item">6 → <strong>12</strong></span>
+        <span style="color:var(--text-muted);margin-left:.5rem">→ [10, 16, 12]</span>
+      </div>
+      <p><strong>Final result:</strong> <code>[10, 16, 12]</code></p>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question</div>
+      <p>A list of student marks is given: <code>[45, 72, 38, 91, 55, 60, 29, 83]</code></p>
+      <p>(a) Write a Python expression using <code>filter</code> and a lambda to produce a list of all marks that are 50 or above. State the result. (2 marks)</p>
+      <p>(b) Write a Python expression using <code>map</code> and a lambda to add 5 bonus marks to every mark in the original list. State the result. (2 marks)</p>
+      <p>(c) Using <code>reduce</code>, write an expression to find the highest mark in the original list. (2 marks)</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>(a)</strong></p>
+        <div style="font-family:'Courier New',Courier,monospace;font-size:.85rem;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:.6rem .9rem;margin:.4rem 0">
+          list(filter(lambda x: x &gt;= 50, [45, 72, 38, 91, 55, 60, 29, 83]))
+        </div>
+        <p>Result: <code>[72, 91, 55, 60, 83]</code> (1 mark for expression, 1 mark for result)</p>
+        <p><strong>(b)</strong></p>
+        <div style="font-family:'Courier New',Courier,monospace;font-size:.85rem;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:.6rem .9rem;margin:.4rem 0">
+          list(map(lambda x: x + 5, [45, 72, 38, 91, 55, 60, 29, 83]))
+        </div>
+        <p>Result: <code>[50, 77, 43, 96, 60, 65, 34, 88]</code> (1 mark for expression, 1 mark for result)</p>
+        <p><strong>(c)</strong></p>
+        <div style="font-family:'Courier New',Courier,monospace;font-size:.85rem;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:.6rem .9rem;margin:.4rem 0">
+          from functools import reduce<br>
+          reduce(lambda acc, x: acc if acc &gt; x else x, [45, 72, 38, 91, 55, 60, 29, 83])
+        </div>
+        <p>Result: <code>91</code> (1 mark for correct lambda comparing acc and x; 1 mark for correct result)</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- SECTION 5: Comparing Paradigms          -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="lesson-section" id="comparison">
+    <h2><span class="section-num">5</span> Comparing Paradigms</h2>
+
+    <p>Choosing the right paradigm depends on the nature of the problem, the team's expertise, and the language available. In practice, most modern programs blend paradigms — Python is primarily procedural/OOP but has good functional features; Prolog is purely declarative but allows arithmetic and side effects.</p>
+
+    <table class="plain-table">
+      <tr>
+        <th>Criterion</th>
+        <th>Procedural</th>
+        <th>Object-Oriented</th>
+        <th>Declarative (Prolog)</th>
+        <th>Functional</th>
+      </tr>
+      <tr>
+        <td><strong>Control flow</strong></td>
+        <td>Explicit — sequence, loops, conditionals</td>
+        <td>Explicit — methods, events</td>
+        <td>Implicit — inference engine handles it</td>
+        <td>Implicit — recursion; no loops</td>
+      </tr>
+      <tr>
+        <td><strong>State / Variables</strong></td>
+        <td>Mutable variables; global state common</td>
+        <td>Mutable state encapsulated in objects</td>
+        <td>No variables in the traditional sense; logic variables unify once</td>
+        <td>Immutable data; no mutable state</td>
+      </tr>
+      <tr>
+        <td><strong>Code reuse</strong></td>
+        <td>Procedures/functions</td>
+        <td>Inheritance, polymorphism</td>
+        <td>Rules can be composed and reused</td>
+        <td>Function composition, higher-order functions</td>
+      </tr>
+      <tr>
+        <td><strong>Best suited for</strong></td>
+        <td>General scripting, simple sequential tasks</td>
+        <td>Modelling real-world entities; large systems</td>
+        <td>Logic problems, rule-based reasoning, knowledge representation</td>
+        <td>Data transformation pipelines, concurrent/parallel processing, mathematical computation</td>
+      </tr>
+      <tr>
+        <td><strong>Testing ease</strong></td>
+        <td>Moderate — side effects can complicate testing</td>
+        <td>Moderate — mocking objects needed</td>
+        <td>Queries can be tested directly</td>
+        <td>Easy — pure functions are trivial to unit-test</td>
+      </tr>
+      <tr>
+        <td><strong>Typical examples</strong></td>
+        <td>C, Pascal</td>
+        <td>Java, C++, Python</td>
+        <td>Prolog, SQL</td>
+        <td>Haskell, Erlang; Python/JS functional features</td>
+      </tr>
+    </table>
+
+    <h3>When to Use Each Paradigm</h3>
+
+    <div class="arch-grid">
+      <div class="arch-card">
+        <h4>Use Procedural when…</h4>
+        <p>The problem is a straightforward sequence of steps. Performance is critical. The team is familiar with C-style languages. Script automation tasks.</p>
+      </div>
+      <div class="arch-card">
+        <h4>Use OOP when…</h4>
+        <p>Modelling a system with real-world entities that have identity, state, and behaviour. Large teams where encapsulation prevents accidental interference between modules.</p>
+      </div>
+      <div class="arch-card">
+        <h4>Use Declarative when…</h4>
+        <p>The problem is about relationships and logic — expert systems, scheduling, theorem proving, natural language parsing. The "what" is clear but the "how" is complex.</p>
+      </div>
+      <div class="arch-card">
+        <h4>Use Functional when…</h4>
+        <p>Transforming or processing collections of data. Concurrency/parallelism (no shared mutable state means no race conditions). Mathematical or financial computation.</p>
+      </div>
+    </div>
+
+    <div class="worked">
+      <div class="worked-title">Worked Example — Choosing a Paradigm</div>
+      <p><strong>Scenario:</strong> A team is building a system to diagnose network faults. The system must apply a set of IF-THEN rules (e.g., "if packet loss > 5% AND latency > 200ms THEN suspect congestion") to a set of observed measurements to identify probable faults.</p>
+      <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Declarative (Prolog / rule engine):</strong> The problem is fundamentally about logical inference — known facts (measurements) + rules → conclusions (fault). This maps directly to the declarative paradigm. The rule base can be extended by non-programmers. The inference engine handles backtracking and rule chaining automatically.</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">OOP could model the network topology, but the reasoning logic itself is still best expressed declaratively.</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Conclusion:</strong> Declarative (with OOP for the surrounding system architecture) is the most appropriate choice.</div></div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question</div>
+      <p>A programmer needs to process a log file containing 1 million web server records. For each record, she needs to: (1) filter out records where the status code is not 200, (2) extract the response time, and (3) calculate the average response time of the remaining records.</p>
+      <p>Explain why a functional programming approach would be well suited to this task, and sketch how map, filter, and reduce would each be used. (4 marks)</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Why functional is well-suited:</strong> The task is a classic data transformation pipeline — it applies a sequence of transformations to a large collection of records. Functional HOFs express each transformation as a clean, composable step with no side effects. Immutability means no risk of accidentally modifying the original log data. The pipeline is easy to reason about and test step by step. (1 mark)</p>
+        <p><strong>filter:</strong> Used in step 1 — <code>filter(lambda r: r.status == 200, records)</code> — removes all records that do not have status code 200, producing a new collection of successful records only. (1 mark)</p>
+        <p><strong>map:</strong> Used in step 2 — <code>map(lambda r: r.response_time, filtered_records)</code> — transforms each record object into just its response time value, producing a list of numbers. (1 mark)</p>
+        <p><strong>reduce:</strong> Used in step 3 — to sum all response times and divide by the count to calculate the average. Alternatively: <code>reduce(lambda acc, x: acc + x, times, 0) / len(times)</code>. (1 mark)</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- SECTION 6: Exam Practice                -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="lesson-section" id="exam-practice">
+    <h2><span class="section-num">📝</span> Exam Practice</h2>
+
+    <div class="practice">
+      <div class="pq-title">Question 1 — 4 marks</div>
+      <p>Consider this Prolog knowledge base:</p>
+      <div class="code-block" style="margin:.5rem 0">
+        <span class="code-lang">Prolog</span>
+<span class="prolog-fact">likes(alice, jazz).</span>
+<span class="prolog-fact">likes(alice, rock).</span>
+<span class="prolog-fact">likes(bob, jazz).</span>
+<span class="prolog-fact">likes(carol, classical).</span>
+<span class="prolog-fact">likes(carol, rock).</span>
+
+<span class="prolog-rule">common_taste(<span class="prolog-var">X</span>, <span class="prolog-var">Y</span>) :-</span>
+    <span class="prolog-rule">likes(<span class="prolog-var">X</span>, <span class="prolog-var">Genre</span>),</span>
+    <span class="prolog-rule">likes(<span class="prolog-var">Y</span>, <span class="prolog-var">Genre</span>),</span>
+    <span class="prolog-rule"><span class="prolog-var">X</span> \= <span class="prolog-var">Y</span>.</span>
+      </div>
+      <p>(a) What are all the solutions returned by <code>?- common_taste(alice, Y).</code>? (2 marks)</p>
+      <p>(b) Explain how Prolog uses backtracking to find more than one solution. (2 marks)</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>(a)</strong></p>
+        <p>Prolog tries each <code>likes(alice, Genre)</code> fact in turn:</p>
+        <ul>
+          <li>Genre = jazz → finds <code>likes(bob, jazz)</code> → Y = bob (alice ≠ bob ✓) → <strong>Y = bob</strong> (1 mark)</li>
+          <li>Genre = rock → finds <code>likes(carol, rock)</code> → Y = carol (alice ≠ carol ✓) → <strong>Y = carol</strong> (1 mark)</li>
+        </ul>
+        <p>Results: <code>Y = bob ; Y = carol.</code></p>
+        <p><strong>(b)</strong> When Prolog finds the first solution (Y = bob) and the user asks for more (by pressing <code>;</code>), Prolog backtracks to the most recent choice point — the <code>likes(alice, Genre)</code> goal — and tries the next matching fact (<code>likes(alice, rock)</code>). It then continues forward with Genre = rock and finds Y = carol. Without backtracking, only the first solution would be returned. (2 marks)</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Question 2 — 5 marks</div>
+      <p>Write a Prolog knowledge base for the following scenario and answer the query shown.</p>
+      <p><em>A pet shop sells dogs, cats, and fish. Dogs and cats are mammals. Fish are not mammals. Any mammal that lives in water is an aquatic mammal.</em></p>
+      <p>(a) Write Prolog facts and rules to represent this knowledge. (3 marks)</p>
+      <p>(b) Write a query to find all animals that are mammals. State the result. (2 marks)</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>(a)</strong></p>
+        <div style="font-family:'Courier New',Courier,monospace;font-size:.85rem;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:.75rem 1rem;margin:.4rem 0;line-height:1.8">
+          sells(petshop, dog).<br>
+          sells(petshop, cat).<br>
+          sells(petshop, fish).<br><br>
+          mammal(dog).<br>
+          mammal(cat).<br><br>
+          aquatic_mammal(X) :-<br>
+          &nbsp;&nbsp;mammal(X),<br>
+          &nbsp;&nbsp;lives_in_water(X).
+        </div>
+        <p>(1 mark for facts with sells/mammal; 1 mark for fish not being stated as mammal; 1 mark for aquatic_mammal rule using both mammal and lives_in_water)</p>
+        <p><strong>(b)</strong></p>
+        <div style="font-family:'Courier New',Courier,monospace;font-size:.85rem;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:.6rem .9rem;margin:.4rem 0">
+          ?- mammal(X).
+        </div>
+        <p>Result: <code>X = dog ; X = cat.</code> (fish is not declared as a mammal, so it does not appear.) (1 mark for query, 1 mark for correct result)</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Question 3 — 4 marks</div>
+      <p>Explain the difference between <strong>map</strong> and <strong>reduce</strong> as higher-order functions. For each, give an example of a problem it solves, and write a Python lambda expression that would be used with it. (4 marks)</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>map:</strong> Applies a function to every element of a list and returns a new list of the same length, where each element is the result of applying the function to the corresponding input element. The list is transformed but not combined. (1 mark)</p>
+        <p><em>Example:</em> Convert a list of temperatures from Celsius to Fahrenheit: <code>map(lambda c: c * 9/5 + 32, temps)</code>. (1 mark)</p>
+        <p><strong>reduce:</strong> Combines all elements of a list into a single value by repeatedly applying a two-argument function — an accumulator and the current element — working from left to right through the list. (1 mark)</p>
+        <p><em>Example:</em> Multiply all elements together: <code>reduce(lambda acc, x: acc * x, numbers, 1)</code>. (1 mark)</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Question 4 — 5 marks</div>
+      <p>Trace the execution of the following Python code. Show the output of each <code>print</code> statement and explain what is happening at each step. (5 marks)</p>
+      <div class="code-block" style="margin:.5rem 0">
+        <span class="code-lang">Python</span>
+<span class="kw">from</span> functools <span class="kw">import</span> reduce
+
+data = [<span class="num">3</span>, <span class="num">7</span>, <span class="num">2</span>, <span class="num">9</span>, <span class="num">4</span>, <span class="num">6</span>]
+
+step1 = <span class="fn">list</span>(<span class="fn">filter</span>(<span class="kw">lambda</span> x: x % <span class="num">2</span> != <span class="num">0</span>, data))
+<span class="fn">print</span>(step1)
+
+step2 = <span class="fn">list</span>(<span class="fn">map</span>(<span class="kw">lambda</span> x: x ** <span class="num">2</span>, step1))
+<span class="fn">print</span>(step2)
+
+step3 = <span class="fn">reduce</span>(<span class="kw">lambda</span> acc, x: acc + x, step2, <span class="num">0</span>)
+<span class="fn">print</span>(step3)
+      </div>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>step1 — filter odd numbers:</strong> The lambda <code>x % 2 != 0</code> keeps only odd elements from <code>[3, 7, 2, 9, 4, 6]</code> → removes 2, 4, 6. <code>print(step1)</code> outputs: <strong>[3, 7, 9]</strong> (1 mark)</p>
+        <p><strong>step2 — square each element:</strong> The lambda <code>x ** 2</code> is applied to each element of step1: 3²=9, 7²=49, 9²=81. <code>print(step2)</code> outputs: <strong>[9, 49, 81]</strong> (2 marks)</p>
+        <p><strong>step3 — sum all squares:</strong> reduce starts with accumulator 0 and adds each element: 0+9=9, 9+49=58, 58+81=139. <code>print(step3)</code> outputs: <strong>139</strong> (1 mark)</p>
+        <p><strong>Overall:</strong> This pipeline computes the sum of the squares of all odd numbers in the original list — a clean functional composition of filter → map → reduce. (1 mark)</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Question 5 — 4 marks</div>
+      <p>Compare declarative programming (using Prolog) and functional programming as two alternatives to procedural programming. Your answer should discuss: how control flow is handled, how each treats data, and one advantage unique to each paradigm. (4 marks)</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Control flow:</strong> In Prolog, the programmer writes no explicit control flow — the inference engine decides how to apply rules and backtracks automatically when needed. In functional programming, control flow is expressed through recursion and function composition rather than loops and conditionals; there is also no explicit iteration. Both contrast with procedural programming where the programmer explicitly writes every step. (1 mark)</p>
+        <p><strong>Data:</strong> Prolog uses logic variables that unify to a value once and cannot be reassigned — binding is permanent within a clause. Functional programming uses immutable values — once a value is created it cannot be changed; functions create new values rather than modifying existing ones. Both avoid the mutable state that makes procedural programs harder to reason about. (1 mark)</p>
+        <p><strong>Advantage of declarative (Prolog):</strong> Ideal for problems defined by rules and relationships — the programmer describes the knowledge, not the algorithm. Adding a new rule extends the system without rewriting any code. Used for expert systems, scheduling, and logic-based AI. (1 mark)</p>
+        <p><strong>Advantage of functional:</strong> Pure functions are trivially easy to test (same input always gives same output, no side effects) and can be safely parallelised (no shared mutable state). Higher-order functions enable concise data transformation pipelines that are easy to read and compose. (1 mark)</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Question 6 — 3 marks</div>
+      <p>Write a recursive Python function <code>my_length(lst)</code> that returns the number of elements in a list without using the built-in <code>len()</code> function. Use functional style (no loops, no mutable variables). Trace your function on <code>[4, 7, 2]</code>. (3 marks)</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <div style="font-family:'Courier New',Courier,monospace;font-size:.85rem;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:.75rem 1rem;margin:.4rem 0;line-height:1.8">
+          def my_length(lst):<br>
+          &nbsp;&nbsp;if lst == []:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;return 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# base case<br>
+          &nbsp;&nbsp;return 1 + my_length(lst[1:])&nbsp;&nbsp;# 1 for head + length of tail
+        </div>
+        <p>(1 mark for base case returning 0; 1 mark for recursive case: 1 + my_length(tail))</p>
+        <p><strong>Trace on [4, 7, 2]:</strong></p>
+        <p>my_length([4,7,2]) = 1 + my_length([7,2])<br>
+        = 1 + 1 + my_length([2])<br>
+        = 1 + 1 + 1 + my_length([])<br>
+        = 1 + 1 + 1 + 0 = <strong>3</strong> (1 mark for correct trace)</p>
+      </div>
+    </div>
+
+    <h3>Revision Checklist</h3>
+    <ul class="checklist">
+      <li>Name and describe four programming paradigms: procedural, OOP, declarative, functional</li>
+      <li>Explain the key distinction between imperative (how) and declarative (what) programming</li>
+      <li>Write Prolog facts (unconditional truths) using correct syntax</li>
+      <li>Write Prolog rules using :- with conjunctions (comma) and state what a rule means</li>
+      <li>Write and interpret Prolog queries and state what Prolog returns</li>
+      <li>Explain what unification is and give an example of two terms that do / don't unify</li>
+      <li>Trace Prolog backtracking step-by-step for a multi-solution query</li>
+      <li>Use the <code>is</code> operator for arithmetic in Prolog</li>
+      <li>Define pure function, immutability, side effect, and referential transparency</li>
+      <li>Write and read lambda (anonymous) function expressions</li>
+      <li>Explain what a closure is</li>
+      <li>Describe the head–tail structure of a list and write a recursive list function</li>
+      <li>Apply map, filter, and reduce to a list using lambda expressions — state the result</li>
+      <li>Trace a pipeline of map → filter → reduce step-by-step</li>
+      <li>Compare all four paradigms and choose the most appropriate for a given scenario with justification</li>
+    </ul>
+  </div>
+
+</main>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-box">
+    <h3>Contents</h3>
+    <ul class="toc-list">
+      <li><a href="#paradigms" class="active">1. Paradigms</a></li>
+      <li><a href="#declarative">2. Declarative &amp; Prolog</a></li>
+      <li><a href="#functional">3. Functional Programming</a></li>
+      <li><a href="#list-processing">4. List Processing</a></li>
+      <li><a href="#comparison">5. Comparing Paradigms</a></li>
+      <li><a href="#exam-practice">📝 Exam Practice</a></li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>Prolog Syntax</h3>
+    <ul style="font-size:.78rem;padding-left:0;list-style:none;color:var(--text);font-family:'Courier New',Courier,monospace">
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>Fact:</strong> pred(a, b).</li>
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>Rule:</strong> head :- body1, body2.</li>
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>Query:</strong> ?- goal.</li>
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>Variable:</strong> Uppercase</li>
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>Arith:</strong> X is 3 + 2.</li>
+      <li style="padding:.2rem 0"><strong>List:</strong> [Head | Tail]</li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>HOF Quick Ref</h3>
+    <ul style="font-size:.78rem;padding-left:0;list-style:none;color:var(--text)">
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>map</strong> — transform every element</li>
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>filter</strong> — keep matching elements</li>
+      <li style="padding:.2rem 0"><strong>reduce</strong> — fold list to single value</li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>FP Principles</h3>
+    <ul style="font-size:.78rem;padding-left:0;list-style:none;color:var(--text)">
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>Pure:</strong> same input → same output</li>
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>Immutable:</strong> no changing data</li>
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>No side effects</strong></li>
+      <li style="padding:.2rem 0"><strong>Recursion</strong> instead of loops</li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box" style="border-left:4px solid #e65100">
+    <h3 style="color:#e65100">Common Mistakes</h3>
+    <ul style="font-size:.78rem;padding-left:1.1rem;color:var(--text)">
+      <li style="margin:.3rem 0">Prolog variables start UPPERCASE; atoms start lowercase</li>
+      <li style="margin:.3rem 0">Use <code>is</code> for arithmetic — <code>=</code> only unifies terms, does not evaluate</li>
+      <li style="margin:.3rem 0">map returns a new list of the same length — it does not filter</li>
+      <li style="margin:.3rem 0">filter does not transform elements — it only selects or rejects them</li>
+      <li style="margin:.3rem 0">A pure function never prints, writes files, or modifies global state</li>
+      <li style="margin:.3rem 0">Declarative ≠ functional — both differ from procedural in different ways</li>
+    </ul>
+  </div>
+
+  <a href="topic17-computational-thinking.html" style="display:block;text-align:center;background:var(--surface2);color:var(--primary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.65rem;font-weight:700;font-size:.82rem;text-decoration:none;margin-top:.25rem">
+    ← Topic 17: Computational Thinking
+  </a>
+  <a href="index.html" style="display:block;text-align:center;background:var(--primary);color:#fff;border-radius:var(--radius-sm);padding:.75rem;font-weight:700;font-size:.875rem;text-decoration:none;margin-top:.5rem">
+    ← Back to All Topics
+  </a>
+
+</aside>
+
+</div><!-- /lesson-wrap -->
+
+<footer style="background:var(--surface);border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;font-size:.8rem;color:var(--text-muted)">
+  Cambridge International AS &amp; A Level Computer Science 9618 — Topic 18: Further Programming &nbsp;|&nbsp;
+  Not affiliated with Cambridge Assessment International Education.
+</footer>
+
+<script src="script.js"></script>
+<script>
+  const sections = document.querySelectorAll('.lesson-section[id]');
+  const navLinks = document.querySelectorAll('.toc-list a, .page-nav a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+  document.querySelectorAll('.reveal-btn').forEach(btn => { btn.textContent = 'Show Answer'; });
+</script>
+</body>
+</html>
