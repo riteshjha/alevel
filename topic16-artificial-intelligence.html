@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Topic 16: Artificial Intelligence — CS 9618</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .page-nav { background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:64px; z-index:90; overflow-x:auto; }
+    .page-nav-inner { max-width:1100px; margin:0 auto; padding:0 2rem; display:flex; gap:0; }
+    .page-nav a { display:block; padding:.75rem 1.1rem; font-size:.82rem; font-weight:600; color:var(--text-muted); text-decoration:none; white-space:nowrap; border-bottom:3px solid transparent; transition:color .2s,border-color .2s; }
+    .page-nav a:hover,.page-nav a.active { color:var(--primary); border-bottom-color:var(--primary); }
+
+    .lesson-wrap { max-width:1100px; margin:0 auto; padding:2.5rem 2rem 4rem; display:grid; grid-template-columns:1fr 280px; gap:2.5rem; align-items:start; }
+    @media(max-width:900px){ .lesson-wrap{grid-template-columns:1fr} .sidebar{display:none} }
+
+    .sidebar { position:sticky; top:120px; }
+    .sidebar-box { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; margin-bottom:1rem; box-shadow:var(--shadow); }
+    .sidebar-box h3 { font-size:.85rem; font-weight:700; margin-bottom:.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; }
+    .toc-list { list-style:none; }
+    .toc-list li { padding:.2rem 0; }
+    .toc-list a { font-size:.82rem; color:var(--text-muted); text-decoration:none; display:block; padding:.25rem .5rem; border-radius:4px; transition:background .15s,color .15s; }
+    .toc-list a:hover { background:var(--surface2); color:var(--primary); }
+    .toc-list a.active { background:var(--accent-light); color:var(--primary); font-weight:600; }
+
+    .lesson-section { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:2rem 2.25rem; margin-bottom:2rem; box-shadow:var(--shadow); scroll-margin-top:130px; }
+    .lesson-section h2 { font-size:1.5rem; font-weight:800; color:var(--primary); margin-bottom:.4rem; display:flex; align-items:center; gap:.6rem; }
+    .section-num { background:var(--primary); color:#fff; width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:.9rem; font-weight:800; flex-shrink:0; }
+    .lesson-section h3 { font-size:1.1rem; font-weight:700; margin:1.75rem 0 .75rem; padding-bottom:.4rem; border-bottom:2px solid var(--border); color:var(--text); }
+    .lesson-section h4 { font-size:.95rem; font-weight:700; margin:1.25rem 0 .5rem; color:var(--primary-light); }
+    .lesson-section p { font-size:.9rem; line-height:1.75; color:var(--text); margin-bottom:.75rem; }
+    .lesson-section ul,.lesson-section ol { padding-left:1.5rem; margin-bottom:.75rem; }
+    .lesson-section li { font-size:.9rem; line-height:1.75; color:var(--text); }
+
+    /* Worked example */
+    .worked { background:linear-gradient(135deg,#e3f2fd,#e8eaf6); border:1px solid #90caf9; border-left:5px solid #1565c0; border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:1.25rem 1.5rem; margin:1rem 0; }
+    [data-theme="dark"] .worked { background:#001929; border-color:#1565c0; }
+    .worked .worked-title { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#1565c0; margin-bottom:.6rem; }
+    [data-theme="dark"] .worked .worked-title { color:#90caf9; }
+    .worked p,.worked li { font-size:.875rem; color:var(--text); }
+    .worked .step { display:flex; gap:.75rem; margin:.4rem 0; align-items:flex-start; }
+    .worked .step-num { background:#1565c0; color:#fff; min-width:22px; height:22px; border-radius:50%; font-size:.72rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+    .worked .step-text { font-size:.875rem; line-height:1.6; }
+
+    /* Practice question */
+    .practice { background:var(--surface2); border:1px solid var(--border); border-left:5px solid #2e7d32; border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:1.25rem 1.5rem; margin:1rem 0; }
+    .practice .pq-title { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#2e7d32; margin-bottom:.6rem; }
+    .practice p,.practice li { font-size:.875rem; }
+    .practice .reveal-btn { background:#2e7d32; color:#fff; border:none; border-radius:6px; padding:.4rem 1rem; font-size:.8rem; font-weight:700; cursor:pointer; margin-top:.75rem; transition:background .2s; }
+    .practice .reveal-btn:hover { background:#1b5e20; }
+    .practice .answer-reveal { display:none; margin-top:.75rem; padding:.75rem 1rem; background:#e8f5e9; border-radius:var(--radius-sm); font-size:.875rem; }
+    [data-theme="dark"] .practice .answer-reveal { background:#1b2e1c; color:#c8e6c9; }
+    .practice .answer-reveal.open { display:block; }
+
+    /* Callouts */
+    .callout { background:var(--surface2); border-left:4px solid var(--accent); border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:.85rem 1.1rem; margin:.75rem 0; font-size:.875rem; color:var(--text); }
+    .callout.warn { border-color:#f59e0b; }
+    .callout.tip  { border-color:#22c55e; }
+    .callout.exam { border-color:#7c3aed; }
+
+    /* Key term */
+    .key-term { background:linear-gradient(transparent 60%,rgba(21,101,192,.15) 60%); font-weight:700; }
+
+    /* Objectives & breadcrumb */
+    .objectives-list { list-style:none; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:.5rem; }
+    .objectives-list li { font-size:.85rem; display:flex; align-items:flex-start; gap:.5rem; padding:.4rem 0; color:var(--text); }
+    .objectives-list li::before { content:'✦'; color:var(--accent); flex-shrink:0; }
+    .breadcrumb { display:flex; align-items:center; gap:.4rem; font-size:.82rem; color:var(--text-muted); margin-bottom:1.5rem; }
+    .breadcrumb a { color:var(--primary-light); text-decoration:none; }
+    .breadcrumb a:hover { text-decoration:underline; }
+
+    /* Checklist */
+    .checklist { list-style:none; padding:0; }
+    .checklist li { display:flex; align-items:flex-start; gap:.6rem; padding:.35rem 0; font-size:.875rem; color:var(--text); }
+    .checklist li::before { content:'☐'; color:var(--primary-light); font-size:1rem; flex-shrink:0; }
+
+    /* Comparison table */
+    .plain-table { width:100%; border-collapse:collapse; font-size:.875rem; margin:.75rem 0; }
+    .plain-table th { background:var(--primary); color:#fff; padding:.45rem .8rem; text-align:left; }
+    .plain-table td { border:1px solid var(--border); padding:.4rem .8rem; color:var(--text); vertical-align:top; }
+    .plain-table tr:nth-child(even) td { background:var(--surface2); }
+
+    /* Feature cards */
+    .feature-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:.85rem; margin:.75rem 0; }
+    .feature-card { background:var(--surface2); border:1px solid var(--border); border-top:3px solid #1565c0; border-radius:var(--radius-sm); padding:1rem 1.1rem; }
+    .feature-card h4 { font-size:.9rem; font-weight:800; color:#1565c0; margin-bottom:.4rem; }
+    [data-theme="dark"] .feature-card h4 { color:#90caf9; }
+    .feature-card p { font-size:.82rem; line-height:1.6; color:var(--text); margin:0; }
+
+    /* Neural network diagram */
+    .nn-diagram { display:flex; align-items:center; justify-content:center; gap:2rem; padding:1.5rem; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); margin:.75rem 0; overflow-x:auto; }
+    .nn-layer { display:flex; flex-direction:column; align-items:center; gap:.75rem; }
+    .nn-label { font-size:.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; margin-bottom:.25rem; }
+    .nn-node { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.72rem; font-weight:700; color:#fff; }
+    .nn-input  { background:#1565c0; }
+    .nn-hidden { background:#6a1b9a; }
+    .nn-output { background:#2e7d32; }
+    .nn-arrow { font-size:1.5rem; color:var(--text-muted); align-self:center; }
+
+    /* Expert system diagram */
+    .es-diagram { display:grid; grid-template-columns:1fr 1fr 1fr; gap:.75rem; margin:.75rem 0; }
+    .es-box { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:.85rem 1rem; text-align:center; }
+    .es-box h4 { font-size:.85rem; font-weight:800; color:#1565c0; margin-bottom:.35rem; }
+    [data-theme="dark"] .es-box h4 { color:#90caf9; }
+    .es-box p { font-size:.78rem; color:var(--text); margin:0; line-height:1.5; }
+
+    /* Arch cards (same pattern) */
+    .arch-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:.85rem; margin:.75rem 0; }
+    .arch-card { background:var(--surface2); border:1px solid var(--border); border-top:3px solid #1565c0; border-radius:var(--radius-sm); padding:1rem 1.1rem; }
+    .arch-card h4 { font-size:.88rem; font-weight:800; color:#1565c0; margin-bottom:.35rem; }
+    [data-theme="dark"] .arch-card h4 { color:#90caf9; }
+    .arch-card p { font-size:.8rem; line-height:1.6; color:var(--text); margin:0; }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="header-inner">
+    <a class="logo" href="index.html">
+      <div class="logo-icon">💻</div>
+      <div>
+        <div class="logo-text">CS 9618</div>
+        <div class="logo-sub">Cambridge AS &amp; A Level</div>
+      </div>
+    </a>
+    <div class="header-actions">
+      <button class="btn-icon" id="theme-btn" title="Toggle theme">🌙</button>
+    </div>
+  </div>
+</header>
+
+<!-- Section nav -->
+<nav class="page-nav" aria-label="Sections">
+  <div class="page-nav-inner">
+    <a href="#what-is-ai" class="active">1. What is AI?</a>
+    <a href="#machine-learning">2. Machine Learning</a>
+    <a href="#neural-networks">3. Neural Networks</a>
+    <a href="#expert-systems">4. Expert Systems</a>
+    <a href="#nlp">5. NLP</a>
+    <a href="#exam-practice">📝 Exam Practice</a>
+  </div>
+</nav>
+
+<div class="lesson-wrap">
+<main>
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="index.html">Home</a>
+    <span>›</span>
+    <a href="index.html#tab-al">Paper 3 — Advanced Theory</a>
+    <span>›</span>
+    <strong style="color:var(--text)">Topic 16: Artificial Intelligence</strong>
+  </div>
+
+  <!-- Hero -->
+  <div class="lesson-section" style="background:linear-gradient(135deg,#003780,#1565c0,#1976d2);color:#fff;border:none">
+    <div style="display:flex;align-items:flex-start;gap:1.25rem">
+      <div style="font-size:3rem;flex-shrink:0">🤖</div>
+      <div>
+        <div style="font-size:.75rem;font-weight:700;opacity:.7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem">Paper 3 · Topic 16 · A Level Only</div>
+        <h1 style="font-size:1.9rem;font-weight:900;margin-bottom:.5rem;color:#fff">Artificial Intelligence</h1>
+        <p style="opacity:.85;font-size:.95rem;max-width:620px;margin-bottom:1rem;color:#fff">The Turing Test and definitions of intelligence, machine learning paradigms (supervised, unsupervised, reinforcement), neural networks and backpropagation, expert systems, and natural language processing — how computers are programmed to exhibit intelligent behaviour.</p>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+          <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">Paper 3 · A Level Only</span>
+          <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:700">~12% of Paper 3 marks</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Learning objectives -->
+  <div class="lesson-section">
+    <h2><span class="section-num">✦</span> Learning Objectives</h2>
+    <p>By the end of this topic you should be able to:</p>
+    <ul class="objectives-list">
+      <li>Define artificial intelligence and explain the Turing Test</li>
+      <li>Distinguish between strong AI and weak AI</li>
+      <li>Describe the three main types of machine learning: supervised, unsupervised, and reinforcement learning</li>
+      <li>Explain what training data, features, and labels are</li>
+      <li>Describe overfitting and how to detect it using a validation set</li>
+      <li>Describe the structure of a neural network: input, hidden, and output layers</li>
+      <li>Explain how a neural network learns through forward propagation and backpropagation</li>
+      <li>Describe the role of weights, biases, and activation functions</li>
+      <li>Describe the components of an expert system: knowledge base, inference engine, explanation facility</li>
+      <li>Compare forward chaining and backward chaining in an inference engine</li>
+      <li>State the limitations of expert systems</li>
+      <li>Explain key NLP tasks: tokenisation, parsing, sentiment analysis, and machine translation</li>
+    </ul>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 1: What is AI?                 -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="what-is-ai">
+    <h2><span class="section-num">1</span> What is Artificial Intelligence?</h2>
+
+    <p><span class="key-term">Artificial Intelligence (AI)</span> is the field of computer science concerned with building systems that can perform tasks that would normally require human intelligence — reasoning, learning, problem-solving, perception, and language understanding.</p>
+
+    <h3>The Turing Test</h3>
+    <p>In 1950, Alan Turing proposed a practical test for machine intelligence. In the <span class="key-term">Turing Test</span>, a human interrogator conducts a text conversation with two participants hidden from view — one is a human, the other a machine. If the interrogator cannot reliably distinguish the machine from the human after a sustained conversation, the machine is said to have passed the test and may be considered intelligent.</p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h4>Imitation Game</h4>
+        <p>Turing's original framing — the machine "imitates" a human. The interrogator asks any question and judges the replies. The machine wins if the interrogator gets it wrong.</p>
+      </div>
+      <div class="feature-card">
+        <h4>What it measures</h4>
+        <p>The ability to produce convincing natural-language responses. It tests language and reasoning — but not physical ability, emotion, or consciousness.</p>
+      </div>
+      <div class="feature-card">
+        <h4>Criticisms</h4>
+        <p>Passing the test does not mean the machine "understands" anything (Chinese Room argument). A machine could pass by deception rather than genuine intelligence.</p>
+      </div>
+      <div class="feature-card">
+        <h4>Significance</h4>
+        <p>Shifted AI from philosophical "can machines think?" to a practical, measurable question. Still widely referenced as a benchmark concept in AI discussions.</p>
+      </div>
+    </div>
+
+    <h3>Weak AI vs Strong AI</h3>
+    <table class="plain-table">
+      <tr><th>Type</th><th>Definition</th><th>Example</th></tr>
+      <tr>
+        <td><strong>Weak (Narrow) AI</strong></td>
+        <td>A system designed to perform one specific task well. Does not generalise beyond its domain. Has no general reasoning or consciousness.</td>
+        <td>Chess engine, spam filter, image classifier, speech recognition</td>
+      </tr>
+      <tr>
+        <td><strong>Strong (General) AI</strong></td>
+        <td>A hypothetical system with human-level general reasoning ability — able to learn and perform any intellectual task a human can. Does not currently exist.</td>
+        <td>Hypothetical: a system that can both play chess, write poetry, and diagnose illness without separate training for each</td>
+      </tr>
+    </table>
+
+    <div class="callout exam">
+      <strong>Exam tip:</strong> All current AI systems (including large language models) are weak/narrow AI. Strong AI is a theoretical concept — do not claim it exists. The Cambridge syllabus focuses on weak AI applications.
+    </div>
+
+    <h3>Knowledge Representation</h3>
+    <p>For a computer to "reason," knowledge must be encoded in a form the system can process. Common representations include:</p>
+    <ul>
+      <li><strong>Rules (IF–THEN):</strong> IF the patient has a fever AND a cough THEN suspect flu. Used in expert systems.</li>
+      <li><strong>Semantic networks:</strong> Nodes representing concepts linked by labelled relationships (e.g., "Dog IS-A Animal").</li>
+      <li><strong>Frames:</strong> Structured records for stereotyped situations (similar to objects in OOP).</li>
+      <li><strong>Numeric weights:</strong> Used in neural networks — knowledge is implicitly encoded in connection strengths.</li>
+    </ul>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question</div>
+      <p>Describe the Turing Test and explain one limitation of using it as a measure of machine intelligence.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Turing Test:</strong> A human interrogator holds a text conversation with two participants — one human, one machine — without knowing which is which. If the interrogator cannot reliably identify the machine after sustained questioning, the machine is said to pass the test. (2 marks)</p>
+        <p><strong>Limitation (any one):</strong></p>
+        <ul>
+          <li>A machine could pass through clever deception or mimicry without genuinely understanding anything. (1 mark)</li>
+          <li>The test only measures linguistic performance, not broader intelligence such as physical skill, creativity, or emotional understanding. (1 mark)</li>
+          <li>The Chinese Room argument (Searle): a system can produce correct responses purely by symbol manipulation, with no actual comprehension. (1 mark)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 2: Machine Learning            -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="machine-learning">
+    <h2><span class="section-num">2</span> Machine Learning</h2>
+
+    <p><span class="key-term">Machine learning (ML)</span> is a subset of AI in which a system learns patterns from data without being explicitly programmed with the rules. Instead of the programmer writing the logic, the algorithm infers the logic from examples.</p>
+
+    <h3>Key Terminology</h3>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h4>Training Data</h4>
+        <p>The dataset used to train the model. The algorithm processes examples and adjusts its internal parameters to minimise errors on this data.</p>
+      </div>
+      <div class="feature-card">
+        <h4>Features</h4>
+        <p>The measurable properties (input variables) of each example. For a spam filter: sender, subject line length, presence of certain words.</p>
+      </div>
+      <div class="feature-card">
+        <h4>Label</h4>
+        <p>The correct answer (output) for each training example. In supervised learning only. E.g., "spam" or "not spam" for each email.</p>
+      </div>
+      <div class="feature-card">
+        <h4>Model</h4>
+        <p>The trained system — a mathematical function mapping inputs (features) to outputs (predictions). The result of the training process.</p>
+      </div>
+      <div class="feature-card">
+        <h4>Validation Set</h4>
+        <p>A held-out dataset not used during training. Used to measure how well the model generalises to unseen data and to detect overfitting.</p>
+      </div>
+      <div class="feature-card">
+        <h4>Overfitting</h4>
+        <p>The model learns the training data too precisely — including noise — and performs poorly on new data. High training accuracy but low validation accuracy.</p>
+      </div>
+    </div>
+
+    <h3>The Three Learning Paradigms</h3>
+
+    <h4>Supervised Learning</h4>
+    <p>The algorithm is given <em>labelled</em> training examples — each input is paired with the correct output. The model learns to map inputs to outputs by minimising the difference between its predictions and the true labels.</p>
+    <table class="plain-table">
+      <tr><th>Aspect</th><th>Detail</th></tr>
+      <tr><td>Requires</td><td>Labelled dataset (human-annotated)</td></tr>
+      <tr><td>Goal</td><td>Predict a label for new, unseen inputs</td></tr>
+      <tr><td>Sub-tasks</td><td><strong>Classification</strong> — output is a category (e.g., cat/dog, spam/not-spam); <strong>Regression</strong> — output is a continuous value (e.g., house price)</td></tr>
+      <tr><td>Examples</td><td>Email spam filter, image classifier, medical diagnosis, credit scoring</td></tr>
+      <tr><td>Common algorithms</td><td>Decision trees, k-nearest neighbours, neural networks, support vector machines</td></tr>
+    </table>
+
+    <h4>Unsupervised Learning</h4>
+    <p>The algorithm is given <em>unlabelled</em> data and must discover hidden structure or patterns on its own. There are no correct answers provided.</p>
+    <table class="plain-table">
+      <tr><th>Aspect</th><th>Detail</th></tr>
+      <tr><td>Requires</td><td>Unlabelled dataset</td></tr>
+      <tr><td>Goal</td><td>Discover patterns, groupings, or structure</td></tr>
+      <tr><td>Sub-tasks</td><td><strong>Clustering</strong> — group similar examples together; <strong>Dimensionality reduction</strong> — compress data to fewer features while preserving structure</td></tr>
+      <tr><td>Examples</td><td>Customer segmentation, anomaly detection, document topic modelling, gene expression analysis</td></tr>
+      <tr><td>Common algorithms</td><td>k-means clustering, hierarchical clustering, principal component analysis (PCA)</td></tr>
+    </table>
+
+    <h4>Reinforcement Learning</h4>
+    <p>An <span class="key-term">agent</span> learns by interacting with an environment. It takes actions, receives a reward (positive) or penalty (negative) signal, and updates its strategy (<span class="key-term">policy</span>) to maximise cumulative reward over time. There is no labelled dataset — the agent discovers what works through trial and error.</p>
+    <table class="plain-table">
+      <tr><th>Component</th><th>Definition</th></tr>
+      <tr><td>Agent</td><td>The learning system that takes actions</td></tr>
+      <tr><td>Environment</td><td>The system the agent interacts with</td></tr>
+      <tr><td>State</td><td>The current situation of the agent in the environment</td></tr>
+      <tr><td>Action</td><td>A choice made by the agent that changes the state</td></tr>
+      <tr><td>Reward</td><td>Feedback signal: positive for good actions, negative for bad ones</td></tr>
+      <tr><td>Policy</td><td>The agent's strategy: maps states to actions to maximise future reward</td></tr>
+    </table>
+    <p><em>Examples:</em> Game-playing AI (chess, Go, video games), robot locomotion training, recommendation systems, self-driving vehicle navigation.</p>
+
+    <div class="worked">
+      <div class="worked-title">Worked Example — Classifying a Learning Task</div>
+      <p>A streaming service wants to group users into segments based on their watching habits (genre, duration, time of day), without knowing in advance what the groups should be.</p>
+      <div class="step"><div class="step-num">1</div><div class="step-text">Is the data labelled? No — there is no pre-assigned "correct group" for each user.</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Is there an agent interacting with an environment? No.</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Conclusion: this is <strong>unsupervised learning</strong>, specifically <strong>clustering</strong>.</div></div>
+      <p style="margin-top:.5rem">If instead the service wanted to predict whether a user would churn (leave), and had historical data labelled "churned / stayed", that would be <strong>supervised classification</strong>.</p>
+    </div>
+
+    <h3>Overfitting vs Underfitting</h3>
+    <table class="plain-table">
+      <tr><th>Problem</th><th>Cause</th><th>Symptom</th><th>Fix</th></tr>
+      <tr>
+        <td><strong>Overfitting</strong></td>
+        <td>Model is too complex; memorises training data noise</td>
+        <td>High training accuracy, low validation accuracy</td>
+        <td>More training data, regularisation, simpler model, dropout</td>
+      </tr>
+      <tr>
+        <td><strong>Underfitting</strong></td>
+        <td>Model is too simple; cannot capture the underlying pattern</td>
+        <td>Low training accuracy and low validation accuracy</td>
+        <td>More features, more complex model, longer training</td>
+      </tr>
+      <tr>
+        <td><strong>Good fit</strong></td>
+        <td>Model complexity matches data complexity</td>
+        <td>High training accuracy ≈ high validation accuracy</td>
+        <td>Monitor training vs validation loss curves</td>
+      </tr>
+    </table>
+
+    <div class="callout tip">
+      <strong>Key point:</strong> A model that achieves 99% accuracy on training data but only 60% on the validation set is overfitting. The solution is not to train longer — training longer usually makes it worse. Collect more diverse data or simplify the model.
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question</div>
+      <p>A hospital wants to train a model that predicts whether a tumour is malignant or benign, given features such as size, density, and irregular border. A dataset of 10,000 scans has been collected, each labelled by a radiologist as "malignant" or "benign".</p>
+      <p>(a) Identify the type of machine learning being used. (1 mark)</p>
+      <p>(b) Explain what is meant by overfitting in this context, and describe one method to detect it. (3 marks)</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>(a)</strong> Supervised learning (classification). The data is labelled (each scan has a correct answer), and the task is to predict a category (malignant/benign). (1 mark)</p>
+        <p><strong>(b) Overfitting:</strong> The model learns the specific patterns of the training scans — including irrelevant noise and coincidences — rather than the genuine features of malignancy. It performs very accurately on training scans it has already seen, but poorly when given new, unseen scans from different patients. (1 mark)</p>
+        <p><strong>Detection:</strong> Split the 10,000 scans into a training set and a separate validation set (held-out data not used during training). After training, measure the accuracy on both sets. If training accuracy is much higher than validation accuracy (e.g., 98% vs 65%), the model is overfitting. (2 marks)</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 3: Neural Networks             -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="neural-networks">
+    <h2><span class="section-num">3</span> Neural Networks</h2>
+
+    <p>An <span class="key-term">artificial neural network (ANN)</span> is a computational model loosely inspired by the structure of biological neurons in the brain. It consists of layers of interconnected nodes (neurons) — each connection has a numerical <em>weight</em> that determines how strongly signals are transmitted. Neural networks learn by adjusting these weights.</p>
+
+    <h3>Structure of a Neural Network</h3>
+
+    <div class="nn-diagram">
+      <div class="nn-layer">
+        <div class="nn-label">Input Layer</div>
+        <div class="nn-node nn-input">x₁</div>
+        <div class="nn-node nn-input">x₂</div>
+        <div class="nn-node nn-input">x₃</div>
+      </div>
+      <div class="nn-arrow">→</div>
+      <div class="nn-layer">
+        <div class="nn-label">Hidden Layer 1</div>
+        <div class="nn-node nn-hidden">h</div>
+        <div class="nn-node nn-hidden">h</div>
+        <div class="nn-node nn-hidden">h</div>
+        <div class="nn-node nn-hidden">h</div>
+      </div>
+      <div class="nn-arrow">→</div>
+      <div class="nn-layer">
+        <div class="nn-label">Hidden Layer 2</div>
+        <div class="nn-node nn-hidden">h</div>
+        <div class="nn-node nn-hidden">h</div>
+        <div class="nn-node nn-hidden">h</div>
+      </div>
+      <div class="nn-arrow">→</div>
+      <div class="nn-layer">
+        <div class="nn-label">Output Layer</div>
+        <div class="nn-node nn-output">ŷ</div>
+      </div>
+    </div>
+
+    <table class="plain-table">
+      <tr><th>Layer</th><th>Role</th></tr>
+      <tr><td><strong>Input layer</strong></td><td>One neuron per input feature. Passes raw data into the network — no computation performed here.</td></tr>
+      <tr><td><strong>Hidden layers</strong></td><td>One or more layers between input and output. Each neuron computes a weighted sum of its inputs, adds a bias, and applies an activation function. This is where the network learns abstract representations.</td></tr>
+      <tr><td><strong>Output layer</strong></td><td>Produces the final prediction. Number of neurons depends on the task: 1 for binary classification, N for N-class classification, 1 for regression.</td></tr>
+    </table>
+
+    <h3>How a Single Neuron Works</h3>
+    <p>Each neuron in a hidden or output layer performs three steps:</p>
+    <ol>
+      <li><strong>Weighted sum:</strong> Multiply each input by its weight and sum them: z = w₁x₁ + w₂x₂ + … + wₙxₙ + b (where b is the <span class="key-term">bias</span>).</li>
+      <li><strong>Activation function:</strong> Apply a non-linear function f(z) to introduce non-linearity. Without this, the entire network collapses to a linear function regardless of depth.</li>
+      <li><strong>Output:</strong> Pass the result to neurons in the next layer.</li>
+    </ol>
+
+    <table class="plain-table">
+      <tr><th>Activation Function</th><th>Formula</th><th>Use / Properties</th></tr>
+      <tr><td><strong>Sigmoid</strong></td><td>σ(z) = 1 / (1 + e⁻ᶻ)</td><td>Squashes output to (0, 1). Used in output layer for binary classification (gives a probability).</td></tr>
+      <tr><td><strong>ReLU</strong></td><td>f(z) = max(0, z)</td><td>Returns z if positive, else 0. Most common in hidden layers — fast to compute, avoids vanishing gradient.</td></tr>
+      <tr><td><strong>Softmax</strong></td><td>Normalises outputs to sum to 1</td><td>Output layer for multi-class classification — gives a probability distribution over all classes.</td></tr>
+      <tr><td><strong>Tanh</strong></td><td>tanh(z) = (eᶻ − e⁻ᶻ) / (eᶻ + e⁻ᶻ)</td><td>Squashes to (−1, 1). Zero-centred, sometimes preferred over sigmoid in hidden layers.</td></tr>
+    </table>
+
+    <h3>Training: Forward Propagation and Backpropagation</h3>
+    <p>Neural networks learn by iteratively adjusting weights to minimise a <span class="key-term">loss function</span> — a measure of how wrong the network's predictions are.</p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h4>1. Forward Propagation</h4>
+        <p>Input data flows through the network layer by layer. Each neuron applies its weights, bias, and activation function. The final layer produces a prediction ŷ.</p>
+      </div>
+      <div class="feature-card">
+        <h4>2. Loss Calculation</h4>
+        <p>Compare the prediction ŷ to the true label y using a loss function (e.g., cross-entropy for classification, mean squared error for regression). A high loss means the prediction was very wrong.</p>
+      </div>
+      <div class="feature-card">
+        <h4>3. Backpropagation</h4>
+        <p>Compute how much each weight contributed to the loss using the chain rule of calculus. The gradient of the loss with respect to each weight is propagated backwards through the network.</p>
+      </div>
+      <div class="feature-card">
+        <h4>4. Gradient Descent</h4>
+        <p>Each weight is updated: w ← w − η × (∂Loss/∂w), where η (eta) is the <em>learning rate</em>. Small η = slow convergence; large η = overshooting. Repeated for many batches of data.</p>
+      </div>
+      <div class="feature-card">
+        <h4>5. Epoch</h4>
+        <p>One complete pass through the entire training dataset. Training typically runs for many epochs — the loss should decrease with each epoch if the model is learning correctly.</p>
+      </div>
+      <div class="feature-card">
+        <h4>6. Convergence</h4>
+        <p>Training stops when the loss stops decreasing significantly, or after a maximum number of epochs. The weights at this point define the trained model.</p>
+      </div>
+    </div>
+
+    <div class="worked">
+      <div class="worked-title">Worked Example — Tracing Forward Propagation</div>
+      <p>A simple network has one hidden neuron with inputs x₁ = 1, x₂ = 0.5, weights w₁ = 0.8, w₂ = 0.4, bias b = 0.1. Activation: ReLU.</p>
+      <div class="step"><div class="step-num">1</div><div class="step-text">Weighted sum: z = (0.8 × 1) + (0.4 × 0.5) + 0.1 = 0.8 + 0.2 + 0.1 = <strong>1.1</strong></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Apply ReLU: f(1.1) = max(0, 1.1) = <strong>1.1</strong> (positive, so unchanged)</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">The neuron outputs <strong>1.1</strong>, which becomes the input to the next layer.</div></div>
+      <p style="margin-top:.5rem">If z were negative (e.g., −0.3), ReLU would output 0, effectively "switching off" that neuron for this input.</p>
+    </div>
+
+    <h3>Deep Learning</h3>
+    <p><span class="key-term">Deep learning</span> refers to neural networks with many hidden layers (typically 10+). Each layer learns increasingly abstract representations: early layers detect edges and simple patterns; later layers detect complex objects and concepts. Deep networks have achieved state-of-the-art results in image recognition, speech recognition, and natural language processing.</p>
+
+    <div class="callout exam">
+      <strong>Exam tip:</strong> You are not expected to calculate backpropagation by hand. However, you must be able to: (1) describe the purpose of forward propagation, the loss function, and backpropagation in training; (2) explain what weights, biases, and activation functions do; (3) explain why more data and more layers generally improve accuracy (to a point). Always relate these to the learning process.
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question</div>
+      <p>Describe the role of <strong>backpropagation</strong> in training a neural network. Include in your answer the terms: loss function, gradient, and weight. (4 marks)</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p>After a forward pass produces a prediction, the <strong>loss function</strong> measures how far the prediction is from the correct label — a high loss means the network made a large error. (1 mark)</p>
+        <p>Backpropagation calculates the <strong>gradient</strong> of the loss with respect to each <strong>weight</strong> in the network — this tells us how much and in which direction each weight contributed to the error. (1 mark)</p>
+        <p>The gradients are propagated backwards through the network layer by layer using the chain rule of calculus, from the output layer back to the input layer. (1 mark)</p>
+        <p>Each weight is then updated in the direction that reduces the loss (gradient descent): the weight is decreased by a small amount proportional to its gradient and the learning rate. Repeating this process over many training examples allows the network to progressively reduce its error and learn the correct patterns. (1 mark)</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 4: Expert Systems              -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="expert-systems">
+    <h2><span class="section-num">4</span> Expert Systems</h2>
+
+    <p>An <span class="key-term">expert system</span> is a computer program that emulates the decision-making ability of a human expert in a specific domain. Unlike neural networks, expert systems store knowledge explicitly as human-readable rules and can explain how they reached a conclusion.</p>
+
+    <h3>Components of an Expert System</h3>
+
+    <div class="es-diagram">
+      <div class="es-box">
+        <h4>Knowledge Base</h4>
+        <p>Contains domain facts and IF-THEN rules provided by human experts. The "memory" of the system.</p>
+      </div>
+      <div class="es-box">
+        <h4>Inference Engine</h4>
+        <p>Applies rules from the knowledge base to known facts to derive new conclusions. The "brain" of the system.</p>
+      </div>
+      <div class="es-box">
+        <h4>Explanation Facility</h4>
+        <p>Explains which rules were fired and why a conclusion was reached. Makes the system transparent and auditable.</p>
+      </div>
+    </div>
+
+    <p>Additional components often include a <strong>user interface</strong> (for asking questions and displaying conclusions) and a <strong>working memory</strong> (the set of currently known facts, updated as the session progresses).</p>
+
+    <h3>The Knowledge Base</h3>
+    <p>The knowledge base is built by a <span class="key-term">knowledge engineer</span> who interviews domain experts (e.g., doctors, lawyers, engineers) and encodes their expertise as rules. A typical rule takes the form:</p>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.85rem 1.25rem;font-family:'Courier New',Courier,monospace;font-size:.88rem;margin:.75rem 0">
+      IF patient_temperature &gt; 38.5 AND symptom = "cough" AND symptom = "fatigue"<br>
+      THEN diagnosis = "possible influenza" WITH confidence = 0.75
+    </div>
+    <p>Many rules use <strong>confidence factors</strong> (certainty factors) to handle uncertainty — real-world knowledge is rarely absolute.</p>
+
+    <h3>The Inference Engine: Forward vs Backward Chaining</h3>
+    <table class="plain-table">
+      <tr><th>Method</th><th>Direction</th><th>How it works</th><th>Use case</th></tr>
+      <tr>
+        <td><strong>Forward Chaining</strong></td>
+        <td>Data → Conclusion</td>
+        <td>Starts with known facts, fires all applicable rules, adds new facts, and repeats until a conclusion is reached or no more rules can fire. Also called "data-driven."</td>
+        <td>Monitoring systems, process control (e.g., detect all alerts given sensor readings)</td>
+      </tr>
+      <tr>
+        <td><strong>Backward Chaining</strong></td>
+        <td>Conclusion → Data</td>
+        <td>Starts with a goal (hypothesis) and works backwards — asks "which rules could prove this?" and then tries to verify the conditions of those rules. Also called "goal-driven."</td>
+        <td>Diagnosis systems (e.g., "Is the patient diabetic?" → verify conditions)</td>
+      </tr>
+    </table>
+
+    <div class="worked">
+      <div class="worked-title">Worked Example — Forward Chaining</div>
+      <p><strong>Knowledge base:</strong></p>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:.75rem 1rem;font-family:'Courier New',Courier,monospace;font-size:.85rem;margin:.5rem 0">
+        Rule 1: IF animal_has_fur AND animal_has_claws THEN animal_is_mammal<br>
+        Rule 2: IF animal_is_mammal AND animal_hunts_prey THEN animal_is_carnivore<br>
+        Rule 3: IF animal_is_carnivore AND animal_has_stripes THEN animal_is_tiger
+      </div>
+      <p><strong>Initial facts:</strong> animal_has_fur, animal_has_claws, animal_hunts_prey, animal_has_stripes</p>
+      <div class="step"><div class="step-num">1</div><div class="step-text">Fire Rule 1 → add <strong>animal_is_mammal</strong> to working memory.</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Fire Rule 2 (conditions met) → add <strong>animal_is_carnivore</strong>.</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Fire Rule 3 (conditions met) → conclusion: <strong>animal_is_tiger</strong>.</div></div>
+    </div>
+
+    <h3>Advantages and Limitations</h3>
+    <table class="plain-table">
+      <tr><th>Advantages</th><th>Limitations</th></tr>
+      <tr>
+        <td>Can operate 24/7 without fatigue; provides consistent advice</td>
+        <td>Cannot learn from new cases — only as good as the rules in the knowledge base</td>
+      </tr>
+      <tr>
+        <td>Can combine knowledge from multiple experts</td>
+        <td>Very expensive and time-consuming to build (knowledge acquisition bottleneck)</td>
+      </tr>
+      <tr>
+        <td>Transparent — the explanation facility shows exactly how conclusions were reached</td>
+        <td>Brittle outside the domain — performs poorly on questions outside its knowledge base</td>
+      </tr>
+      <tr>
+        <td>Useful in domains where human experts are scarce or unavailable</td>
+        <td>Rules may conflict or become outdated as the domain changes</td>
+      </tr>
+      <tr>
+        <td>Can handle uncertainty through confidence factors</td>
+        <td>Cannot handle genuinely novel situations not covered by existing rules</td>
+      </tr>
+    </table>
+
+    <div class="callout exam">
+      <strong>Exam tip:</strong> A question asking to compare expert systems with neural networks is common. Key contrasts: (1) expert systems use explicit rules — neural networks encode knowledge implicitly in weights; (2) expert systems can explain their reasoning — neural networks are "black boxes"; (3) expert systems cannot learn from new data — neural networks improve with more training data.
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question</div>
+      <p>A medical diagnosis system has the following rules in its knowledge base:</p>
+      <div style="font-family:'Courier New',Courier,monospace;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:.75rem 1rem;font-size:.85rem;margin:.5rem 0">
+        Rule A: IF high_blood_pressure AND overweight THEN at_risk_diabetes<br>
+        Rule B: IF at_risk_diabetes AND high_glucose THEN probable_diabetes<br>
+        Rule C: IF probable_diabetes AND family_history THEN confirmed_diabetes
+      </div>
+      <p>The system knows the following facts about a patient: high_blood_pressure, overweight, high_glucose, family_history.</p>
+      <p>(a) Using forward chaining, state the order in which rules are fired and the final conclusion. (3 marks)</p>
+      <p>(b) Explain the purpose of the explanation facility in an expert system. (2 marks)</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>(a)</strong></p>
+        <p>Fire Rule A: conditions high_blood_pressure AND overweight are both known → adds <strong>at_risk_diabetes</strong> to working memory. (1 mark)</p>
+        <p>Fire Rule B: conditions at_risk_diabetes AND high_glucose are both known → adds <strong>probable_diabetes</strong>. (1 mark)</p>
+        <p>Fire Rule C: conditions probable_diabetes AND family_history are both known → conclusion: <strong>confirmed_diabetes</strong>. (1 mark)</p>
+        <p><strong>(b)</strong> The explanation facility records which rules were fired and in what order to reach the conclusion. (1 mark) It allows the doctor (or patient) to understand <em>why</em> the system reached its diagnosis — for example, "diabetes was confirmed because the patient had probable diabetes (from high glucose and being at risk) combined with a family history." This makes the system transparent, auditable, and easier to trust, and allows experts to identify if the reasoning was flawed. (1 mark)</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 5: Natural Language Processing -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="nlp">
+    <h2><span class="section-num">5</span> Natural Language Processing (NLP)</h2>
+
+    <p><span class="key-term">Natural Language Processing (NLP)</span> is the branch of AI concerned with enabling computers to understand, interpret, and generate human language. Human language is ambiguous, context-dependent, and constantly evolving — making it one of the hardest problems in AI.</p>
+
+    <h3>Key NLP Tasks</h3>
+
+    <div class="arch-grid">
+      <div class="arch-card">
+        <h4>Tokenisation</h4>
+        <p>Splitting text into meaningful units (tokens) — typically words or sub-words. The first step in almost every NLP pipeline.</p>
+        <p style="font-size:.78rem;margin-top:.4rem"><em>Example:</em> "The cat sat." → ["The", "cat", "sat", "."]</p>
+      </div>
+      <div class="arch-card">
+        <h4>Part-of-Speech Tagging</h4>
+        <p>Labelling each token with its grammatical role: noun, verb, adjective, etc. Helps parse sentence structure.</p>
+        <p style="font-size:.78rem;margin-top:.4rem"><em>Example:</em> "run" (verb) vs "run" (noun) in context.</p>
+      </div>
+      <div class="arch-card">
+        <h4>Parsing (Syntax Analysis)</h4>
+        <p>Building a structured representation of a sentence — a parse tree — showing how words relate grammatically.</p>
+        <p style="font-size:.78rem;margin-top:.4rem"><em>Example:</em> Identifying the subject, verb, and object in "The dog chased the cat."</p>
+      </div>
+      <div class="arch-card">
+        <h4>Named Entity Recognition</h4>
+        <p>Identifying proper nouns: people, organisations, locations, dates. Used in information extraction.</p>
+        <p style="font-size:.78rem;margin-top:.4rem"><em>Example:</em> "Apple (ORG) was founded in Cupertino (LOC) in 1976 (DATE)."</p>
+      </div>
+      <div class="arch-card">
+        <h4>Sentiment Analysis</h4>
+        <p>Determining the emotional tone of text: positive, negative, or neutral. Used in social media monitoring and product reviews.</p>
+        <p style="font-size:.78rem;margin-top:.4rem"><em>Example:</em> "The film was absolutely brilliant!" → positive.</p>
+      </div>
+      <div class="arch-card">
+        <h4>Machine Translation</h4>
+        <p>Automatically translating text from one natural language to another. Modern systems use neural networks (transformer models).</p>
+        <p style="font-size:.78rem;margin-top:.4rem"><em>Example:</em> "Bonjour le monde" → "Hello the world."</p>
+      </div>
+    </div>
+
+    <h3>Challenges of NLP</h3>
+    <table class="plain-table">
+      <tr><th>Challenge</th><th>Explanation</th><th>Example</th></tr>
+      <tr>
+        <td><strong>Ambiguity</strong></td>
+        <td>Words and sentences often have multiple meanings. Context is required to choose the correct interpretation.</td>
+        <td>"I saw her duck" — did she lower her head, or did I see a duck she owns?</td>
+      </tr>
+      <tr>
+        <td><strong>Coreference</strong></td>
+        <td>Pronouns and references must be resolved to identify what entity they refer to.</td>
+        <td>"Alice told Bob she was tired" — who was tired, Alice or Bob?</td>
+      </tr>
+      <tr>
+        <td><strong>Context and world knowledge</strong></td>
+        <td>Understanding language often requires background knowledge not stated in the text.</td>
+        <td>"The trophy didn't fit in the suitcase because it was too big." — what is too big?</td>
+      </tr>
+      <tr>
+        <td><strong>Idioms and figurative language</strong></td>
+        <td>Phrases whose meaning cannot be inferred from the literal meaning of individual words.</td>
+        <td>"It's raining cats and dogs" cannot be understood word-for-word.</td>
+      </tr>
+      <tr>
+        <td><strong>Language variation</strong></td>
+        <td>Dialects, slang, spelling errors, and evolving vocabulary make parsing unreliable.</td>
+        <td>"gonna", "tbh", "gr8" are not standard dictionary words.</td>
+      </tr>
+    </table>
+
+    <h3>A Brief History of NLP Approaches</h3>
+    <p>NLP has evolved through three broad eras:</p>
+    <ol>
+      <li><strong>Rule-based (1950s–1980s):</strong> Hand-coded grammar rules and dictionaries. Brittle — failed on text outside the grammar's scope.</li>
+      <li><strong>Statistical (1990s–2000s):</strong> Trained on large corpora using probabilistic models. More robust, but required extensive feature engineering.</li>
+      <li><strong>Neural (2010s–present):</strong> Deep learning models (RNNs, LSTMs, Transformers) learn representations directly from text. Modern large language models (e.g., GPT, BERT) achieve near-human performance on many NLP benchmarks.</li>
+    </ol>
+
+    <div class="callout tip">
+      <strong>Key insight:</strong> Modern NLP succeeds partly because the internet provides vast quantities of human-written text for training. The more diverse and large the training corpus, the better the model captures the subtleties of language.
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Practice Question</div>
+      <p>Explain two reasons why natural language processing is a challenging problem for computers, compared to processing formal languages such as programming languages. (4 marks)</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Reason 1 — Ambiguity:</strong> Words and sentences in natural language can have multiple meanings. A computer must use context to determine the correct interpretation, but this context may itself be ambiguous. Programming languages are unambiguous by design — every syntactically valid statement has exactly one defined meaning. (2 marks)</p>
+        <p><strong>Reason 2 — World knowledge and context:</strong> Understanding natural language often requires general knowledge about the world that is not stated in the text (e.g., knowing that suitcases are smaller than trophies helps resolve "it was too big"). Programming languages require no world knowledge — they follow strict syntactic rules the computer can check mechanically. (2 marks)</p>
+        <p><em>Also accept:</em> idioms/figurative language, coreference resolution, spelling/grammar variation, sarcasm, evolving slang.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 6: Exam Practice               -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="lesson-section" id="exam-practice">
+    <h2><span class="section-num">📝</span> Exam Practice</h2>
+
+    <div class="practice">
+      <div class="pq-title">Question 1 — 4 marks</div>
+      <p>Compare supervised learning and unsupervised learning. Your answer should include: the type of data required, the goal of each approach, and one example of each.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Supervised learning</strong> requires labelled data — each training example has an input and a correct output (label). The goal is to learn a function that maps inputs to labels, so the model can predict labels for new, unseen inputs. (1 mark) <em>Example:</em> Training an email spam classifier using thousands of emails labelled "spam" or "not spam." (1 mark)</p>
+        <p><strong>Unsupervised learning</strong> uses unlabelled data — no correct outputs are provided. The goal is to discover hidden structure or patterns in the data (e.g., groups, clusters, or compressed representations). (1 mark) <em>Example:</em> Grouping customers into segments based on purchase history, without knowing in advance what the groups should be. (1 mark)</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Question 2 — 5 marks</div>
+      <p>A game-playing AI learns to play a video game by trying different actions and receiving a score after each game. The AI is not given any rules about the game — it must discover what to do on its own.</p>
+      <p>(a) Identify the type of machine learning being used. Justify your answer. (2 marks)</p>
+      <p>(b) Define the terms <em>agent</em>, <em>state</em>, and <em>reward</em> as they apply to this scenario. (3 marks)</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>(a)</strong> Reinforcement learning. (1 mark) The AI (agent) learns by interacting with the environment (the game) and receiving feedback (score/reward) — it is not given labelled examples (not supervised) nor is it finding structure in unlabelled data (not unsupervised). It discovers optimal actions through trial and error. (1 mark)</p>
+        <p><strong>(b)</strong></p>
+        <ul>
+          <li><strong>Agent:</strong> The AI program that plays the game — it observes the game state and selects actions. (1 mark)</li>
+          <li><strong>State:</strong> The current situation of the game — for example, the position of the player, enemies, and score at a given moment. (1 mark)</li>
+          <li><strong>Reward:</strong> The score (or change in score) received after each action or after each game — a positive reward for good actions (e.g., killing an enemy), a negative reward (penalty) for bad actions (e.g., losing a life). (1 mark)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Question 3 — 5 marks</div>
+      <p>Describe the structure of a neural network trained to classify handwritten digits (0–9) from 28×28 pixel images. Your answer should include the number of input and output neurons and the roles of the hidden layers. Then explain how the network is trained using backpropagation. (5 marks)</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Structure:</strong> The input layer has 784 neurons (one per pixel in the 28×28 image — each pixel's greyscale value is a feature). (1 mark) The output layer has 10 neurons, one per digit class (0–9) — a softmax activation produces a probability distribution, and the digit with the highest probability is the prediction. (1 mark) Hidden layers in between transform the raw pixel values into increasingly abstract representations — early layers may detect edges and curves; later layers recognise digit-specific shapes. (1 mark)</p>
+        <p><strong>Training (backpropagation):</strong> A training image is passed through the network (forward propagation) to produce a predicted probability distribution. The loss function (cross-entropy) measures how far the prediction is from the true label (e.g., predicted 70% for "3" but the true digit was "8"). (1 mark) Backpropagation calculates the gradient of the loss with respect to every weight, propagating the error signal backwards through the network. Gradient descent updates each weight to reduce the loss. This is repeated for many images over many epochs until the loss converges. (1 mark)</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Question 4 — 6 marks</div>
+      <p>Compare expert systems and neural networks as approaches to building an AI system for medical diagnosis. Your answer should discuss: knowledge acquisition, transparency, learning from new data, and one advantage unique to each approach.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Knowledge acquisition:</strong> Expert systems require a knowledge engineer to interview human doctors and encode their knowledge as explicit IF-THEN rules — this is expensive and time-consuming (knowledge acquisition bottleneck). Neural networks learn automatically from large datasets of labelled patient records — no manual rule creation is needed, but a large, labelled dataset must exist. (1 mark)</p>
+        <p><strong>Transparency:</strong> Expert systems are transparent — the explanation facility can show exactly which rules fired to reach a diagnosis (e.g., "confirmed diabetes because blood glucose was high AND the patient was at risk"). Neural networks are "black boxes" — it is very difficult to explain why a particular diagnosis was made, which is a serious concern in safety-critical medical applications. (2 marks)</p>
+        <p><strong>Learning from new data:</strong> Expert systems cannot update their knowledge automatically — if a new treatment protocol is discovered, the knowledge base must be updated by a knowledge engineer. Neural networks can be re-trained on new data, potentially improving over time as more patient records become available. (1 mark)</p>
+        <p><strong>Advantage of expert systems:</strong> Can operate reliably even with small datasets — rules work with even one example if the expert can articulate the rule. (1 mark)</p>
+        <p><strong>Advantage of neural networks:</strong> Can discover subtle, complex patterns in data (e.g., rare combinations of symptoms) that human experts may not be able to articulate as rules. (1 mark)</p>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Question 5 — 3 marks</div>
+      <p>Give three challenges that make natural language processing more difficult than processing a formal programming language.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p>Any three of:</p>
+        <ul>
+          <li><strong>Ambiguity:</strong> Words and sentences in natural language can have multiple valid interpretations; context is needed to disambiguate. Programming languages are unambiguous by design. (1 mark)</li>
+          <li><strong>Coreference resolution:</strong> Pronouns must be resolved to their referents, which can be unclear. "She told her to leave" — who told whom? (1 mark)</li>
+          <li><strong>Idioms and figurative language:</strong> Phrases like "kick the bucket" cannot be understood word-for-word. Programming languages have no idioms. (1 mark)</li>
+          <li><strong>World knowledge:</strong> Understanding often requires background knowledge not in the text itself. Programming languages need no external knowledge. (1 mark)</li>
+          <li><strong>Variation and evolution:</strong> Natural language includes dialects, slang, abbreviations, and spelling errors. Programming languages have fixed, strict syntax. (1 mark)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="pq-title">Question 6 — 4 marks</div>
+      <p>Explain what is meant by the Turing Test and discuss whether passing the Turing Test should be considered sufficient evidence that a machine is truly intelligent.</p>
+      <button class="reveal-btn">Show Answer</button>
+      <div class="answer-reveal">
+        <p><strong>Turing Test:</strong> A human interrogator conducts a text-based conversation with both a human and a machine, without knowing which is which. If the interrogator cannot reliably distinguish the machine from the human, the machine passes the test. Turing proposed this as a practical substitute for the unanswerable question "can machines think?" (2 marks)</p>
+        <p><strong>Argument against sufficiency:</strong> Passing the Turing Test does not necessarily mean a machine is truly intelligent or understands anything. The Chinese Room argument (Searle) illustrates this — a system could manipulate symbols according to rules and produce convincing replies with no genuine comprehension. Additionally, the test only measures linguistic performance, not creativity, emotion, physical intelligence, or moral reasoning — aspects of human intelligence not captured by text alone. A machine might also pass through deception (e.g., deliberately making typos) rather than genuine understanding. (2 marks)</p>
+      </div>
+    </div>
+
+    <h3>Revision Checklist</h3>
+    <ul class="checklist">
+      <li>Define AI and distinguish between weak (narrow) and strong (general) AI</li>
+      <li>Describe the Turing Test and state one criticism of it as a measure of intelligence</li>
+      <li>Explain supervised, unsupervised, and reinforcement learning with examples</li>
+      <li>Define: features, labels, training data, validation set, overfitting</li>
+      <li>Describe the three layers of a neural network and the role of each</li>
+      <li>Explain what weights, biases, and activation functions do within a neuron</li>
+      <li>Describe the training process: forward propagation → loss → backpropagation → weight update</li>
+      <li>Describe the components of an expert system: knowledge base, inference engine, explanation facility</li>
+      <li>Explain forward chaining and backward chaining with a simple example</li>
+      <li>State three limitations of expert systems</li>
+      <li>Compare expert systems and neural networks: transparency, learning, knowledge acquisition</li>
+      <li>Describe three NLP tasks: tokenisation, sentiment analysis, machine translation</li>
+      <li>Give two reasons why NLP is harder than processing formal languages</li>
+    </ul>
+  </div>
+
+</main>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-box">
+    <h3>Contents</h3>
+    <ul class="toc-list">
+      <li><a href="#what-is-ai" class="active">1. What is AI?</a></li>
+      <li><a href="#machine-learning">2. Machine Learning</a></li>
+      <li><a href="#neural-networks">3. Neural Networks</a></li>
+      <li><a href="#expert-systems">4. Expert Systems</a></li>
+      <li><a href="#nlp">5. NLP</a></li>
+      <li><a href="#exam-practice">📝 Exam Practice</a></li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>ML Paradigms</h3>
+    <ul style="font-size:.78rem;padding-left:0;list-style:none;color:var(--text)">
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>Supervised</strong> — labelled data, predict output</li>
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>Unsupervised</strong> — unlabelled, find structure</li>
+      <li style="padding:.2rem 0"><strong>Reinforcement</strong> — agent + rewards, trial &amp; error</li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>Neural Network</h3>
+    <ul style="font-size:.78rem;padding-left:0;list-style:none;color:var(--text)">
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>Input layer</strong> — one node per feature</li>
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>Hidden layers</strong> — learn representations</li>
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>Output layer</strong> — final prediction</li>
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>Weights</strong> — connection strengths</li>
+      <li style="padding:.2rem 0">Training: forward → loss → backprop → update</li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>Expert System</h3>
+    <ul style="font-size:.78rem;padding-left:0;list-style:none;color:var(--text)">
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>Knowledge Base</strong> — IF-THEN rules + facts</li>
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>Inference Engine</strong> — applies rules</li>
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>Forward</strong> — data → conclusion</li>
+      <li style="padding:.2rem 0"><strong>Backward</strong> — goal → verify conditions</li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box">
+    <h3>Activation Functions</h3>
+    <ul style="font-size:.78rem;padding-left:0;list-style:none;color:var(--text);font-family:'Courier New',Courier,monospace">
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>ReLU</strong> — max(0, z) — hidden layers</li>
+      <li style="padding:.2rem 0;border-bottom:1px solid var(--border)"><strong>Sigmoid</strong> — (0,1) — binary output</li>
+      <li style="padding:.2rem 0"><strong>Softmax</strong> — sums to 1 — multi-class output</li>
+    </ul>
+  </div>
+
+  <div class="sidebar-box" style="border-left:4px solid #1565c0">
+    <h3 style="color:#1565c0">Common Mistakes</h3>
+    <ul style="font-size:.78rem;padding-left:1.1rem;color:var(--text)">
+      <li style="margin:.3rem 0">All current AI is weak/narrow AI — do not claim strong AI exists</li>
+      <li style="margin:.3rem 0">Passing the Turing Test ≠ genuine understanding — it tests behaviour, not cognition</li>
+      <li style="margin:.3rem 0">Neural networks cannot explain their reasoning — expert systems can</li>
+      <li style="margin:.3rem 0">Expert systems do not learn from new data — knowledge must be manually updated</li>
+      <li style="margin:.3rem 0">Overfitting: high training accuracy + low validation accuracy — don't confuse with underfitting</li>
+    </ul>
+  </div>
+
+  <a href="topic15-further-hardware.html" style="display:block;text-align:center;background:var(--surface2);color:var(--primary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.65rem;font-weight:700;font-size:.82rem;text-decoration:none;margin-top:.25rem">
+    ← Topic 15: Further Hardware
+  </a>
+  <a href="index.html" style="display:block;text-align:center;background:var(--primary);color:#fff;border-radius:var(--radius-sm);padding:.75rem;font-weight:700;font-size:.875rem;text-decoration:none;margin-top:.5rem">
+    ← Back to All Topics
+  </a>
+
+</aside>
+
+</div><!-- /lesson-wrap -->
+
+<footer style="background:var(--surface);border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;font-size:.8rem;color:var(--text-muted)">
+  Cambridge International AS &amp; A Level Computer Science 9618 — Topic 16: Artificial Intelligence &nbsp;|&nbsp;
+  Not affiliated with Cambridge Assessment International Education.
+</footer>
+
+<script src="script.js"></script>
+<script>
+  const sections = document.querySelectorAll('.lesson-section[id]');
+  const navLinks = document.querySelectorAll('.toc-list a, .page-nav a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+  document.querySelectorAll('.reveal-btn').forEach(btn => { btn.textContent = 'Show Answer'; });
+</script>
+</body>
+</html>
